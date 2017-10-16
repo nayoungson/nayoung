@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "API_OS1nayoung", "API_OS1nayoung\API_OS1nayoung.vcxproj", "{A3F6654A-963B-4518-8A55-C13860721EDE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A3F6654A-963B-4518-8A55-C13860721EDE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A3F6654A-963B-4518-8A55-C13860721EDE}.Debug|Win32.Build.0 = Debug|Win32
+		{A3F6654A-963B-4518-8A55-C13860721EDE}.Release|Win32.ActiveCfg = Release|Win32
+		{A3F6654A-963B-4518-8A55-C13860721EDE}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
