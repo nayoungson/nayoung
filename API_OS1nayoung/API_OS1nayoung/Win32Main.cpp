@@ -75,6 +75,10 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 
 		CreateWindow(L"button", L"------------ 10/6 - 10/13 [3ÁÖÂ÷] ------------", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,300,250,40,hWnd,(HMENU)22,g_hInst,NULL);
 		CreateWindow(L"button", L"GetProcessWorkingSetSize", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,350,250,40,hWnd,(HMENU)23,g_hInst,NULL);
+		CreateWindow(L"button", L"GetProcessWorkingSetSizeEx", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,400,250,40,hWnd,(HMENU)24,g_hInst,NULL);
+		
+
+
 		
 		CreateWindow(L"button", L"", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,0,250,40,hWnd,(HMENU)23,g_hInst,NULL);
 
@@ -95,6 +99,9 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 			
 		case 23:
 			test_GetProcessWorkingSetSize();
+			break;
+		case 24:
+			test_GetProcessWorkingSetSizeEx();
 			break;
 		}
 		return 0;

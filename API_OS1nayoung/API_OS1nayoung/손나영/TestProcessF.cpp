@@ -172,8 +172,8 @@ BOOL test_QueryProcessAffinityUpdateMode(){
 */
 BOOL test_GetProcessWorkingSetSize(){
 
-	HANDLE hProcess;
 	BOOL result;
+	HANDLE hProcess;
 	SIZE_T dwMin, dwMax;
 
 	char buf[BUFSIZ];
@@ -206,6 +206,53 @@ BOOL test_GetProcessWorkingSetSize(){
 	wresult(__FILE__, __LINE__, "GetProcessWorkingSetSize", buf, "SUCCESS", meg);
 
     CloseHandle(hProcess);
+	return true;
+}
+
+BOOL test_GetProcessWorkingSetSizeEx(){
+	
+	BOOL result;
+	HANDLE hProcess;
+	SIZE_T dwMin, dwMax;
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	/** process 식별자 가져옴 */
+	int num = GetCurrentProcessId();
+
+	/**	PROCESS_QUERY_INFORMATION : access right(security)
+		FALSE : process do not inherit this handle	
+		num : GetCurrentProcessId()		*/
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, num);
+
+	printf("aa");
+
+	/** OpenProcess() 실패	*/
+	if (!hProcess) {
+		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
+		return 1;
+	}
+
+	printf("bb");
+
+	/**	process의 working set size를 가져옴	*/
+	result = GetProcessWorkingSetSizeEx(hProcess, &dwMin, &dwMax, (PDWORD)QUOTA_LIMITS_HARDWS_MIN_ENABLE);
+
+	printf("cc");
+
+	printf("dfs");
+	Sleep(2000);
+	if(result == ERROR_SUCCESS){
+		sprintf(meg, " GetProcessWorkingSetSizeEx() : SUCCESS \n\n ProcessId : %d \n MinimumWorkingSetSize : %lu KB \n MaximumWorkingSetSize : %lu KB", num, dwMin, dwMax);
+		strcpy(buf, "SUCCESS");
+
+	}else{
+		printf("sdfdf");
+		strcpy(buf, GetErrorMessage(" GetProcessWorkingSetSize() : FAIL \n\n Error Message :", GetLastError()));
+	}
+	wresult(__FILE__, __LINE__, "GetProcessWorkingSetSizeEx", buf, "SUCCESS", meg);
+
 	return true;
 }
 

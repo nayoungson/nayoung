@@ -17,4 +17,6 @@ BOOL test_SetProcessShutdownParameters();
 
 //3ÁÖÂ÷
 BOOL test_GetProcessWorkingSetSize();
+BOOL test_GetProcessWorkingSetSizeEx();
+
 #endif
