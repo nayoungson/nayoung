@@ -226,29 +226,20 @@ BOOL test_GetProcessWorkingSetSizeEx(){
 		num : GetCurrentProcessId()		*/
 	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, num);
 
-	printf("aa");
-
 	/** OpenProcess() 실패	*/
 	if (!hProcess) {
 		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
 		return 1;
 	}
 
-	printf("bb");
-
 	/**	process의 working set size를 가져옴	*/
-	result = GetProcessWorkingSetSizeEx(hProcess, &dwMin, &dwMax, (PDWORD)QUOTA_LIMITS_HARDWS_MIN_ENABLE);
-
-	printf("cc");
-
-	printf("dfs");
-	Sleep(2000);
-	if(result == ERROR_SUCCESS){
+	/** 0xC0000005: 0x00000000 위치를 기록하는 동안 액세스 위반이 발생했습니다. */
+	result = GetProcessWorkingSetSizeEx(hProcess, &dwMin, &dwMax, 0);
+	
+	if(!result){
 		sprintf(meg, " GetProcessWorkingSetSizeEx() : SUCCESS \n\n ProcessId : %d \n MinimumWorkingSetSize : %lu KB \n MaximumWorkingSetSize : %lu KB", num, dwMin, dwMax);
 		strcpy(buf, "SUCCESS");
-
 	}else{
-		printf("sdfdf");
 		strcpy(buf, GetErrorMessage(" GetProcessWorkingSetSize() : FAIL \n\n Error Message :", GetLastError()));
 	}
 	wresult(__FILE__, __LINE__, "GetProcessWorkingSetSizeEx", buf, "SUCCESS", meg);

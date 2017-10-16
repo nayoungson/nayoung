@@ -1,20 +1,8 @@
-﻿빌드 시작: 2017-10-16 오후 12:19:29
-     1>2 노드의 "C:\Users\Tmax\documents\visual studio 2012\Projects\API_OS1nayoung\API_OS1nayoung\API_OS1nayoung.vcxproj" 프로젝트(Rebuild 대상)입니다.
+﻿빌드 시작: 2017-10-16 오후 1:43:32
+     1>2 노드의 "C:\Users\Tmax\documents\visual studio 2012\Projects\API_OS1nayoung\API_OS1nayoung\API_OS1nayoung.vcxproj" 프로젝트(Build 대상)입니다.
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt MyUtil.cpp OSQA.cpp Win32Main.cpp "손나영\TestCriticalSection.cpp" "손나영\TestFunctionPPT.cpp" "손나영\TestLibrary.cpp" "손나영\TestFunction.cpp" "손나영\TestModule.cpp" "손나영\TestDebug.cpp" "손나영\TestProcessF.cpp" "손나영\TestProcessor.cpp" "손나영\TestRegistry.cpp" "손나영\TestRegistryPPT.cpp"
-         MyUtil.cpp
-         OSQA.cpp
-         Win32Main.cpp
-         TestCriticalSection.cpp
-         TestFunctionPPT.cpp
-         TestLibrary.cpp
-         TestFunction.cpp
-         TestModule.cpp
-         TestDebug.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt "손나영\TestProcessF.cpp"
          TestProcessF.cpp
-         TestProcessor.cpp
-         TestRegistry.cpp
-         TestRegistryPPT.cpp
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Tmax\documents\visual studio 2012\Projects\API_OS1nayoung\Release\API_OS1nayoung.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Tmax\documents\visual studio 2012\Projects\API_OS1nayoung\Release\API_OS1nayoung.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Tmax\documents\visual studio 2012\Projects\API_OS1nayoung\Release\API_OS1nayoung.lib" /MACHINE:X86 /SAFESEH Release\MyUtil.obj
          Release\OSQA.obj
@@ -32,8 +20,8 @@
          코드를 생성하고 있습니다.
          코드를 생성했습니다.
          API_OS1nayoung.vcxproj -> C:\Users\Tmax\documents\visual studio 2012\Projects\API_OS1nayoung\Release\API_OS1nayoung.exe
-     1>"C:\Users\Tmax\documents\visual studio 2012\Projects\API_OS1nayoung\API_OS1nayoung\API_OS1nayoung.vcxproj" 프로젝트를 빌드했습니다(Rebuild 대상).
+     1>"C:\Users\Tmax\documents\visual studio 2012\Projects\API_OS1nayoung\API_OS1nayoung\API_OS1nayoung.vcxproj" 프로젝트를 빌드했습니다(Build 대상).
 
 빌드했습니다.
 
-경과 시간: 00:00:10.82
+경과 시간: 00:00:01.79

@@ -77,21 +77,10 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		CreateWindow(L"button", L"GetProcessWorkingSetSize", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,350,250,40,hWnd,(HMENU)23,g_hInst,NULL);
 		CreateWindow(L"button", L"GetProcessWorkingSetSizeEx", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,400,250,40,hWnd,(HMENU)24,g_hInst,NULL);
 		
-
-
-		
 		CreateWindow(L"button", L"", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,0,250,40,hWnd,(HMENU)23,g_hInst,NULL);
-
 		CreateWindow(L"button", L" ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,0,250,40,hWnd,(HMENU)5,g_hInst,NULL);
 		CreateWindow(L"button", L" ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,0,250,40,hWnd,(HMENU)5,g_hInst,NULL);
 
-
-		
-
-		
-		
-		// 5∂Û¿Œ
-		
 		break;
 
 	case WM_COMMAND:
