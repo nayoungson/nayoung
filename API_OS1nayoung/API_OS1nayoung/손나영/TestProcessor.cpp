@@ -24,6 +24,28 @@ BOOL test_GetMaximumProcessorCount(){
 	return true;
 }
 
+BOOL test_GetMaximumProcessorGroupCount(){
+
+	char meg[BUFSIZ] = "FAIL";																							
+	char buf[BUFSIZ];
+
+	DWORD result = GetMaximumProcessorGroupCount();
+
+	#ifdef OQADBGPRINT
+	printf("test_GetMaximumProcessorGroupCount \n");
+	#endif
+
+	if(result != 0){
+		sprintf(meg, " GetMaximumProcessorGroupCount() : SUCCESS \n\n 프로세서 그룹 최대 개수 : %d", result);
+		strcpy(buf, "SUCCESS");
+	}else 
+		strcpy(buf, GetErrorMessage(" GetMaximumProcessorGroupCount() : FAIL \n\n Error Message :", GetLastError()));
+
+	wresult(__FILE__, __LINE__, "GetMaximumProcessorGroupCount", buf, "SUCCESS", meg);
+
+	return true;
+}
+
 BOOL test_GetActiveProcessorCount(){
 
 	char meg[BUFSIZ] = "FAIL";
@@ -101,6 +123,7 @@ BOOL test_GetCurrentProcessorNumber(){
 	char meg[BUFSIZ] = "FAIL";
 	char buf[BUFSIZ];
 
+	/** returns the processor number within the processor group to which the logical processor is assigned.*/
 	DWORD result = GetCurrentProcessorNumber();
 
 	#ifdef OQADBGPRINT
@@ -112,8 +135,62 @@ BOOL test_GetCurrentProcessorNumber(){
 		strcpy(buf, "SUCCESS");
 	}else 
 		strcpy(buf, GetErrorMessage(" GetCurrentProcessorNumber() : FAIL \n\n Error Message :", GetLastError()));
-	
+
 	wresult(__FILE__, __LINE__, "GetCurrentProcessorNumber", buf, "SUCCESS", meg);
+
+	return true;
+}
+
+/** 
+	node number for the specified processor.
+	NUMA(Non-Uniform Memory Access) NODE : 
+*/
+BOOL test_GetNumaProcessorNode(){
 	
+	BOOL result;
+	
+	char meg[BUFSIZ] = "FAIL";
+	char buf[BUFSIZ];
+
+	/** processor가 존재하지 않는다면 node number(두 번째 파라미터)는 0xFF */
+	DWORD processorNumber = GetCurrentProcessorNumber();
+
+	if(processorNumber != -1){
+		// 255
+		UCHAR nodeNumber = 255;
+		result = GetNumaProcessorNode((UCHAR)processorNumber, &nodeNumber);
+
+		if(result != 0){
+			sprintf(meg, " GetNumaProcessorNode() : SUCCESS \n\n number of processor the current thread : %d", processorNumber);
+			strcpy(buf, "SUCCESS");
+		}else 
+			strcpy(buf, GetErrorMessage(" GetCurrentProcessorNumber() : FAIL \n\n Error Message :", GetLastError()));
+	}else
+		strcpy(buf, GetErrorMessage(" processor number 조회에 실패했습니다. \n\n Error Message :", GetLastError()));
+
+	wresult(__FILE__, __LINE__, "GetCurrentProcessorNumber", buf, "SUCCESS", meg);
+	return true;
+}
+
+BOOL test_GetNumaNodeNumberFromHandle(){
+
+	BOOL result;
+
+	char meg[BUFSIZ] = "FAIL";
+	char buf[BUFSIZ];
+
+	USHORT nodeNumber = 255;
+	HANDLE hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test_GetNumaNodeNumberFromHandle.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	result = GetNumaNodeNumberFromHandle(hFile, &nodeNumber);
+
+	if(result != 0){
+			sprintf(meg, " GetNumaNodeNumberFromHandle() : SUCCESS");
+			strcpy(buf, "SUCCESS");
+	}else 
+			strcpy(buf, GetErrorMessage(" GetNumaNodeNumberFromHandle() : FAIL \n\n Error Message :", GetLastError()));
+	
+	wresult(__FILE__, __LINE__, "GetNumaNodeNumberFromHandle", buf, "SUCCESS", meg);
+
 	return true;
 }

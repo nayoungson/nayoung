@@ -11,4 +11,9 @@ BOOL test_GetActiveProcessorGroupCount();
 BOOL test_GetLogicalProcessorInformationEx();
 BOOL test_GetCurrentProcessorNumber();
 
+//3ÁÖÂ÷
+BOOL test_GetMaximumProcessorGroupCount();
+BOOL test_GetNumaProcessorNode();
+BOOL test_GetNumaNodeNumberFromHandle();
+
 #endif

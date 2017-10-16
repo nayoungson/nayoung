@@ -53,7 +53,6 @@ BOOL test_SetProcessAffinityUpdateMode(){
 	return true;
 }
 
-
 BOOL test_SetProcessShutdownParameters(){
 
 	char meg[BUFSIZ] = "FAIL";
@@ -141,6 +140,10 @@ BOOL test_QueryProcessAffinityUpdateMode(){
 
 	char meg[BUFSIZ] = "FAIL";
 
+	#ifdef OQADBGPRINT
+	printf("test_QueryProcessAffinityUpdateMode\n");
+	#endif
+
 	//HANDLE hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test2.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	//hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test2.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
@@ -163,6 +166,44 @@ BOOL test_QueryProcessAffinityUpdateMode(){
 	return true;
 } 
 
+BOOL test_GetProcessId(){
+
+	BOOL result;
+	HANDLE hProcess;
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	#ifdef OQADBGPRINT
+	printf("test_GetProcessId\n");
+	#endif
+
+	/** process 식별자 가져옴 */
+	DWORD num = GetCurrentProcessId();
+
+	/**	PROCESS_QUERY_INFORMATION : access right(security)
+		FALSE : process do not inherit this handle	
+		num : GetCurrentProcessId()		*/
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, num);
+
+	/** OpenProcess() 실패	*/
+	if (!hProcess) {
+		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
+		return 1;
+	}
+	
+	result = GetProcessId(hProcess);
+	
+	if(result){
+		sprintf(meg, " GetProcessId() : SUCCESS \n\n ProcessId : %d ", num);
+		strcpy(buf, "SUCCESS");
+	}else{
+		strcpy(buf, GetErrorMessage(" GetProcessId() : FAIL \n\n Error Message :", GetLastError()));
+	}
+	wresult(__FILE__, __LINE__, "GetProcessId", buf, "SUCCESS", meg);
+
+	return true;
+}
 
 /**
 	process가 자주 참조하는 데이터를 물리 메모리 영역에 상주 시켜서 
@@ -178,6 +219,10 @@ BOOL test_GetProcessWorkingSetSize(){
 
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
+
+	#ifdef OQADBGPRINT
+	printf("test_GetProcessWorkingSetSize\n");
+	#endif
 
 	/** process 식별자 가져옴 */
 	int num = GetCurrentProcessId();
@@ -206,6 +251,76 @@ BOOL test_GetProcessWorkingSetSize(){
 	wresult(__FILE__, __LINE__, "GetProcessWorkingSetSize", buf, "SUCCESS", meg);
 
     CloseHandle(hProcess);
+	return true;
+}
+
+BOOL test_IsProcessInJob(){
+
+	BOOL result;
+	BOOL bInJob;
+	HANDLE hProcess;
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	#ifdef OQADBGPRINT
+	printf("test_IsProcessInJob\n");
+	#endif
+
+	/** process 식별자 가져옴 */
+	int num = GetCurrentProcessId();
+
+	/**	PROCESS_QUERY_INFORMATION : access right(security)
+		FALSE : process do not inherit this handle	
+		num : GetCurrentProcessId()		*/
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, num);
+
+	/** OpenProcess() 실패	*/
+	if (!hProcess) {
+		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
+		return 1;
+	}
+
+	/** process가 지정된 작업에서 실행 중인지 여부 결정	*/
+    result = IsProcessInJob(hProcess, 0, &bInJob);
+
+	if(result != 0){
+		sprintf(meg, " IsProcessInJob() : SUCCESS");
+		strcpy(buf, "SUCCESS");
+
+	}else 
+		strcpy(buf, GetErrorMessage(" IsProcessInJob() : FAIL \n\n Error Message :", GetLastError()));
+
+	wresult(__FILE__, __LINE__, "IsProcessInJob", buf, "SUCCESS", meg);
+	return true;
+}
+
+BOOL test_GetProcessGroupAffinity(){
+
+
+	HANDLE hProcess;
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	#ifdef OQADBGPRINT
+	printf("test_GetProcessGroupAffinity\n");
+	#endif
+
+	/** process 식별자 가져옴 */
+	int pid = GetCurrentProcessId();
+
+	/**	PROCESS_QUERY_INFORMATION : access right(security)
+		FALSE : process do not inherit this handle	
+		num : GetCurrentProcessId()		*/
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
+
+	/** OpenProcess() 실패	*/
+	if (!hProcess) {
+		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
+		return 1;
+
+	}
 	return true;
 }
 
@@ -247,6 +362,27 @@ BOOL test_GetProcessWorkingSetSizeEx(){
 	return true;
 }
 
+BOOL test_GetProcessDEPPolicy(){
+
+	HANDLE hProcess;
+
+	int num = GetCurrentProcessId();
+
+	/**	PROCESS_QUERY_INFORMATION : access right(security)
+		FALSE : process do not inherit this handle	
+		num : GetCurrentProcessId()		*/
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, num);
+
+	/** DEP Flags : 0 / PROCESS_DEP_ENABLE / PROCESS_DEP_DISABLE_ATL_THUNK_EMULATION */
+	//if(GetProcessDEPPolicy(hProcess, &dwPolicy, 0) != FALSE){
+	//	if (dwPolicy == PROCESS_DEP_ENABLE) {
+	//	printf("a");
+	//	}
+	//}else
+	//	printf("b");
+
+	return true;
+}
 
 BOOL test_SetProcessPriorityBoost(){
 

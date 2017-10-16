@@ -74,11 +74,19 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 
 
 		CreateWindow(L"button", L"------------ 10/6 - 10/13 [3ÁÖÂ÷] ------------", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,300,250,40,hWnd,(HMENU)22,g_hInst,NULL);
-		CreateWindow(L"button", L"GetProcessWorkingSetSize", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,350,250,40,hWnd,(HMENU)23,g_hInst,NULL);
-		CreateWindow(L"button", L"GetProcessWorkingSetSizeEx", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,400,250,40,hWnd,(HMENU)24,g_hInst,NULL);
+		CreateWindow(L"button", L"GetProcessId", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,350,250,40,hWnd,(HMENU)23,g_hInst,NULL);
+		CreateWindow(L"button", L"GetProcessWorkingSetSize", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,400,250,40,hWnd,(HMENU)24,g_hInst,NULL);
+		CreateWindow(L"button", L"IsProcessInJob", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,450,250,40,hWnd,(HMENU)25,g_hInst,NULL);
+		CreateWindow(L"button", L"GetMaximumProcessorGroupCount", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,500,250,40,hWnd,(HMENU)26,g_hInst,NULL);
+		CreateWindow(L"button", L"GetNumaProcessorNode", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,550,250,40,hWnd,(HMENU)27,g_hInst,NULL);
+		CreateWindow(L"button", L"GetNumaNodeNumberFromHandle", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,600,250,40,hWnd,(HMENU)28,g_hInst,NULL);
 		
-		CreateWindow(L"button", L"", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,0,250,40,hWnd,(HMENU)23,g_hInst,NULL);
-		CreateWindow(L"button", L" ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,0,250,40,hWnd,(HMENU)5,g_hInst,NULL);
+
+		//CreateWindow(L"button", L"GetProcessWorkingSetSizeEx", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,400,250,40,hWnd,(HMENU)25,g_hInst,NULL);
+		//CreateWindow(L"button", L"GetProcessDEPPolicy", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,450,250,40,hWnd,(HMENU)26,g_hInst,NULL);
+		
+
+
 		CreateWindow(L"button", L" ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,0,250,40,hWnd,(HMENU)5,g_hInst,NULL);
 
 		break;
@@ -86,11 +94,30 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
 			
+		case 17:
+			test_GetActiveProcessorGroupCount();
+			break;
+		case 18:
+			test_GetCurrentProcessorNumber();
+			break;
+
 		case 23:
-			test_GetProcessWorkingSetSize();
+			test_GetProcessId();
 			break;
 		case 24:
-			test_GetProcessWorkingSetSizeEx();
+			test_GetProcessWorkingSetSize();
+			break;
+		case 25:
+			test_IsProcessInJob();
+			break;
+		case 26:
+			test_GetMaximumProcessorGroupCount();
+			break;
+		case 27:
+			test_GetNumaProcessorNode();
+			break;
+		case 28:
+			test_GetNumaNodeNumberFromHandle();
 			break;
 		}
 		return 0;

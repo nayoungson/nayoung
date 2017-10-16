@@ -16,7 +16,12 @@ BOOL test_SetProcessShutdownParameters();
 
 
 //3ÁÖÂ÷
+BOOL test_GetProcessId();
 BOOL test_GetProcessWorkingSetSize();
+BOOL test_IsProcessInJob();
+
 BOOL test_GetProcessWorkingSetSizeEx();
+BOOL test_GetProcessDEPPolicy();
+BOOL test_GetProcessGroupAffinity();
 
 #endif
