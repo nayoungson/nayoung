@@ -26,10 +26,6 @@ BOOL test_RegCreateKeyExW(){
 	return true;
 }
 
-
-
-
-
 BOOL test_RegSetValueExW(){ 
 	
 	RECT rt;

@@ -14,5 +14,9 @@ BOOL test_RegEnumKeyExA();
 BOOL test_RegDisablePredefinedCacheEx();
 BOOL test_RegGetValueW();
 
+//3ÁÖÂ÷
+BOOL test_RegRestoreKeyA();
+BOOL test_RegLoadKeyA();
+BOOL test_RegOpenCurrentUser();
 
 #endif

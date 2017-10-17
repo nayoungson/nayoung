@@ -6,12 +6,14 @@ BOOL test_RegLoadKeyA(){
 	HWND hWnd =0;
 	HKEY newKey;
 	LONG result;
+	RECT rt;
 
-	//HKEY hKey = HKEY_LOCAL_MACHINE;
-	HKEY hKey = HKEY_CURRENT_USER;
+	HKEY hKey = HKEY_LOCAL_MACHINE;
+	//HKEY hKey = HKEY_CURRENT_USER;
 	//HKEY hKey = HKEY_USERS;
-	LPSTR lpSubKey = "SOFTWARE\\NAYOUNG_API_TEST\\RegiTest\\Position";
+
 	LPSTR lpFile = "C:\\Users\\Tmax\\Desktop\\test\\dbg_log.dat";
+	LPSTR lpSubKey = "SOFTWARE\\NAYOUNG_API_TEST\\RegiTest\\Position";
 
 	int wresult_value=0;
 	char buf[BUFSIZ];
@@ -27,16 +29,25 @@ BOOL test_RegLoadKeyA(){
 	if(result == ERROR_SUCCESS){
 		printf("create 정상");
 		result = RegOpenKeyEx(hKey, L"SOFTWARE\\NAYOUNG_API_TEST\\RegiTest\\Position",0, KEY_ALL_ACCESS, &newKey);
-		printf("open 정상");
-		//create → open 하고 나면 load작업
-		result = RegLoadKeyA(hKey, lpSubKey, lpFile);
-		printf("load됨");
 		if(result==ERROR_SUCCESS){
-			strcpy(meg, "RegLoadKeyA() : PASS");
-			wresult_value=1;
-		}else{
-			strcpy(meg, "RegLoadKeyA() : FAIL");
+			printf("open 정상");
+			//create → open 하고 나면 load작업
 
+			result = RegSetValueExW(newKey, L"Left",0,REG_DWORD,(LPBYTE)&rt.left,sizeof(LONG));
+			if(result != ERROR_SUCCESS)
+				strcpy(meg, " 레지스트리 SET 실패");
+
+
+			result = RegLoadKeyA(hKey, lpSubKey, lpFile);
+
+			if(result==ERROR_SUCCESS){
+				printf("load됨");
+				strcpy(meg, "RegLoadKeyA() : PASS");
+				wresult_value=1;
+			}else{ 
+				printf("load 안 됨");
+				strcpy(meg, GetErrorMessage(" GetProcessId() : FAIL \n\n Error Message :", GetLastError()));
+			}
 		}
 	}
 
@@ -45,7 +56,6 @@ BOOL test_RegLoadKeyA(){
 
 	return true;
 }
-
 
 BOOL test_RegUnLoadKeyA(){
 	
@@ -224,8 +234,8 @@ BOOL test_RegOpenCurrentUser(){
 
 
 	//if(== ERROR_SUCCESS){
-	
-	RegCloseKey(newKey);
+
+	RegCloseKey(newKey);	
 
 	return true;
 }
@@ -279,7 +289,7 @@ BOOL test_RegGetValueW(){
 	/** RegGetValueW 성공, 실패 경우 */ 
 	if(result==ERROR_SUCCESS){
 		wresult_value=1;
-		strcpy(meg, " RegGetValueW : SUCCESS \n\n ");
+		strcpy(meg, " RegGetValueW : SUCCESS");
 	}else
 		strcpy(meg, " RegGetValueW : FAIL");
 
@@ -288,3 +298,83 @@ BOOL test_RegGetValueW(){
 		
 	return true;
 }
+
+BOOL test_RegOpenCurrentUser(){
+	/** 사용자 current thread의 핸들 검색 */
+
+	HKEY keyCurrentUser;
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+	int wresult_value = 0;
+
+	/** 첫 번째 parameter : REGSAM형 → KEY_READ : Combination of KEY_QUERY_VALUE(하위 키 데이터를 쿼리 가능), KEY_ENUMERATE_SUB_KEYS(하위 키 열거), and KEY_NOTIFY(변경 통지) access.*/
+	LONG result = RegOpenCurrentUser(KEY_READ, &keyCurrentUser);
+
+	if(result==ERROR_SUCCESS){
+		strcpy(meg, " RegOpenCurrentUser : SUCCESS");
+		wresult_value=1;
+	}else
+		strcpy(meg, " RegOpenCurrentUser : FAIL");
+
+	RegCloseKey(keyCurrentUser);
+
+	sprintf(buf, "%d", wresult_value);
+	wresult(__FILE__, __LINE__, "RegOpenCurrentUser", buf, "1", meg);
+
+	return true;
+}
+
+
+/**
+BOOL test_RegRestoreKeyA(){
+
+	/** 두 번째 파라미터 lpFile : name of the file with the registry information. 
+								  created by using the RegSaveKey function. 
+								  → RegSaveKey(hKey, lpFile, lpSecurityAttributes(NULL이면 default security descriptor 가져옴))	
+	LONG result2;
+	HKEY newKey;
+	LSTATUS result;
+
+	char meg[BUFSIZ] = "FAIL";
+	char buf[BUFSIZ];
+	
+
+	#ifdef OQADBGPRINT
+	printf("test_RegCreateKeyExW\n");
+	#endif
+
+	result = RegCreateKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\NAYOUNG_API_TEST\\RegiTest\\Position", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS,NULL,&newKey, NULL);
+
+	if(result == ERROR_SUCCESS){
+		printf("create성공");
+			
+	}else
+		printf("create실패");
+
+	Sleep(2000);
+
+	LPCTSTR lpFile = L"C:\\Users\\Tmax\\Desktop\\test\\dbg_log.dat";
+
+	//result2 = RegSaveKey(HKEY_CURRENT_USER, lpFile, NULL);
+	
+	//if(result2 == ERROR_SUCCESS)
+	//	printf("save 성공");
+	//else{
+	//	printf("save 실패");
+	//	strcpy(meg, GetErrorMessage(" GetProcessId() : FAIL \n\n Error Message :", GetLastError()));
+	//}
+	//wresult(__FILE__, __LINE__, "GetProcessId", buf, "SUCCESS", meg);
+		
+
+	Sleep(2000);
+
+	result = RegRestoreKeyA(HKEY_CURRENT_USER, (LPSTR)(LPCTSTR)result, REG_FORCE_RESTORE);
+
+	if(result == ERROR_SUCCESS)
+		printf("restore 성공");
+	else
+		printf("restore 실패");
+	return true;
+}
+*/

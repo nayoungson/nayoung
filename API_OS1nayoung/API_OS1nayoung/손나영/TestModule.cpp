@@ -2,6 +2,11 @@
 #include <TlHelp32.h>
 #include <Psapi.h>
 
+
+/**
+	loads and executes an application
+	only with 16bit version. CreateProcess 함수 사용.
+	*/
 BOOL test_LoadModule(){
 
 	LPVOID lp;
@@ -10,16 +15,18 @@ BOOL test_LoadModule(){
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
 
-	#ifdef OQADBGPRINT
+#ifdef OQADBGPRINT
 	printf("test_LoadModule\n");
-	#endif
+#endif
 
-	if(LoadModule("Notepad.exe", &lp)==31){
+		
+	// succeeds → return value is greater than 31
+	if(LoadModule("Notepad.exe", &lp)>31){
 		strcpy(meg, " LoadModule() : PASS \n\n Notepad loaded");
 		wresult_value=1;
 	}else
-		strcpy(meg, " LoadModule() : FAIL \n\n 16bit에서만 지원되는 함수입니다.\n LoadModule 대신 CreateProcess 함수를 사용할 수 있습니다.");
 
+		strcpy(meg, GetErrorMessage("  LoadModule() : FAIL \n\n 16bit에서만 지원되는 함수입니다.\n LoadModule 대신 CreateProcess 함수를 사용할 수 있습니다.\n\n Error Message :", GetLastError()));
 	sprintf(buf, "%d", wresult_value);
 	wresult(__FILE__, __LINE__, "LoadModule", buf, "1", meg);
 
@@ -33,6 +40,8 @@ BOOL test_LoadModule(){
 BOOL test_Module32FirstW(){   //첫 번째 인자 : CreateToolhelp32Snapshot 함수로 불러와야 함 
 	HANDLE hshot = NULL;
 	BOOL result;
+
+	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
 
 	#ifdef OQADBGPRINT
@@ -45,18 +54,21 @@ BOOL test_Module32FirstW(){   //첫 번째 인자 : CreateToolhelp32Snapshot 함수로 �
 	result = Module32FirstW(hshot, &me32);
 
 	if(result){
-		strcpy(meg, " Module32FirstW : PASS \n\n CreateToolhelp32Snapshot()로 first 모듈 정보 얻어옴 \n first entry → copy to the buffer");
-		wresult(__FILE__, __LINE__, "Module32FirstW", "1", "1", meg);  
+		sprintf(meg, " Module32FirstW : PASS \n\n CreateToolhelp32Snapshot()로 first 모듈 정보 얻어옴 \n first entry → copy to the buffer");
+		strcpy(buf, "SUCCESS");
 	}else{
 		CloseHandle(hshot);
-		wresult(__FILE__, __LINE__, "Module32FirstW", "0", "1", meg);  
+		
 	}
+	wresult(__FILE__, __LINE__, "Module32FirstW", buf, "SUCCESS", meg);  
 	return true;
 }
 
 BOOL test_Module32NextW(){   // 첫 번째 인자 : CreateToolhelp32Snapshot 함수로 불러와야 함
 	HANDLE hshot = NULL;
 	BOOL result;
+
+	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
 
 	#ifdef OQADBGPRINT
@@ -69,12 +81,12 @@ BOOL test_Module32NextW(){   // 첫 번째 인자 : CreateToolhelp32Snapshot 함수로 �
 	result = Module32NextW(hshot, &me32);
 
 	if(result){
-		strcpy(meg, "Module32NextW : PASS \n\n CreateToolhelp32Snapshot()로 next 모듈 정보 얻어옴 \n next entry → copy to the buffer");
-		wresult(__FILE__, __LINE__, "Module32NextW", "1", "1", meg);  
+		sprintf(meg, "Module32NextW : PASS \n\n CreateToolhelp32Snapshot()로 next 모듈 정보 얻어옴 \n next entry → copy to the buffer");
+		strcpy(buf, "SUCCESS");
 	}else{
 		CloseHandle(hshot);
-		wresult(__FILE__, __LINE__, "Module32NextW", "0", "1", "FAIL");  
 	}
+	wresult(__FILE__, __LINE__, "Module32FirstW", buf, "SUCCESS", meg);  
 	return true;
 }
 

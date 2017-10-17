@@ -79,12 +79,15 @@ BOOL test_SetCriticalSectionSpinCount(){
 
 #define BUFSIZE MAX_PATH
 
+/**
+	특정 파일의 파일 시스템 및 볼륨에 대한 정보 검색
+
+	*/
 BOOL test_GetVolumeInformationByHandleW(){
 
 	#ifdef OQADBGPRINT
 	printf("test_GetVolumeInformationByHandleW \n");
 	#endif
-
 
 	BOOL result;
 	TCHAR Volume[MAX_PATH];
@@ -94,9 +97,11 @@ BOOL test_GetVolumeInformationByHandleW(){
 
 	//HANDLE hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test_GetVolumeInformationByHandleW.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	HANDLE hFile = CreateFile(L"손나영\\test_GetVolumeInformationByHandleW.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	//파라미터(파일 핸들, 볼륨 이름 수신 버퍼, 볼륨 이름 버퍼 길이, 시리얼 넘버, 파일 구성요소 이름 길이, ..)
 	result = GetVolumeInformationByHandleW(hFile,Volume,MAX_PATH,NULL,NULL,NULL,NULL,0);
 
-
+	//요청된 모든 정보가 검색되면 반환 값은 != 0
 	if(result != 0){
 		sprintf(meg, "GetVolumeInformationByHandleW() : SUCCESS");
 		strcpy(buf, "SUCCESS");
