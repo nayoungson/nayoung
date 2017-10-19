@@ -83,6 +83,7 @@
     <ClCompile Include="손나영\TestFunctionPPT.cpp" />
     <ClCompile Include="손나영\TestLibrary.cpp" />
     <ClCompile Include="손나영\TestFunction.cpp" />
+    <ClCompile Include="손나영\TestMemory.cpp" />
     <ClCompile Include="손나영\TestModule.cpp" />
     <ClCompile Include="손나영\TestDebug.cpp" />
     <ClCompile Include="손나영\TestProcessF.cpp" />
@@ -97,6 +98,7 @@
     <ClInclude Include="손나영\TestFunctionPPT.h" />
     <ClInclude Include="손나영\TestLibrary.h" />
     <ClInclude Include="손나영\TestFunction.h" />
+    <ClInclude Include="손나영\TestMemory.h" />
     <ClInclude Include="손나영\TestModule.h" />
     <ClInclude Include="손나영\TestProcessF.h" />
     <ClInclude Include="손나영\TestProcessor.h" />

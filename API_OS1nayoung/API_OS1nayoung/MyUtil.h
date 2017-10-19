@@ -25,6 +25,7 @@
 #include "손나영\TestProcessor.h"
 #include "손나영\TestFunctionPPT.h"
 
+#include "손나영\TestMemory.h"
 
 #define BUTTON_POS_X 0
 #define BUTTON_POS_Y 0

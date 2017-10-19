@@ -34,7 +34,7 @@ BOOL test_GetMaximumProcessorGroupCount(){
 	#ifdef OQADBGPRINT
 	printf("test_GetMaximumProcessorGroupCount \n");
 	#endif
-
+	
 	if(result != 0){
 		sprintf(meg, " GetMaximumProcessorGroupCount() : SUCCESS \n\n 프로세서 그룹 최대 개수 : %d", result);
 		strcpy(buf, "SUCCESS");
@@ -46,16 +46,20 @@ BOOL test_GetMaximumProcessorGroupCount(){
 	return true;
 }
 
+/**
+	시스템 안이나 프로세서 그룹에서 active 상태의 프로세서들의 수를 검색
+*/
 BOOL test_GetActiveProcessorCount(){
-
-	char meg[BUFSIZ] = "FAIL";
-	char buf[BUFSIZ];
-
-	DWORD result = GetActiveProcessorCount(ALL_PROCESSOR_GROUPS);
 
 	#ifdef OQADBGPRINT
 	printf("test_GetActiveProcessorCount \n");
 	#endif
+
+	char meg[BUFSIZ] = "FAIL";
+	char buf[BUFSIZ];
+
+	/** 파라미터 ALL_PROCESSOR_GROUPS */
+	DWORD result = GetActiveProcessorCount(ALL_PROCESSOR_GROUPS);
 
 	if(result != 0){
 		sprintf(meg, " GetActiveProcessorCount() : SUCCESS \n\n 활성 프로세서 개수 : %d", result);
@@ -144,6 +148,11 @@ BOOL test_GetCurrentProcessorNumber(){
 /** 
 	node number for the specified processor.
 	NUMA(Non-Uniform Memory Access) NODE : 
+	NUMA 아키텍처는 각 프로세서 그룹에 자체 메모리가 있으며 자체 I/O 채널이 있는 경우도 있다. 
+	그러나 각 CPU는 일관된 방법으로 다른 그룹과 연결된 메모리에 액세스 한다. 각 그룹을 NUMA노드라 한다.  
+	하나의 CPU 소켓에 코어 여러개가 들어가 있을 수 있기에 같은 지역 메모리를 사용하는 CPU 코어들을 묶어서 하나의 NUMA 노드로 친다.
+	8코어 4소켓 CPU라면 (하이퍼스레딩을 가정하지 않을 때에) 0~7번 코어는 NUMA 노드 0번, 8~15번 코어는 NUMA 노드 1번과 같은 방식.
+
 */
 BOOL test_GetNumaProcessorNode(){
 	

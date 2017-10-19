@@ -11,6 +11,8 @@ BOOL test_SetCriticalSectionSpinCount();
 BOOL test_GetVolumeInformationByHandleW();
 BOOL test_FatalAppExitW();
 
+//3ÁÖÂ÷
+BOOL test_FatalExit();
 
 #endif
 

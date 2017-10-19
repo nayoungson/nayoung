@@ -109,23 +109,27 @@ BOOL test_K32EnumProcessModules(){
 }
 */
 
+/**
+	지정된 process의 working set을 모니터링 시작(초기화)
+*/
 BOOL test_K32InitializeProcessForWsWatch(){
 
-	char meg[BUFSIZ] = "FAIL";
-
-	/** hFile에 생성한 파일 */
-	//HANDLE hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	//hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	HANDLE hFile = CreateFile(L"손나영\\test_K32InitializeProcessForWsWatch.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	hFile = CreateFile(L"손나영\\test_K32InitializeProcessForWsWatch.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	BOOL result = InitializeProcessForWsWatch(hFile);
-	
 	#ifdef OQADBGPRINT
 	printf("test_K32InitializeProcessForWsWatch\n");
 	#endif
 
+	char meg[BUFSIZ] = "FAIL";
+
+	/** hFile에 생성한 파일 */
+	HANDLE hFile = CreateFile(L"손나영\\test_K32InitializeProcessForWsWatch.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	
+	//HANDLE hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	//hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	hFile = CreateFile(L"손나영\\test_K32InitializeProcessForWsWatch.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	BOOL result = InitializeProcessForWsWatch(hFile);
+	
 	if(result != 0)
 		strcpy(meg, "InitializeProcessForWsWatch() : SUCCESS");	
 	else 
@@ -133,35 +137,44 @@ BOOL test_K32InitializeProcessForWsWatch(){
 	
 	wresult(__FILE__, __LINE__, "InitializeProcessForWsWatch", meg, "InitializeProcessForWsWatch() : SUCCESS", meg);
 
+	//추가된 페이지 검색하려면 GetWsChangesEx() function.
 	return true;
 }
 
+/**
+	특정 프로세스의 update mode 검색
+*/
 BOOL test_QueryProcessAffinityUpdateMode(){
 
+	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
+	
+	DWORD Flags = PROCESS_AFFINITY_ENABLE_AUTO_UPDATE;
 
 	#ifdef OQADBGPRINT
 	printf("test_QueryProcessAffinityUpdateMode\n");
 	#endif
+
+	/** hFile에 생성한 파일 */
+	HANDLE hFile = CreateFile(L"손나영\\test_QueryProcessAffinityUpdateMode.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	//HANDLE hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test2.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	//hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test2.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
-	HANDLE hFile = CreateFile(L"손나영\\test_QueryProcessAffinityUpdateMode.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	hFile = CreateFile(L"손나영\\test_QueryProcessAffinityUpdateMode.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
-	BOOL result = QueryProcessAffinityUpdateMode(hFile, 0);
+	/** 두 번째 파라미터 0 : 시스템에 의한 프로세스 affinity의 동적 갱신 불가 
+					    PROCESS_AFFINITY_ENABLE_AUTO_UPDATE : 시스템에 의한 프로세스 affinity의 동적 갱신 가능	*/
+	BOOL result = QueryProcessAffinityUpdateMode(hFile, &Flags);
 
-	#ifdef OQADBGPRINT
-	printf("test_QueryProcessAffinityUpdateMode\n");
-	#endif
-
-	if(result != 0)
-		strcpy(meg, "QueryProcessAffinityUpdateMode() : SUCCESS");	
-	else 
+	if(result != 0){
+		
+		sprintf(meg, "QueryProcessAffinityUpdateMode() : SUCCESS \n\n affinity update mode : %u", Flags);	
+		strcpy(buf, "SUCCESS");
+	}else 
 		strcpy(meg, GetErrorMessage(" QueryProcessAffinityUpdateMode() : FAIL \n\n Error Message :", GetLastError()));
 	
-	wresult(__FILE__, __LINE__, "QueryProcessAffinityUpdateMode", meg, "QueryProcessAffinityUpdateMode() : SUCCESS", meg);
+	wresult(__FILE__, __LINE__, "QueryProcessAffinityUpdateMode", buf, "SUCCESS", meg);
 
 	return true;
 } 

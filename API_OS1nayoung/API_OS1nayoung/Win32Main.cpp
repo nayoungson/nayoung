@@ -82,86 +82,58 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		CreateWindow(L"button", L"GetNumaProcessorNode", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,550,250,40,hWnd,(HMENU)27,g_hInst,NULL);
 		CreateWindow(L"button", L"GetNumaNodeNumberFromHandle", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,600,250,40,hWnd,(HMENU)28,g_hInst,NULL);
 		CreateWindow(L"button", L"RegOpenCurrentUser", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,650,250,40,hWnd,(HMENU)29,g_hInst,NULL);
+		CreateWindow(L"button", L"FatalExit", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,700,250,40,hWnd,(HMENU)30,g_hInst,NULL);
+		CreateWindow(L"button", L"AllocateUserPhysicalPages", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,750,250,40,hWnd,(HMENU)31,g_hInst,NULL);
+		CreateWindow(L"button", L"FreeUserPhysicalPages", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,0,250,40,hWnd,(HMENU)32,g_hInst,NULL);
+		CreateWindow(L"button", L"MapUserPhysicalPages", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,50,250,40,hWnd,(HMENU)33,g_hInst,NULL);
+		CreateWindow(L"button", L"GetLargePageMinimum", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,100,250,40,hWnd,(HMENU)34,g_hInst,NULL);
+		CreateWindow(L"button", L"GetFinalPathNameByHandleA", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,150,250,40,hWnd,(HMENU)35,g_hInst,NULL);
+		CreateWindow(L"button", L"GetApplicationRestartSettings", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,200,250,40,hWnd,(HMENU)36,g_hInst,NULL);
 
-	
+		
 		//CreateWindow(L"button", L"GetProcessWorkingSetSizeEx", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,400,250,40,hWnd,(HMENU)25,g_hInst,NULL);
 		//CreateWindow(L"button", L"GetProcessDEPPolicy", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,450,250,40,hWnd,(HMENU)26,g_hInst,NULL);
-		
-
 
 		CreateWindow(L"button", L"test_Module32FirstW", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,0,250,40,hWnd,(HMENU)50,g_hInst,NULL);
 		CreateWindow(L"button", L"test_Module32NextW", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,50,250,40,hWnd,(HMENU)51,g_hInst,NULL);
-		
-
+	
 		break;
 
 	case WM_COMMAND:
 		switch(LOWORD(wParam)){
 			
-		case 11:
-			test_LoadModule();
-			break;
-		case 12:
-			test_GetVolumeInformationByHandleW();
-			break;
-		case 13:
-			test_K32InitializeProcessForWsWatch();
-			break;
-		case 14:
-			test_FatalAppExitW();
-			break;
-		case 15:
-			test_QueryProcessAffinityUpdateMode();
-			break;
-		case 16:
-			test_GetActiveProcessorCount();
-			break;
-		case 17:
-			test_GetActiveProcessorGroupCount();
-			break;
-		case 18:
-			test_GetCurrentProcessorNumber();
-			break;
-		case 19:
-			test_GetLogicalProcessorInformationEx();
-			break;
-		case 20:
-			test_GetMaximumProcessorCount();
-			break;
-		case 21:
-			test_RegGetValueW();
-			break;
+		case 11:			test_LoadModule();							break;
+		case 12:			test_GetVolumeInformationByHandleW();		break;
+		case 13:			test_K32InitializeProcessForWsWatch();		break;
+		case 14:			test_FatalAppExitW();						break;
+		case 15:			test_QueryProcessAffinityUpdateMode();		break;
+		case 16:			test_GetActiveProcessorCount();				break;
+		case 17:			test_GetActiveProcessorGroupCount();		break;
+		case 18:			test_GetCurrentProcessorNumber();			break;
+		case 19:			test_GetLogicalProcessorInformationEx();	break;
+		case 20:			test_GetMaximumProcessorCount();			break;
+		case 21:			test_RegGetValueW();						break;
+		case 23:			test_GetProcessId();						break;
+		case 24:			test_GetProcessWorkingSetSize();			break;
+		case 25:			test_IsProcessInJob();						break;
+		case 26:			test_GetMaximumProcessorGroupCount();		break;
+		case 27:			test_GetNumaProcessorNode();				break;
+		case 28:			test_GetNumaNodeNumberFromHandle();			break;
+		case 29:			test_RegOpenCurrentUser();					break;
+		case 30:			test_FatalExit();							break;
+		// 1018
+		case 31:			test_AllocateUserPhysicalPages();			break;
+		case 32:			test_FreeUserPhysicalPages();				break;
+		case 33:			test_MapUserPhysicalPages();				break;
+		case 34:			test_GetLargePageMinimum();					break;
+		case 35:			test_GetFinalPathNameByHandleA();			break;
+		case 36:			test_GetApplicationRestartSettings();		break;
 
-		case 23:
-			test_GetProcessId();
-			break;
-		case 24:
-			test_GetProcessWorkingSetSize();
-			break;
-		case 25:
-			test_IsProcessInJob();
-			break;
-		case 26:
-			test_GetMaximumProcessorGroupCount();
-			break;
-		case 27:
-			test_GetNumaProcessorNode();
-			break;
-		case 28:
-			test_GetNumaNodeNumberFromHandle();
-			break;
-		case 29:
-			test_RegOpenCurrentUser();
-			break;
-
-		case 50:
-			test_Module32FirstW();
-			break;
-		case 51:
-			test_Module32NextW();
-			break;
-		}
+		case 50:			test_Module32FirstW();						break;
+		case 51:			test_Module32NextW();						break;
+		}		
 		return 0;
+
 
 	case WM_DESTROY:
 		system("pause");

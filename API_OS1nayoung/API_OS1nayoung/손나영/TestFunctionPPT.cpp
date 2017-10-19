@@ -114,12 +114,16 @@ BOOL test_GetVolumeInformationByHandleW(){
 	return true;
 }
 
+/**
+	message box를 띄우고, 이 box가 닫힐 때 응용 프로그램도 함께 종료.
+	return value가 없음.
+*/
+BOOL test_FatalAppExitW(){ // 에러 핸들링
 
-BOOL test_FatalAppExitW(){ // 에러 핸들링. Displays a message box and terminates the application when the message box is closed.
-	//WinExec("C:\\Users\\Tmax\\Desktop\\test\\FatalAppExit_exe_file_test.exe", SW_SHOW);
-#ifdef OQADBGPRINT
+	#ifdef OQADBGPRINT
 	printf("test_FatalAppExitW \n");
-#endif
+	#endif
+
 	//WinExec("C:\\Users\\Tmax\\Desktop\\test\\FatalAppExit_exe_file_test.exe", SW_SHOW);
 	WinExec("손나영\\FatalAppExit_exe_file_test.exe", SW_SHOW);
 
@@ -135,5 +139,14 @@ BOOL test_FatalAppExitW(){ // 에러 핸들링. Displays a message box and terminates
 	//MessageBox(hWnd, L"FatalAppExitA 성공", L"성공", MB_OK);
 	}
 	*/
+	return true;
+}
+
+BOOL test_FatalExit(){
+
+	HWND hWnd =0;
+	MessageBox(hWnd, L"message box. \n\n [확인]클릭 시 창이 종료됩니다.", L"test", MB_OK);
+    FatalExit(-1);
+
 	return true;
 }

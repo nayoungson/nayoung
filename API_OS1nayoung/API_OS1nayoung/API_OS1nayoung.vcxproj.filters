@@ -60,6 +60,9 @@
     <ClCompile Include="Win32Main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="손나영\TestMemory.cpp">
+      <Filter>소스 파일\손나영</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyUtil.h">
@@ -93,6 +96,9 @@
       <Filter>헤더 파일\손나영</Filter>
     </ClInclude>
     <ClInclude Include="손나영\TestProcessF.h">
+      <Filter>헤더 파일\손나영</Filter>
+    </ClInclude>
+    <ClInclude Include="손나영\TestMemory.h">
       <Filter>헤더 파일\손나영</Filter>
     </ClInclude>
   </ItemGroup>
