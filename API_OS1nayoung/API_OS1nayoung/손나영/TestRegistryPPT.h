@@ -19,4 +19,5 @@ BOOL test_RegRestoreKeyA();
 BOOL test_RegLoadKeyA();
 BOOL test_RegOpenCurrentUser();
 
+
 #endif

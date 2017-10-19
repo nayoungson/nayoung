@@ -1,5 +1,6 @@
 #include "TestFunctionPPT.h"
 
+
 BOOL test_SetFileInformationByHandle(){
 
 	/** setting function the file information */
@@ -143,10 +144,61 @@ BOOL test_FatalAppExitW(){ // 에러 핸들링
 }
 
 BOOL test_FatalExit(){
+	
+	#ifdef OQADBGPRINT
+	printf("test_FatalAppExitW \n");
+	#endif
 
+	/*
 	HWND hWnd =0;
 	MessageBox(hWnd, L"message box. \n\n [확인]클릭 시 창이 종료됩니다.", L"test", MB_OK);
     FatalExit(-1);
+	*/
+
+	WinExec("손나영\\FatalExit_exe_file_test.exe", SW_SHOW);
 
 	return true;
 }
+
+/**
+BOOL test_CreateHardLinkTransactedA(){
+
+	HWND hWnd = 0;
+	HANDLE hFile = NULL;
+	HANDLE hTransaction;
+
+	int wresult_value=0;
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	#ifdef OQADBGPRINT
+	printf("test_CreateHardLinkW\n");
+	#endif
+
+	DeleteFile(L"손나영\\CreateHardLinkTransactedA.link"); //Delete하지 않은 상태에서 다시 CreateHardLinkW를 진행하면 FAIL됨. 반드시 삭제해야 함.
+	DeleteFile(L"손나영\\CreateHardLinkTransactedA.txt");
+
+	hFile = CreateFile(L"손나영\\CreateHardLinkTransactedA.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	hTransaction = CreateTransaction(NULL, NULL, 0, 0, 0, 0, NULL);
+
+	BOOL result = CreateHardLinkTransactedA("손나영\\CreateHardLinkTransactedA.link", "손나영\\CreateHardLinkTransactedA.txt", NULL, hTransaction);
+
+	if(result){
+		strcpy(meg, " CreateHardLinkTransactedA() : PASS \n\n CreateHardLinkTransactedA 성공 \n(계속해서 CreateHardLinkW 실행을 위해 생성한 파일을 삭제합니다.)");
+		wresult_value=1;
+
+	}else{
+		strcpy(meg, " CreateHardLinkTransactedA() : FAIL \n\n 생성 실패 \n(관리자 권한으로 실행했는지, 경로가 올바른지 확인하십시오.)");
+	}
+
+	CloseHandle(hFile);
+
+	DeleteFile(L"손나영\\test_CreateHardLinkTransactedA.link"); //Delete하지 않은 상태에서 다시 CreateHardLinkW를 진행하면 FAIL됨. 반드시 삭제해야 함.
+	DeleteFile(L"손나영\\test_CreateHardLinkTransactedA.txt");
+
+	sprintf(buf, "%d", wresult_value);
+	wresult(__FILE__, __LINE__, "test_CreateHardLinkTransactedA", buf, "1", meg);
+
+	return TRUE;
+}
+*/

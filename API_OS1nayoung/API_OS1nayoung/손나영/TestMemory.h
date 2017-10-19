@@ -14,5 +14,7 @@ BOOL test_GetLargePageMinimum();
 BOOL test_GetFinalPathNameByHandleA();
 BOOL test_GetApplicationRestartSettings();
 
+BOOL test_VirtualAllocExNuma();
+BOOL test_AllocateUserPhysicalPagesNuma();
 
 #endif

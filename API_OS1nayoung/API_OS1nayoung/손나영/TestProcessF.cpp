@@ -3,15 +3,15 @@
 
 BOOL test_SetProcessDEPPolicy(){
 	
-	BOOL result = true;
-	
-	char *buf = NULL;
-	char meg[BUFSIZ] = "FAIL";
-
 	#ifdef OQADBGPRINT
 	printf("test_SetProcessDEPPolicy\n");
 	#endif
 
+	BOOL result = true;
+	
+	char *buf = NULL;
+	char meg[BUFSIZ] = "FAIL";
+	
 	// DEP(Data Execution Prevention) : 데이타 실행 방지
 	// SetProcessDEPPolicy 함수는 32bit process를 위한 setting
 	// 따라서, 현 windows 환경(64bit)에서는 fail 뜨는 것0이 정상
@@ -31,12 +31,12 @@ BOOL test_SetProcessDEPPolicy(){
 
 BOOL test_SetProcessAffinityUpdateMode(){
 
+	#ifdef OQADBGPRINT
+	printf("test_SetProcessAffinityUpdateMode\ n");
+	#endif
+
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
-
-	#ifdef OQADBGPRINT
-	printf("test_SetProcessAffinityUpdateMode\n");
-	#endif
 
 	// 0 : Disables dynamic update of the process affinity by the system.
 	// PROCESS_AFFINITY_ENABLE_AUTO_UPDATE : Enables dynamic update of the process affinity by the system.
@@ -55,11 +55,11 @@ BOOL test_SetProcessAffinityUpdateMode(){
 
 BOOL test_SetProcessShutdownParameters(){
 
-	char meg[BUFSIZ] = "FAIL";
-
 	#ifdef OQADBGPRINT
 	printf("test_SetProcessShutdownParameters\n");
 	#endif
+
+	char meg[BUFSIZ] = "FAIL";
 
 	// 현재 호출중인 프로세스의 종료 매개 변수를 설정
 	// 첫 번째 파라미터 : 프로세스 종료 우선 순위. value 값 다섯 가지 중에 set.
@@ -78,14 +78,14 @@ BOOL test_SetProcessShutdownParameters(){
 
 BOOL test_GetProcessShutdownParameters(){
 
+	#ifdef OQADBGPRINT
+	printf("test_GetProcessShutdownParameters\n");
+	#endif
+
 	char meg[BUFSIZ] = "FAIL";
 
 	DWORD lpdwLevel;
 	DWORD lpdwFlags;
-
-	#ifdef OQADBGPRINT
-	printf("test_GetProcessShutdownParameters\n");
-	#endif
 
 	// 현재 호출 중인 프로세스의 종료 매개 변수를 검색. 함수 성공 시 nonzero.
 	if(GetProcessShutdownParameters(&lpdwLevel, &lpdwFlags) != 0)
@@ -146,14 +146,14 @@ BOOL test_K32InitializeProcessForWsWatch(){
 */
 BOOL test_QueryProcessAffinityUpdateMode(){
 
+	#ifdef OQADBGPRINT
+	printf("test_QueryProcessAffinityUpdateMode\n");
+	#endif
+
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
 	
 	DWORD Flags = PROCESS_AFFINITY_ENABLE_AUTO_UPDATE;
-
-	#ifdef OQADBGPRINT
-	printf("test_QueryProcessAffinityUpdateMode\n");
-	#endif
 
 	/** hFile에 생성한 파일 */
 	HANDLE hFile = CreateFile(L"손나영\\test_QueryProcessAffinityUpdateMode.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -181,23 +181,23 @@ BOOL test_QueryProcessAffinityUpdateMode(){
 
 BOOL test_GetProcessId(){
 
+	#ifdef OQADBGPRINT
+	printf("test_GetProcessId\n");
+	#endif
+
 	BOOL result;
 	HANDLE hProcess;
 
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
-
-	#ifdef OQADBGPRINT
-	printf("test_GetProcessId\n");
-	#endif
-
+	
 	/** process 식별자 가져옴 */
-	DWORD num = GetCurrentProcessId();
+	DWORD pid = GetCurrentProcessId();
 
 	/**	PROCESS_QUERY_INFORMATION : access right(security)
 		FALSE : process do not inherit this handle	
-		num : GetCurrentProcessId()		*/
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, num);
+		pid : GetCurrentProcessId()		*/
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
 
 	/** OpenProcess() 실패	*/
 	if (!hProcess) {
@@ -208,7 +208,7 @@ BOOL test_GetProcessId(){
 	result = GetProcessId(hProcess);
 	
 	if(result){
-		sprintf(meg, " GetProcessId() : SUCCESS \n\n ProcessId : %d ", num);
+		sprintf(meg, " GetProcessId() : SUCCESS \n\n ProcessId : %d ", pid);
 		strcpy(buf, "SUCCESS");
 	}else{
 		strcpy(buf, GetErrorMessage(" GetProcessId() : FAIL \n\n Error Message :", GetLastError()));
@@ -226,6 +226,10 @@ BOOL test_GetProcessId(){
 */
 BOOL test_GetProcessWorkingSetSize(){
 
+	#ifdef OQADBGPRINT
+	printf("test_GetProcessWorkingSetSize\n");
+	#endif
+
 	BOOL result;
 	HANDLE hProcess;
 	SIZE_T dwMin, dwMax;
@@ -233,17 +237,13 @@ BOOL test_GetProcessWorkingSetSize(){
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
 
-	#ifdef OQADBGPRINT
-	printf("test_GetProcessWorkingSetSize\n");
-	#endif
-
 	/** process 식별자 가져옴 */
-	int num = GetCurrentProcessId();
+	int pid = GetCurrentProcessId();
 
 	/**	PROCESS_QUERY_INFORMATION : access right(security)
 		FALSE : process do not inherit this handle	
-		num : GetCurrentProcessId()		*/
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, num);
+		pid : GetCurrentProcessId()		*/
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
 
 	/** OpenProcess() 실패	*/
 	if (!hProcess) {
@@ -255,7 +255,7 @@ BOOL test_GetProcessWorkingSetSize(){
 	result = GetProcessWorkingSetSize(hProcess, &dwMin, &dwMax);
 
 	if (result != 0){
-		sprintf(meg, " GetProcessWorkingSetSize() : SUCCESS \n\n ProcessId : %d \n MinimumWorkingSetSize : %lu KB \n MaximumWorkingSetSize : %lu KB", num, dwMin, dwMax);
+		sprintf(meg, " GetProcessWorkingSetSize() : SUCCESS \n\n ProcessId : %d \n MinimumWorkingSetSize : %lu KB \n MaximumWorkingSetSize : %lu KB", pid, dwMin, dwMax);
 		strcpy(buf, "SUCCESS");
 
 	}else 
@@ -269,24 +269,24 @@ BOOL test_GetProcessWorkingSetSize(){
 
 BOOL test_IsProcessInJob(){
 
+	#ifdef OQADBGPRINT
+	printf("test_IsProcessInJob\n");
+	#endif
+
 	BOOL result;
 	BOOL bInJob;
 	HANDLE hProcess;
 
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
-
-	#ifdef OQADBGPRINT
-	printf("test_IsProcessInJob\n");
-	#endif
-
+	
 	/** process 식별자 가져옴 */
-	int num = GetCurrentProcessId();
+	int pid = GetCurrentProcessId();
 
 	/**	PROCESS_QUERY_INFORMATION : access right(security)
 		FALSE : process do not inherit this handle	
-		num : GetCurrentProcessId()		*/
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, num);
+		pid : GetCurrentProcessId()		*/
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
 
 	/** OpenProcess() 실패	*/
 	if (!hProcess) {
@@ -305,37 +305,140 @@ BOOL test_IsProcessInJob(){
 		strcpy(buf, GetErrorMessage(" IsProcessInJob() : FAIL \n\n Error Message :", GetLastError()));
 
 	wresult(__FILE__, __LINE__, "IsProcessInJob", buf, "SUCCESS", meg);
+
 	return true;
 }
 
-BOOL test_GetProcessGroupAffinity(){
 
+BOOL test_GetProcessHandleCount(){
 
-	HANDLE hProcess;
+	#ifdef OQADBGPRINT
+	printf("test_GetProcessHandleCount\n");
+	#endif
+
+	BOOL result;
+	DWORD handlecount;
 
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
-
-	#ifdef OQADBGPRINT
-	printf("test_GetProcessGroupAffinity\n");
-	#endif
-
-	/** process 식별자 가져옴 */
 	int pid = GetCurrentProcessId();
 
-	/**	PROCESS_QUERY_INFORMATION : access right(security)
-		FALSE : process do not inherit this handle	
-		num : GetCurrentProcessId()		*/
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
-
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
+	result = GetProcessHandleCount(hProcess, &handlecount);
+	
 	/** OpenProcess() 실패	*/
 	if (!hProcess) {
 		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
 		return 1;
-
 	}
+
+	if(result != 0){
+		sprintf(meg, " GetProcessHandleCount() : SUCCESS \n\n ProcessID : %d \n HandleCount : %d", pid, handlecount);
+		
+		strcpy(buf, "SUCCESS");
+
+	}else 
+		strcpy(buf, GetErrorMessage(" GetProcessHandleCount() : FAIL \n\n Error Message :", GetLastError()));
+
+	wresult(__FILE__, __LINE__, "GetProcessHandleCount", buf, "SUCCESS", meg);
+
 	return true;
 }
+
+/** 32bit 프로세서만 지원 */
+BOOL test_GetProcessDEPPolicy(){
+
+	#ifdef OQADBGPRINT
+	printf("test_GetProcessDEPPolicy\n");
+	#endif
+
+	int pid;
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	HANDLE hProcess;
+	DWORD flags;
+	BOOL permanent;
+
+	/**	hProcess
+		PROCESS_QUERY_INFORMATION : access right(security)
+		FALSE : process do not inherit this handle	
+		pid : GetCurrentProcessId()		*/
+	
+	pid = GetCurrentProcessId();
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
+	flags = PROCESS_DEP_ENABLE;
+	
+	/** OpenProcess() 실패	*/
+	if (!hProcess) {
+		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
+		return 1;
+	}
+
+	/** DEP Flags : 0 / PROCESS_DEP_ENABLE / PROCESS_DEP_DISABLE_ATL_THUNK_EMULATION */
+	if(GetProcessDEPPolicy(hProcess, &flags, &permanent) == TRUE){
+		sprintf(meg, " GetProcessDEPPolicy() : SUCCESS");
+		strcpy(buf, "SUCCESS");
+	}else{
+		strcpy(buf, GetErrorMessage(" GetProcessDEPPolicy() : FAIL \n\n Error Message :", GetLastError()));
+	}
+	wresult(__FILE__, __LINE__, "GetProcessDEPPolicy", buf, "SUCCESS", meg);
+
+	return true;
+}
+
+/**
+BOOL test_GetProcessGroupAffinity(){
+
+	int pid;
+	
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	HANDLE hProcess;
+	USHORT gcount;
+	USHORT *garray;
+
+	pid = GetCurrentProcessId();
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
+
+	/** OpenProcess() 실패	
+	if (!hProcess) {
+		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
+		return 1;
+	}
+
+	if (GetProcessGroupAffinity(hProcess, &gcount, garray) != 0){
+		printf("ds");
+	}else{
+		printf("%d", GetLastError());
+		strcpy(meg, GetErrorMessage(" GetProcessGroupAffinity() : FAIL \n\n Error Message : ", GetLastError()));
+	}
+	/**
+	if (GetProcessGroupAffinity(hProcess, &gcount, garray) == 0) {
+		DWORD err = GetLastError();
+
+		if (err == ERROR_INSUFFICIENT_BUFFER) {
+			gcount = gcount * sizeof(garray[0]);
+
+			if (GetProcessGroupAffinity(hProcess, &gcount, garray) != 0) {
+				printf("sdf");
+				strcpy(buf, "SUCCESS");
+
+				CloseHandle(hProcess);
+				return 0;
+			}
+		} 
+	}
+	
+
+	CloseHandle(hProcess);
+
+	wresult(__FILE__, __LINE__, "GetProcessDEPPolicy", buf, "SUCCESS", meg);
+	return true;
+}
+
+*/
 
 BOOL test_GetProcessWorkingSetSizeEx(){
 	
@@ -347,12 +450,12 @@ BOOL test_GetProcessWorkingSetSizeEx(){
 	char meg[BUFSIZ] = "FAIL";
 
 	/** process 식별자 가져옴 */
-	int num = GetCurrentProcessId();
+	int pid = GetCurrentProcessId();
 
 	/**	PROCESS_QUERY_INFORMATION : access right(security)
 		FALSE : process do not inherit this handle	
-		num : GetCurrentProcessId()		*/
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, num);
+		pid : GetCurrentProcessId()		*/
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
 
 	/** OpenProcess() 실패	*/
 	if (!hProcess) {
@@ -365,7 +468,7 @@ BOOL test_GetProcessWorkingSetSizeEx(){
 	result = GetProcessWorkingSetSizeEx(hProcess, &dwMin, &dwMax, 0);
 	
 	if(!result){
-		sprintf(meg, " GetProcessWorkingSetSizeEx() : SUCCESS \n\n ProcessId : %d \n MinimumWorkingSetSize : %lu KB \n MaximumWorkingSetSize : %lu KB", num, dwMin, dwMax);
+		sprintf(meg, " GetProcessWorkingSetSizeEx() : SUCCESS \n\n ProcessId : %d \n MinimumWorkingSetSize : %lu KB \n MaximumWorkingSetSize : %lu KB", pid, dwMin, dwMax);
 		strcpy(buf, "SUCCESS");
 	}else{
 		strcpy(buf, GetErrorMessage(" GetProcessWorkingSetSize() : FAIL \n\n Error Message :", GetLastError()));
@@ -375,27 +478,6 @@ BOOL test_GetProcessWorkingSetSizeEx(){
 	return true;
 }
 
-BOOL test_GetProcessDEPPolicy(){
-
-	HANDLE hProcess;
-
-	int num = GetCurrentProcessId();
-
-	/**	PROCESS_QUERY_INFORMATION : access right(security)
-		FALSE : process do not inherit this handle	
-		num : GetCurrentProcessId()		*/
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, num);
-
-	/** DEP Flags : 0 / PROCESS_DEP_ENABLE / PROCESS_DEP_DISABLE_ATL_THUNK_EMULATION */
-	//if(GetProcessDEPPolicy(hProcess, &dwPolicy, 0) != FALSE){
-	//	if (dwPolicy == PROCESS_DEP_ENABLE) {
-	//	printf("a");
-	//	}
-	//}else
-	//	printf("b");
-
-	return true;
-}
 
 BOOL test_SetProcessPriorityBoost(){
 
@@ -412,7 +494,6 @@ BOOL test_SetProcessPriorityBoost(){
 }
 
 
-
 /** 지정된 process의 쓰기 캐쉬를 지움(flush) 
 BOOL test_FlushProcessWriteBuffers(){
 	
@@ -422,3 +503,4 @@ BOOL test_FlushProcessWriteBuffers(){
 	return true;
 }
 */
+
