@@ -15,7 +15,7 @@ BOOL test_GetMaximumProcessorCount(){
 		sprintf(meg, " GetMaximumProcessorCount() : SUCCESS \n\n 프로세서 최대값 = %d", result);
 		strcpy(buf, "SUCCESS");
 	}else 
-		strcpy(buf, GetErrorMessage(" GetMaximumProcessorCount() : FAIL \n\n Error Message :", GetLastError()));
+		strcpy(meg, GetErrorMessage(" GetMaximumProcessorCount() : FAIL \n\n Error Message :", GetLastError()));
 	
 	wresult(__FILE__, __LINE__, "GetMaximumProcessorCount", buf, "SUCCESS", meg);
 
@@ -39,7 +39,7 @@ BOOL test_GetMaximumProcessorGroupCount(){
 		sprintf(meg, " GetMaximumProcessorGroupCount() : SUCCESS \n\n 프로세서 그룹 최대 개수 : %d", result);
 		strcpy(buf, "SUCCESS");
 	}else 
-		strcpy(buf, GetErrorMessage(" GetMaximumProcessorGroupCount() : FAIL \n\n Error Message :", GetLastError()));
+		strcpy(meg, GetErrorMessage(" GetMaximumProcessorGroupCount() : FAIL \n\n Error Message :", GetLastError()));
 
 	wresult(__FILE__, __LINE__, "GetMaximumProcessorGroupCount", buf, "SUCCESS", meg);
 
@@ -65,7 +65,7 @@ BOOL test_GetActiveProcessorCount(){
 		sprintf(meg, " GetActiveProcessorCount() : SUCCESS \n\n 활성 프로세서 개수 : %d", result);
 		strcpy(buf, "SUCCESS");
 	}else 
-		strcpy(buf, GetErrorMessage(" GetActiveProcessorCount() : FAIL \n\n Error Message :", GetLastError()));
+		strcpy(meg, GetErrorMessage(" GetActiveProcessorCount() : FAIL \n\n Error Message :", GetLastError()));
 	
 	wresult(__FILE__, __LINE__, "GetActiveProcessorCount", buf, "SUCCESS", meg);
 
@@ -87,7 +87,7 @@ BOOL test_GetActiveProcessorGroupCount(){
 		sprintf(meg, " GetActiveProcessorGroupCount() : SUCCESS \n\n 활성 프로세서 그룹 개수 : %d", result);
 		strcpy(buf, "SUCCESS");
 	}else 
-		strcpy(buf, GetErrorMessage(" GetActiveProcessorGroupCount() : FAIL \n\n Error Message :", GetLastError()));
+		strcpy(meg, GetErrorMessage(" GetActiveProcessorGroupCount() : FAIL \n\n Error Message :", GetLastError()));
 	
 	wresult(__FILE__, __LINE__, "GetActiveProcessorGroupCount", buf, "SUCCESS", meg);
 
@@ -115,7 +115,7 @@ BOOL test_GetLogicalProcessorInformationEx(){
 			sprintf(meg, " GetLogicalProcessorInformationEx() : SUCCESS \n\n");
 			strcpy(buf, "SUCCESS");
 		}else 
-			strcpy(buf, GetErrorMessage(" GetLogicalProcessorInformationEx() : FAIL \n\n Error Message :", GetLastError()));
+			strcpy(meg, GetErrorMessage(" GetLogicalProcessorInformationEx() : FAIL \n\n Error Message :", GetLastError()));
 
 		wresult(__FILE__, __LINE__, "GetLogicalProcessorInformationEx", buf, "SUCCESS", meg);
 	}
@@ -138,7 +138,7 @@ BOOL test_GetCurrentProcessorNumber(){
 		sprintf(meg, " GetCurrentProcessorNumber() : SUCCESS \n\n 현재 실행중인 thread의 number : %d", result);
 		strcpy(buf, "SUCCESS");
 	}else 
-		strcpy(buf, GetErrorMessage(" GetCurrentProcessorNumber() : FAIL \n\n Error Message :", GetLastError()));
+		strcpy(meg, GetErrorMessage(" GetCurrentProcessorNumber() : FAIL \n\n Error Message :", GetLastError()));
 
 	wresult(__FILE__, __LINE__, "GetCurrentProcessorNumber", buf, "SUCCESS", meg);
 
@@ -175,7 +175,7 @@ BOOL test_GetNumaProcessorNode(){
 		}else 
 			strcpy(buf, GetErrorMessage(" GetCurrentProcessorNumber() : FAIL \n\n Error Message :", GetLastError()));
 	}else
-		strcpy(buf, GetErrorMessage(" processor number 조회에 실패했습니다. \n\n Error Message :", GetLastError()));
+		strcpy(meg, GetErrorMessage(" processor number 조회에 실패했습니다. \n\n Error Message :", GetLastError()));
 
 	wresult(__FILE__, __LINE__, "GetCurrentProcessorNumber", buf, "SUCCESS", meg);
 	return true;
@@ -189,7 +189,7 @@ BOOL test_GetNumaNodeNumberFromHandle(){
 	char buf[BUFSIZ];
 
 	USHORT nodeNumber = 255;
-	HANDLE hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test_GetNumaNodeNumberFromHandle.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(L"손나영\\test_GetNumaNodeNumberFromHandle.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	result = GetNumaNodeNumberFromHandle(hFile, &nodeNumber);
 
@@ -197,9 +197,66 @@ BOOL test_GetNumaNodeNumberFromHandle(){
 			sprintf(meg, " GetNumaNodeNumberFromHandle() : SUCCESS");
 			strcpy(buf, "SUCCESS");
 	}else 
-			strcpy(buf, GetErrorMessage(" GetNumaNodeNumberFromHandle() : FAIL \n\n Error Message :", GetLastError()));
+			strcpy(meg, GetErrorMessage(" GetNumaNodeNumberFromHandle() : FAIL \n\n Error Message :", GetLastError()));
 	
 	wresult(__FILE__, __LINE__, "GetNumaNodeNumberFromHandle", buf, "SUCCESS", meg);
+
+	return true;
+}
+
+//노드 번호 검색
+BOOL test_GetNumaProcessorNodeEx(){
+
+	BOOL result;
+
+	char meg[BUFSIZ] = "FAIL";
+	char buf[BUFSIZ];
+
+	PROCESSOR_NUMBER processorNumber;
+	USHORT NodeNumber;
+	// uint16_t numaNode = 0;
+
+	// Query the operating system to determine the NUMA node identifier for the current thread.
+	GetCurrentProcessorNumberEx(&processorNumber);
+
+	result = GetNumaProcessorNodeEx(&processorNumber, &NodeNumber);
+
+	if (result != 0){
+		sprintf(meg, " GetNumaProcessorNodeEx() : SUCCESS");
+		strcpy(buf, "SUCCESS");
+	}else 
+		strcpy(meg, GetErrorMessage(" GetNumaProcessorNodeEx() : FAIL \n\n Error Message :", GetLastError()));
+
+	wresult(__FILE__, __LINE__, "GetNumaProcessorNodeEx", buf, "SUCCESS", meg);
+
+	return true;
+}
+
+BOOL test_GetNumaNodeProcessorMaskEx(){
+
+	BOOL result;
+
+	char meg[BUFSIZ] = "FAIL";
+	char buf[BUFSIZ];
+
+	USHORT NodeNumber = 0;
+	PGROUP_AFFINITY ProcessorMask;
+
+	struct _GROUP_AFFINITY {
+		KAFFINITY Mask;
+		WORD      Group;
+		WORD      Reserved[3];
+	} 
+	result = GetNumaNodeProcessorMaskEx(NodeNumber, ProcessorMask);
+
+	if (result != 0){
+		sprintf(meg, " GetNumaNodeProcessorMaskEx() : SUCCESS");
+		strcpy(buf, "SUCCESS");
+	}else 
+		strcpy(meg, GetErrorMessage(" GetNumaNodeProcessorMaskEx() : FAIL \n\n Error Message :", GetLastError()));
+
+	wresult(__FILE__, __LINE__, "GetNumaNodeProcessorMaskEx", buf, "SUCCESS", meg);
+
 
 	return true;
 }

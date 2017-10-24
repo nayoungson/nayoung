@@ -52,6 +52,7 @@ BOOL test_CreateHardLinkW(){
 	}
 
 	CloseHandle(hFile);
+	Sleep(3000);
 
 	DeleteFile(L"손나영\\test_CreateHardLinkW.link"); //Delete하지 않은 상태에서 다시 CreateHardLinkW를 진행하면 FAIL됨. 반드시 삭제해야 함.
 	DeleteFile(L"손나영\\test_CreateHardLinkW.txt");

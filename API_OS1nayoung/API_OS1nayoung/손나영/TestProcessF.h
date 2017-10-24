@@ -20,6 +20,9 @@ BOOL test_GetProcessWorkingSetSize();
 BOOL test_IsProcessInJob();
 BOOL test_GetProcessHandleCount();
 BOOL test_GetProcessDEPPolicy();
+
+//4ÁÖÂ÷
+BOOL test_FlushProcessWriteBuffers();
 //BOOL test_GetProcessGroupAffinity();
 
 

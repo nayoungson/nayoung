@@ -42,16 +42,10 @@
     <ClCompile Include="손나영\TestProcessor.cpp">
       <Filter>소스 파일\손나영</Filter>
     </ClCompile>
-    <ClCompile Include="손나영\TestLibrary.cpp">
-      <Filter>소스 파일\손나영</Filter>
-    </ClCompile>
     <ClCompile Include="손나영\TestRegistryPPT.cpp">
       <Filter>소스 파일\손나영</Filter>
     </ClCompile>
     <ClCompile Include="손나영\TestFunctionPPT.cpp">
-      <Filter>소스 파일\손나영</Filter>
-    </ClCompile>
-    <ClCompile Include="손나영\TestDebug.cpp">
       <Filter>소스 파일\손나영</Filter>
     </ClCompile>
     <ClCompile Include="손나영\TestProcessF.cpp">
@@ -61,6 +55,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="손나영\TestMemory.cpp">
+      <Filter>소스 파일\손나영</Filter>
+    </ClCompile>
+    <ClCompile Include="token.cpp">
       <Filter>소스 파일\손나영</Filter>
     </ClCompile>
   </ItemGroup>
@@ -84,9 +81,6 @@
       <Filter>헤더 파일\손나영</Filter>
     </ClInclude>
     <ClInclude Include="손나영\TestProcessor.h">
-      <Filter>헤더 파일\손나영</Filter>
-    </ClInclude>
-    <ClInclude Include="손나영\TestLibrary.h">
       <Filter>헤더 파일\손나영</Filter>
     </ClInclude>
     <ClInclude Include="손나영\TestRegistryPPT.h">

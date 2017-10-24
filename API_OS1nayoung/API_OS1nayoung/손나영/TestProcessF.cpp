@@ -387,6 +387,37 @@ BOOL test_GetProcessDEPPolicy(){
 	return true;
 }
 
+/** 현재 프로세스의 스레드를 실행중인 각 프로세서의 쓰기 큐를 플러시합니다. */
+BOOL test_FlushProcessWriteBuffers(){
+
+	#ifdef OQADBGPRINT
+	printf("test_FlushProcessWriteBuffers\n");
+	#endif
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	//__rdtsc : 프로세서 시간 스탬프 반환. 마지막 재설정 후 클록 주기 수 기록.
+
+	unsigned __int64 t1 = __rdtsc();
+	FlushProcessWriteBuffers();
+	unsigned __int64 t2 = __rdtsc() ;
+	
+	printf("%d \n", t1);
+	printf("%d \n", t2);
+
+	if(t1 != t2){
+		sprintf(meg, " FlushProcessWriteBuffers() : SUCCESS");
+		//sprintf(meg, " FlushProcessWriteBuffers() : SUCCESS \n\n Flush 전 __rdtsc = %d \n Flush 후 __rdtsc = %d ", t1, t2);
+		strcpy(buf, "SUCCESS");
+	}else{
+		strcpy(buf, GetErrorMessage(" FlushProcessWriteBuffers() : FAIL \n\n Error Message :", GetLastError()));
+	}
+	wresult(__FILE__, __LINE__, "FlushProcessWriteBuffers", buf, "SUCCESS", meg);
+
+	return true;
+}
+
 /**
 BOOL test_GetProcessGroupAffinity(){
 

@@ -1,5 +1,5 @@
 #include "TestFunctionPPT.h"
-
+#include <ktmw32.h>
 
 BOOL test_SetFileInformationByHandle(){
 
@@ -160,12 +160,72 @@ BOOL test_FatalExit(){
 	return true;
 }
 
-/**
+
+BOOL test_GetLargePageMinimum(){
+
+	#ifdef OQADBGPRINT
+	printf("test_GetLargePageMinimum\n");
+	#endif
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ];
+
+	SIZE_T size = GetLargePageMinimum();
+	printf("%d", size);
+
+	if(size != 0){
+		sprintf(meg, " GetLargePageMinimum() : SUCCESS \n\n →minimum size of a large page : %d Byte", size);
+		strcpy(buf, "SUCCESS");
+	}else{
+		sprintf(meg, " GetLargePageMinimum() : FAIL \n\n 이 프로세서는 large pages를 지원하지 않습니다.");
+	}
+
+	wresult(__FILE__, __LINE__, "GetLargePageMinimum", buf, "SUCCESS", meg);
+
+	return true;
+}
+
+#define BUFSIZE MAX_PATH
+BOOL test_GetFinalPathNameByHandleA(){
+
+	#ifdef OQADBGPRINT
+	printf("test_GetFinalPathNameByHandleA\n");
+	#endif
+
+	HANDLE hFile;
+	DWORD dwRet;
+	TCHAR Path[BUFSIZE];
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ];
+
+	hFile = CreateFile(L"손나영\\test_GetFinalPathNameByHandleA.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if(hFile ==INVALID_HANDLE_VALUE){
+		sprintf(meg, "Could not open file (error %d\n)", GetLastError());
+		return 0;
+	}
+
+	dwRet = GetFinalPathNameByHandle(hFile,Path,BUFSIZE,VOLUME_NAME_NT);
+	if(dwRet < BUFSIZE)	{
+		sprintf(meg, " GetFinalPathNameByHandle() : SUCCESS \n\nThe final path :%S \n", Path);
+		strcpy(buf, "SUCCESS");
+	}
+	else{
+		sprintf(meg, " GetFinalPathNameByHandle() : FAIL \n\n The required buffer size is %d.\n", dwRet);
+	}
+	CloseHandle(hFile);
+
+	wresult(__FILE__, __LINE__, "GetFinalPathNameByHandle", buf, "SUCCESS", meg);
+
+	return true;
+}
+
+
 BOOL test_CreateHardLinkTransactedA(){
 
 	HWND hWnd = 0;
 	HANDLE hFile = NULL;
-	HANDLE hTransaction;
+	HANDLE hTranscation;
 
 	int wresult_value=0;
 	char buf[BUFSIZ];
@@ -175,30 +235,41 @@ BOOL test_CreateHardLinkTransactedA(){
 	printf("test_CreateHardLinkW\n");
 	#endif
 
+	//C:\Users\Tmax\Documents\Visual Studio 2012\Projects\API_OS1nayoung\API_OS1nayoung\손나영
+
 	DeleteFile(L"손나영\\CreateHardLinkTransactedA.link"); //Delete하지 않은 상태에서 다시 CreateHardLinkW를 진행하면 FAIL됨. 반드시 삭제해야 함.
 	DeleteFile(L"손나영\\CreateHardLinkTransactedA.txt");
 
+
 	hFile = CreateFile(L"손나영\\CreateHardLinkTransactedA.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	hTransaction = CreateTransaction(NULL, NULL, 0, 0, 0, 0, NULL);
+	//hTranscation = CreateTransaction(NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	hTranscation = CreateTransaction(NULL, 0, TRANSACTION_DO_NOT_PROMOTE, 0,0,0, NULL);
 
-	BOOL result = CreateHardLinkTransactedA("손나영\\CreateHardLinkTransactedA.link", "손나영\\CreateHardLinkTransactedA.txt", NULL, hTransaction);
+	if(hTranscation == INVALID_HANDLE_VALUE)
+		printf(GetErrorMessage("CreateHardLinkTransactedA() : FAIL \n\n Error Message :", GetLastError()));
+	else
+		printf("\n\nCreateTransaction 성공 \n");
 
-	if(result){
-		strcpy(meg, " CreateHardLinkTransactedA() : PASS \n\n CreateHardLinkTransactedA 성공 \n(계속해서 CreateHardLinkW 실행을 위해 생성한 파일을 삭제합니다.)");
+	BOOL result = CreateHardLinkTransactedA("손나영\\CreateHardLinkTransactedA.link", "손나영\\CreateHardLinkTransactedA.txt", NULL, hTranscation);
+
+	if(result != 0){
+		strcpy(meg, "CreateHardLinkTransactedA() : PASS");
 		wresult_value=1;
 
 	}else{
-		strcpy(meg, " CreateHardLinkTransactedA() : FAIL \n\n 생성 실패 \n(관리자 권한으로 실행했는지, 경로가 올바른지 확인하십시오.)");
+		strcpy(meg, "CreateHardLinkTransactedA() : FAIL");
+		printf("에러 코드 : %d \n", GetLastError());
+		printf(GetErrorMessage("CreateHardLinkTransactedA() : FAIL \nError Message : ", GetLastError()));
 	}
 
+	wresult(__FILE__, __LINE__, "CreateHardLinkTransactedA", buf, "1", meg);
+
+	DeleteFileTransactedA("손나영\\CreateHardLinkTransactedA.link", hTranscation);
+
+	DeleteFile(L"손나영\\CreateHardLinkTransactedA.link"); //Delete하지 않은 상태에서 다시 CreateHardLinkW를 진행하면 FAIL됨. 반드시 삭제해야 함.
+	DeleteFile(L"손나영\\CreateHardLinkTransactedA.txt");
+	
 	CloseHandle(hFile);
-
-	DeleteFile(L"손나영\\test_CreateHardLinkTransactedA.link"); //Delete하지 않은 상태에서 다시 CreateHardLinkW를 진행하면 FAIL됨. 반드시 삭제해야 함.
-	DeleteFile(L"손나영\\test_CreateHardLinkTransactedA.txt");
-
-	sprintf(buf, "%d", wresult_value);
-	wresult(__FILE__, __LINE__, "test_CreateHardLinkTransactedA", buf, "1", meg);
 
 	return TRUE;
 }
-*/

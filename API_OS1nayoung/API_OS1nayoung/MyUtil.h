@@ -17,12 +17,11 @@
 #include "손나영\TestCriticalSection.h"
 #include "손나영\TestFunction.h"
 #include "손나영\TestModule.h"
-#include "손나영\TestLibrary.h"
 #include "손나영\TestRegistry.h"
 
+#include "손나영\TestProcessor.h"
 #include "손나영\TestProcessF.h"
 #include "손나영\TestRegistryPPT.h"
-#include "손나영\TestProcessor.h"
 #include "손나영\TestFunctionPPT.h"
 
 #include "손나영\TestMemory.h"

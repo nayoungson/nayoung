@@ -1,4 +1,5 @@
 #include "TestMemory.h"
+#include <WERAPI.H>
 
 /**
 	AllocateUserPhysicalPages() : 지정된 프로세스의 AWE(Address Windowing Extensions) 영역 내에서 매핑 및 매핑 해제 할 물리적 메모리 페이지를 할당
@@ -20,7 +21,7 @@ BOOL test_AllocateUserPhysicalPages(){
 
 	int PFNArraySize;  
 	char buf[BUFSIZ];
-	char meg[BUFSIZ];
+	char meg[BUFSIZ]="FAIL";
 	
 	GetSystemInfo(&sSysInfo);  // fill the system information structure
 
@@ -46,7 +47,7 @@ BOOL test_AllocateUserPhysicalPages(){
 		strcpy(buf, "SUCCESS");
 	}else {
 		strcpy(meg, GetErrorMessage(" AllocateUserPhysicalPages() : FAIL \n\n <64-bit Windows on Itanium 전용 시스템>\n\n cmd 창에서 wmic cpu get architecture 입력했을 때 \n 6(means Itanium)과 9(means x64)가 출력되어야 지원함 \n\n Error Message :" , GetLastError()));
-
+		strcpy(buf, "FAIL");
 	}
 	if(NumberOfPagesInitial != NumberOfPages) {
 		//printf(("Allocated only %p pages.\n"), NumberOfPages );
@@ -72,7 +73,7 @@ BOOL test_FreeUserPhysicalPages(){
 
 	int PFNArraySize;               // memory to request for PFN array
 	char buf[BUFSIZ];
-	char meg[BUFSIZ];
+	char meg[BUFSIZ]="FAIL";
 
 	GetSystemInfo(&sSysInfo);  // fill the system information structure
 
@@ -111,6 +112,7 @@ BOOL test_FreeUserPhysicalPages(){
 		strcpy(buf, "SUCCESS");
 	}else{
 		sprintf(meg, " FreeUserPhysicalPages() : FAIL \n\n <64-bit Windows on Itanium 전용 시스템> \n\n cmd 창에서 wmic cpu get architecture 입력했을 때 \n 6(means Itanium)과 9(means x64)가 출력되어야 지원함 ");
+		strcpy(buf, "FAIL");
 	}
 
 	wresult(__FILE__, __LINE__, "FreeUserPhysicalPages", buf, "SUCCESS", meg);
@@ -135,7 +137,7 @@ BOOL test_MapUserPhysicalPages(){
 
 	int PFNArraySize;               // memory to request for PFN array
 	char buf[BUFSIZ];
-	char meg[BUFSIZ];
+	char meg[BUFSIZ]="FAIL";
 	
 	GetSystemInfo(&sSysInfo);  // fill the system information structure
 	//_tprintf(_T("This computer has page size %d.\n"), sSysInfo.dwPageSize);
@@ -166,6 +168,7 @@ BOOL test_MapUserPhysicalPages(){
 		strcpy(buf, "SUCCESS");
 	}else{
 		sprintf(meg, " MapUserPhysicalPages() : FAIL \n\n <64-bit Windows on Itanium 전용 시스템> \n\n cmd 창에서 wmic cpu get architecture 입력했을 때 \n 6(means Itanium)과 9(means x64)가 출력되어야 지원함 ");
+		strcpy(buf, "FAIL");
 	}
 
 	wresult(__FILE__, __LINE__, "MapUserPhysicalPages", buf, "SUCCESS", meg);
@@ -174,64 +177,6 @@ BOOL test_MapUserPhysicalPages(){
 }
 
 
-BOOL test_GetLargePageMinimum(){
-
-	#ifdef OQADBGPRINT
-	printf("test_GetLargePageMinimum\n");
-	#endif
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ];
-
-	SIZE_T size = GetLargePageMinimum();
-	printf("%d", size);
-
-	if(size != 0){
-		sprintf(meg, " GetLargePageMinimum() : SUCCESS \n\n →minimum size of a large page : %d Byte", size);
-		strcpy(buf, "SUCCESS");
-	}else{
-		sprintf(meg, " GetLargePageMinimum() : FAIL \n\n 이 프로세서는 large pages를 지원하지 않습니다.");
-	}
-
-	wresult(__FILE__, __LINE__, "GetLargePageMinimum", buf, "SUCCESS", meg);
-
-	return true;
-}
-
-#define BUFSIZE MAX_PATH
-BOOL test_GetFinalPathNameByHandleA(){
-
-	#ifdef OQADBGPRINT
-	printf("test_GetFinalPathNameByHandleA\n");
-	#endif
-
-	HANDLE hFile;
-	DWORD dwRet;
-	TCHAR Path[BUFSIZE];
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ];
-
-	hFile = CreateFile(L"손나영\\test_GetFinalPathNameByHandleA.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	if(hFile ==INVALID_HANDLE_VALUE){
-		sprintf(meg, "Could not open file (error %d\n)", GetLastError());
-		return 0;
-	}
-
-	dwRet = GetFinalPathNameByHandle(hFile,Path,BUFSIZE,VOLUME_NAME_NT);
-	if(dwRet < BUFSIZE)	{
-		sprintf(meg, " GetFinalPathNameByHandle() : SUCCESS \n\nThe final path :%S \n", Path);
-		strcpy(buf, "SUCCESS");
-	}
-	else{
-		sprintf(meg, " GetFinalPathNameByHandle() : FAIL \n\n The required buffer size is %d.\n", dwRet);
-	}
-	CloseHandle(hFile);
-
-	wresult(__FILE__, __LINE__, "GetFinalPathNameByHandle", buf, "SUCCESS", meg);
-
-	return true;
-}
 
 /**
 	특정 process에 등록된 재시작 정보 검색
@@ -306,7 +251,7 @@ BOOL test_VirtualAllocExNuma(){
 	#endif
 
 	char buf[BUFSIZ];
-	char meg[BUFSIZ];
+	char meg[BUFSIZ]="FAIL";
 
 	DWORD  PageSize;
 	ULONG HighestNodeNumber;
@@ -362,6 +307,7 @@ BOOL test_VirtualAllocExNuma(){
 	PCHAR Buffer = (PCHAR)VirtualAllocExNuma(hProcess,NULL,AllocationSize,MEM_RESERVE | MEM_COMMIT,PAGE_READWRITE,NodeNumber);
 
 	if(Buffer == NULL){
+		strcpy(buf, "FAIL");
 		sprintf(meg, "VirtualAllocExNuma() : FAIL \n\n Error : %d \n node number%u\n", GetLastError(), NodeNumber);
 
 	}else{ //성공
@@ -375,10 +321,69 @@ BOOL test_VirtualAllocExNuma(){
 }
 
 
+#define WER_MAX_MEM_BLOCK_SIZE (64 * 1024)
+BOOL test_WerRegisterMemoryBlock(){
+
+	#ifdef OQADBGPRINT
+	printf("test_WerRegisterMemoryBlock\n");
+	#endif
+
+	int address = 0x0001;
+	char buf[BUFSIZ];
+	char meg[BUFSIZ]="FAIL";
+
+	PVOID pv = &address;
+	HRESULT result = WerRegisterMemoryBlock(&pv, WER_MAX_MEM_BLOCK_SIZE);
+
+	if(result == S_OK){
+		strcpy(buf, "SUCCESS");
+		strcpy(meg, " WerRegisterMemoryBlock() : SUCCESS \n\n WER에서 error report를 만들때 수집하기 위한 memory block을 등록했습니다.");
+	}else{
+		strcpy(buf, "FAIL");
+		strcpy(meg, GetErrorMessage(" WerRegisterMemoryBlock() : FAIL  \n\n Error Message :" , GetLastError()));
+	}
+
+	wresult(__FILE__, __LINE__, "WerRegisterMemoryBlock", buf, "SUCCESS", meg);
+
+	return true;
+}
+
+BOOL test_WerUnregisterMemoryBlock(){
+
+	#ifdef OQADBGPRINT
+	printf("test_WerUnregisterMemoryBlock\n");
+	#endif
+
+	int address = 0x0001;
+	char buf[BUFSIZ];
+	char meg[BUFSIZ]="FAIL";
+
+	PVOID pv = &address;
+	HRESULT result = WerRegisterMemoryBlock(&pv, WER_MAX_MEM_BLOCK_SIZE);
+	if(result == S_OK){
+		result = WerUnregisterMemoryBlock(&pv);
+
+		if(result == S_OK){
+			strcpy(buf, "SUCCESS");
+			strcpy(meg, " WerUnregisterMemoryBlock() : SUCCESS \n\n WER에서 error report를 만들때 수집하기 위한 memory block을 삭제했습니다.");
+		}else{
+			strcpy(buf, "FAIL");
+			strcpy(meg, GetErrorMessage(" WerUnregisterMemoryBlock() : FAIL  \n\n Error Message :" , GetLastError()));
+		}
+	}else{
+		strcpy(buf, "FAIL");
+		strcpy(meg, GetErrorMessage(" WerRegisterMemoryBlock() : FAIL  \n\n  WerRegisterMemoryBlock부터 다시 하십시오.Error Message :" , GetLastError()));
+	}
+	wresult(__FILE__, __LINE__, "WerUnregisterMemoryBlock", buf, "SUCCESS", meg);
+
+	return true;
+}
+
+
 BOOL test_AllocateUserPhysicalPagesNuma(){
 	
 	char buf[BUFSIZ];
-	char meg[BUFSIZ];
+	char meg[BUFSIZ]="FAIL";
 	int PFNArraySize;               // memory to request for PFN array
 	
 	BOOL result;
@@ -410,10 +415,13 @@ BOOL test_AllocateUserPhysicalPagesNuma(){
 	result = AllocateUserPhysicalPagesNuma(hProcess,&NumberOfPages,aPFNs,NodeNumber);
 
 	if(result == TRUE){
-		printf("sdfds");
+		strcpy(buf, "SUCCESS");
+		strcpy(meg, " AllocateUserPhysicalPagesNuma() : SUCCESS");
 	}else{
+		strcpy(buf, "FAIL");
 		strcpy(meg, GetErrorMessage(" AllocateUserPhysicalPagesNuma() : FAIL  \n\n Error Message :" , GetLastError()));
 	}
 	wresult(__FILE__, __LINE__, "AllocateUserPhysicalPagesNuma", buf, "SUCCESS", meg);
+
 	return true;
 }

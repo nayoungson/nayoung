@@ -184,7 +184,7 @@ BOOL test_RegQueryValueExW(){
 	BOOL result;
 
 	char meg[BUFSIZ] = "FAIL";
-	char buf[BUFSIZ];
+
 
 	#ifdef OQADBGPRINT
 	printf("test_RegQueryValueExW\n");
@@ -204,7 +204,7 @@ BOOL test_RegQueryValueExW(){
 		}else
 			strcpy(meg, "RegQueryValueExW : FAIL");
 
-	wresult(__FILE__, __LINE__, "RegQueryValueExW", _itoa(result, buf, 10), _itoa(FALSE, buf, 10), meg);
+	wresult(__FILE__, __LINE__, "RegQueryValueExW", meg, "RegQueryValueExW : PASS", meg);
 	return true;
 }
 
@@ -235,7 +235,7 @@ BOOL test_RegCloseKey(){
 		MessageBox(hWnd, L"RegCreateKeyW함수 실패로 인해 RegCloseKey 함수를 진행할 수 없습니다. Regsitry key를 다시 생성하십시오", L"fail", MB_OK);
 		#endif
 	}
-	wresult(__FILE__, __LINE__, "RegCloseKey", "ERROR_SUCCESS", "ERROR_SUCCESS", meg);
+	wresult(__FILE__, __LINE__, "RegCloseKey", meg, " RegCloseKey : PASS \n\n RegCreateKeyW로 key 생성 후 → RegCloseKey 성공", meg);
 
 	return true;
 }
@@ -245,7 +245,7 @@ BOOL test_RegDeleteKeyExW(){
 	LSTATUS result;
 
 	char meg[BUFSIZ] = "FAIL";
-	char buf[BUFSIZ];
+
  	
 	#ifdef OQADBGPRINT
 	printf("test_RegDeleteKeyExW\n");
@@ -260,7 +260,7 @@ BOOL test_RegDeleteKeyExW(){
 	}else
 		strcpy(meg, " RegDeleteKeyExW : FAIL");
 
-	wresult(__FILE__, __LINE__, "RegDeleteKeyExW", _itoa(result, buf, 10), _itoa(ERROR_SUCCESS, buf, 10), meg);
+	wresult(__FILE__, __LINE__, "RegDeleteKeyExW", meg, " RegDeleteKeyExW \n\n SOFTWARE > NAYOUNG_API_TEST > RegiTest 아래 Position 삭제", meg);
 	return true;
 }
 
@@ -380,7 +380,7 @@ BOOL test_RegEnumKeyExW(){
 	#endif
 
 	strcpy(meg, " RegEnumKeyExW() : PASS \n\n 터미널에서 pluse_enum 값 출력을 확인하십시오.");
-	wresult(__FILE__, __LINE__, "RegEnumKeyEx", "ERROR_SUCCESS", "ERROR_SUCCESS", meg);
+	wresult(__FILE__, __LINE__, "RegEnumKeyEx", meg, " RegEnumKeyExW() : PASS \n\n 터미널에서 pluse_enum 값 출력을 확인하십시오.", meg);
 	return true;
 }
 
@@ -423,7 +423,7 @@ BOOL test_RegEnumKeyW(){
 	#endif
 
 	strcpy(meg, " RegEnumKeyW() : PASS \n\n 터미널에서 pluse_enum 값 출력을 확인하십시오.");
-	wresult(__FILE__, __LINE__, "RegEnumKeyEx", "ERROR_SUCCESS", "ERROR_SUCCESS", meg);
+	wresult(__FILE__, __LINE__, "RegEnumKeyEx", meg, " RegEnumKeyW() : PASS \n\n 터미널에서 pluse_enum 값 출력을 확인하십시오.", meg);
 	return true;
 }
 

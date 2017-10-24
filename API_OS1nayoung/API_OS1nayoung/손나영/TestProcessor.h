@@ -15,5 +15,6 @@ BOOL test_GetCurrentProcessorNumber();
 BOOL test_GetMaximumProcessorGroupCount();
 BOOL test_GetNumaProcessorNode();
 BOOL test_GetNumaNodeNumberFromHandle();
-
+BOOL test_GetNumaProcessorNodeEx();
+BOOL test_GetNumaNodeProcessorMaskEx();
 #endif
