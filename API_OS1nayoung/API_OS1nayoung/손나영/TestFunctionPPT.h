@@ -19,6 +19,7 @@ BOOL test_GetFinalPathNameByHandleA();
 
 //14ÁÖÂ÷
 BOOL test_CreateHardLinkTransactedA();
+BOOL test_CreateHardLinkTransactedW();
 BOOL test_WerRegisterMemoryBlock();
 BOOL test_WerUnregisterMemoryBlock();
 

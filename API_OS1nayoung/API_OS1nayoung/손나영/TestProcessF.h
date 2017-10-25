@@ -23,6 +23,13 @@ BOOL test_GetProcessDEPPolicy();
 
 //4ÁÖÂ÷
 BOOL test_FlushProcessWriteBuffers();
+BOOL test_SetProcessPriorityBoost();
+BOOL test_K32EnumProcesses();
+BOOL test_K32EnumProcessModules();
+BOOL test_K32EnumProcessModulesEx();
+BOOL test_K32GetModuleBaseNameA();
+BOOL test_K32GetModuleBaseNameW();
+
 //BOOL test_GetProcessGroupAffinity();
 
 

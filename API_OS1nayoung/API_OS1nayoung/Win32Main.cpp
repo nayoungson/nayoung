@@ -108,15 +108,22 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		CreateWindow(L"button", L"RegRestoreKeyW", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,350,250,40,hWnd,(HMENU)55,g_hInst,NULL);
 
 		CreateWindow(L"button", L"CreateHardLinkTransactedA", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,450,250,40,hWnd,(HMENU)41,g_hInst,NULL);
-		CreateWindow(L"button", L"test_CreateHardLinkW", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,500,250,40,hWnd,(HMENU)42,g_hInst,NULL);
+		CreateWindow(L"button", L"CreateHardLinkTransactedW", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,500,250,40,hWnd,(HMENU)42,g_hInst,NULL);
 		CreateWindow(L"button", L"FlushProcessWriteBuffers", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,550,250,40,hWnd,(HMENU)43,g_hInst,NULL);
 		CreateWindow(L"button", L"WerRegisterMemoryBlock", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,600,250,40,hWnd,(HMENU)44,g_hInst,NULL);
 		CreateWindow(L"button", L"WerUnregisterMemoryBlock", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,650,250,40,hWnd,(HMENU)45,g_hInst,NULL);
 		CreateWindow(L"button", L"GetNumaProcessorNodeEx", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,700,250,40,hWnd,(HMENU)46,g_hInst,NULL);
-		CreateWindow(L"button", L"GetNumaNodeProcessorMaskEx", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,750,250,40,hWnd,(HMENU)47,g_hInst,NULL);
-		
+		CreateWindow(L"button", L"GetNumaNodeProcessorMaskEx - block", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,750,250,40,hWnd,(HMENU)47,g_hInst,NULL);
 
-		
+		CreateWindow(L"button", L"GetProcessWorkingSetSizeEx ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,400,250,40,hWnd,(HMENU)56,g_hInst,NULL);
+		CreateWindow(L"button", L"SetProcessPriorityBoost ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,450,250,40,hWnd,(HMENU)57,g_hInst,NULL);
+		CreateWindow(L"button", L"K32EnumProcesses ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,500,250,40,hWnd,(HMENU)58,g_hInst,NULL);
+		CreateWindow(L"button", L"K32EnumProcessModules ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,550,250,40,hWnd,(HMENU)59,g_hInst,NULL);
+		CreateWindow(L"button", L"K32EnumProcessModulesEx ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,600,250,40,hWnd,(HMENU)60,g_hInst,NULL);
+		CreateWindow(L"button", L"K32GetModuleBaseNameA ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,650,250,40,hWnd,(HMENU)61,g_hInst,NULL);
+		CreateWindow(L"button", L"K32GetModuleBaseNameW ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,700,250,40,hWnd,(HMENU)62,g_hInst,NULL);
+
+
 		//CreateWindow(L"button", L"FlushProcessWriteBuffers", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,500,250,40,hWnd,(HMENU)43,g_hInst,NULL);
 		//CreateWindow(L"button", L"AllocateUserPhysicalPagesNuma-BLOCK", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,300,250,40,hWnd,(HMENU)38,g_hInst,NULL);
 		//CreateWindow(L"button", L"GetProcessGroupAffinity-BLOCK", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,450,250,40,hWnd,(HMENU)41,g_hInst,NULL);
@@ -161,8 +168,8 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		case 38:	test_GetProcessHandleCount();				break;
 		case 39:	test_GetProcessDEPPolicy();					break;
 		//4ÁÖÂ÷
-		case 41:	test_CreateHardLinkTransactedA();			break; //x
-		case 42:	test_CreateHardLinkW();			break;				//x
+		case 41:	test_CreateHardLinkTransactedA();			break; 
+		case 42:	test_CreateHardLinkTransactedW();			break;				
 		case 43:	test_FlushProcessWriteBuffers();			break;
 		case 44:	test_WerRegisterMemoryBlock();				break;
 		case 45:	test_WerUnregisterMemoryBlock();			break;
@@ -178,7 +185,15 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		case 54:	test_RegRestoreKeyA();						break;
 		case 55:	test_RegRestoreKeyW();						break;
 		
+		case 56:	test_GetProcessWorkingSetSizeEx();			break;
+		case 57:	test_SetProcessPriorityBoost();				break;
+		case 58:	test_K32EnumProcesses();					break;
+		case 59:	test_K32EnumProcessModules();				break;
+		case 60:	test_K32EnumProcessModulesEx();				break;
+		case 61:	test_K32GetModuleBaseNameA();				break;
+		case 62:	test_K32GetModuleBaseNameW();				break;
 
+			
 		}		
 		return 0;
 

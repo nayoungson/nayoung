@@ -232,43 +232,123 @@ BOOL test_CreateHardLinkTransactedA(){
 	char meg[BUFSIZ] = "FAIL";
 
 	#ifdef OQADBGPRINT
-	printf("test_CreateHardLinkW\n");
+	printf("test_CreateHardLinkTransactedA\n");
 	#endif
 
 	//C:\Users\Tmax\Documents\Visual Studio 2012\Projects\API_OS1nayoung\API_OS1nayoung\손나영
 
+	//생성한 파일들 삭제(CreateHardLink때)
 	DeleteFile(L"손나영\\CreateHardLinkTransactedA.link"); //Delete하지 않은 상태에서 다시 CreateHardLinkW를 진행하면 FAIL됨. 반드시 삭제해야 함.
 	DeleteFile(L"손나영\\CreateHardLinkTransactedA.txt");
 
-
+	//CreateHardLinkTransactedA을 위해서 미리 파일 생성
 	hFile = CreateFile(L"손나영\\CreateHardLinkTransactedA.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	CloseHandle(hFile);
+
+	//handle 만들기
 	//hTranscation = CreateTransaction(NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 	hTranscation = CreateTransaction(NULL, 0, TRANSACTION_DO_NOT_PROMOTE, 0,0,0, NULL);
 
-	if(hTranscation == INVALID_HANDLE_VALUE)
-		printf(GetErrorMessage("CreateHardLinkTransactedA() : FAIL \n\n Error Message :", GetLastError()));
-	else
-		printf("\n\nCreateTransaction 성공 \n");
-
-	BOOL result = CreateHardLinkTransactedA("손나영\\CreateHardLinkTransactedA.link", "손나영\\CreateHardLinkTransactedA.txt", NULL, hTranscation);
-
-	if(result != 0){
-		strcpy(meg, "CreateHardLinkTransactedA() : PASS");
-		wresult_value=1;
-
+	//handle 오류 여부 확인
+	if(hTranscation == INVALID_HANDLE_VALUE){
+		strcpy(meg, "CreateTransaction에 실패했습니다. \n CreateHardLinkTransactedA를 진행할 수 없습니다. ");
 	}else{
-		strcpy(meg, "CreateHardLinkTransactedA() : FAIL");
-		printf("에러 코드 : %d \n", GetLastError());
-		printf(GetErrorMessage("CreateHardLinkTransactedA() : FAIL \nError Message : ", GetLastError()));
+		//CreateHardLinkTransactedA 전 확실히 삭제
+		//DeleteFileTransactedA("손나영\\CreateHardLinkTransactedA.link", hTranscation);
+
+		//CreateHardLinkTransactedA 수행
+		BOOL result = CreateHardLinkTransactedA("손나영\\CreateHardLinkTransactedA.link", "손나영\\CreateHardLinkTransactedA.txt", NULL, hTranscation);
+
+		//CreateHardLinkTransactedA가 0이 아니면 성공
+		if(result != 0){
+			strcpy(meg, "CreateHardLinkTransactedA() : PASS");
+			wresult_value=1;
+
+		}else{
+			strcpy(meg, "CreateHardLinkTransactedA() : FAIL");
+			printf("에러 코드 : %d \n", GetLastError());
+			printf(GetErrorMessage("CreateHardLinkTransactedA() : FAIL \nError Message : ", GetLastError()));
+		}
 	}
 
+	sprintf(buf, "%d", wresult_value);
 	wresult(__FILE__, __LINE__, "CreateHardLinkTransactedA", buf, "1", meg);
 
+	//CreateHardLinkTransactedA한거 삭제
 	DeleteFileTransactedA("손나영\\CreateHardLinkTransactedA.link", hTranscation);
 
+	//파일 확실히 삭제(CreateHardLink때)
 	DeleteFile(L"손나영\\CreateHardLinkTransactedA.link"); //Delete하지 않은 상태에서 다시 CreateHardLinkW를 진행하면 FAIL됨. 반드시 삭제해야 함.
 	DeleteFile(L"손나영\\CreateHardLinkTransactedA.txt");
-	
+
+	CloseHandle(hFile);
+
+	return TRUE;
+}
+
+
+BOOL test_CreateHardLinkTransactedW(){
+
+	HWND hWnd = 0;
+	HANDLE hFile = NULL;
+	HANDLE hTranscation;
+
+	int wresult_value=0;
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	#ifdef OQADBGPRINT
+	printf("test_CreateHardLinkTransactedW\n");
+	#endif
+
+	//C:\Users\Tmax\Documents\Visual Studio 2012\Projects\API_OS1nayoung\API_OS1nayoung\손나영
+
+	//생성한 파일들 삭제(CreateHardLink때)
+	DeleteFile(L"손나영\\CreateHardLinkTransactedW.link"); //Delete하지 않은 상태에서 다시 CreateHardLinkW를 진행하면 FAIL됨. 반드시 삭제해야 함.
+	DeleteFile(L"손나영\\CreateHardLinkTransactedW.txt");
+
+	//CreateHardLinkTransactedA을 위해서 미리 파일 생성
+	hFile = CreateFile(L"손나영\\CreateHardLinkTransactedW.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	CloseHandle(hFile);
+
+	//handle 만들기
+	//hTranscation = CreateTransaction(NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	hTranscation = CreateTransaction(NULL, 0, TRANSACTION_DO_NOT_PROMOTE, 0,0,0, NULL);
+
+	//handle 오류 여부 확인
+	if(hTranscation == INVALID_HANDLE_VALUE){
+		strcpy(meg, "CreateTransaction에 실패했습니다. \nCreateHardLinkTransactedW를 진행할 수 없습니다. ");
+	}else{
+		//CreateHardLinkTransactedA 전 확실히 삭제
+		//DeleteFileTransactedA("손나영\\CreateHardLinkTransactedA.link", hTranscation);
+
+		//CreateHardLinkTransactedA 수행
+		BOOL result = CreateHardLinkTransactedW(L"손나영\\CreateHardLinkTransactedW.link", L"손나영\\CreateHardLinkTransactedW.txt", NULL, hTranscation);
+
+		//CreateHardLinkTransactedA가 0이 아니면 성공
+		if(result != 0){
+			strcpy(meg, "CreateHardLinkTransactedW() : PASS");
+			wresult_value=1;
+
+		}else{
+			strcpy(meg, "CreateHardLinkTransactedW() : FAIL");
+			printf("에러 코드 : %d \n", GetLastError());
+			printf(GetErrorMessage("CreateHardLinkTransactedW() : FAIL \nError Message : ", GetLastError()));
+		}
+	}
+
+	sprintf(buf, "%d", wresult_value);
+	wresult(__FILE__, __LINE__, "CreateHardLinkTransactedW", buf, "1", meg);
+
+	//CreateHardLinkTransactedA한거 삭제
+	DeleteFileTransactedW(L"손나영\\CreateHardLinkTransactedW.link", hTranscation);
+
+	//파일 확실히 삭제(CreateHardLink때)
+	DeleteFile(L"손나영\\CreateHardLinkTransactedW.link"); //Delete하지 않은 상태에서 다시 CreateHardLinkW를 진행하면 FAIL됨. 반드시 삭제해야 함.
+	DeleteFile(L"손나영\\CreateHardLinkTransactedW.txt");
+
 	CloseHandle(hFile);
 
 	return TRUE;

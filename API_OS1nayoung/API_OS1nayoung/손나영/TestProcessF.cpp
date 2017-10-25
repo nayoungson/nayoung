@@ -264,6 +264,7 @@ BOOL test_GetProcessWorkingSetSize(){
 	wresult(__FILE__, __LINE__, "GetProcessWorkingSetSize", buf, "SUCCESS", meg);
 
     CloseHandle(hProcess);
+
 	return true;
 }
 
@@ -418,6 +419,203 @@ BOOL test_FlushProcessWriteBuffers(){
 	return true;
 }
 
+
+BOOL test_SetProcessPriorityBoost(){
+	
+	#ifdef OQADBGPRINT
+	printf("test_SetProcessPriorityBoost\n");
+	#endif
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+	int pid = GetCurrentProcessId();
+
+	BOOL result;
+	// This handle must have the PROCESS_SET_INFORMATION access right.
+	HANDLE hProcess = OpenProcess(PROCESS_SET_INFORMATION , FALSE, pid);
+
+	// To restore normal behavior, call SetProcessPriorityBoost with DisablePriorityBoost set to FALSE.
+	result = SetProcessPriorityBoost(hProcess, FALSE);
+
+	if(result != 0){
+		sprintf(meg, " SetProcessPriorityBoost() : SUCCESS");
+		strcpy(buf, "SUCCESS");
+	}else{
+		strcpy(meg, GetErrorMessage(" SetProcessPriorityBoost() : FAIL \n\n Error Message :", GetLastError()));
+	}
+
+	wresult(__FILE__, __LINE__, "SetProcessPriorityBoost", buf, "SUCCESS", meg);
+
+	return true;
+}
+
+
+BOOL test_K32EnumProcesses(){
+
+	#ifdef OQADBGPRINT
+	printf("test_K32EnumProcesses\n");
+	#endif
+
+	DWORD arProc[1024],cb;
+	BOOL result;
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	// 프로세스의 목록을 배열에 구하고 개수를 계산한다.
+	result = EnumProcesses(arProc,sizeof(arProc),&cb);
+	
+	if(result != 0){
+		sprintf(meg, " EnumProcesses() : SUCCESS");
+		strcpy(buf, "SUCCESS");
+	}else{
+		strcpy(meg, GetErrorMessage(" EnumProcesses() : FAIL \n\n Error Message :", GetLastError()));
+	}
+
+	wresult(__FILE__, __LINE__, "EnumProcesses", buf, "SUCCESS", meg);
+
+	return true;
+}
+
+BOOL test_K32EnumProcessModules(){
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	DWORD arProc[1024];
+	DWORD cb;
+
+	HMODULE hModule;
+	HANDLE hProcess;
+	BOOL result;
+
+	// 프로세스의 목록을 배열에 구하고 개수를 계산한다.
+	EnumProcesses(arProc,sizeof(arProc),&cb);
+
+	int pid = GetCurrentProcessId();
+
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,FALSE, pid);
+
+	if(hProcess){
+
+		// 첫번째 모듈(=프로세스 그 자체)의 이름을 구해 출력한다.
+		result=EnumProcessModules(hProcess,&hModule,sizeof(hModule),&cb);
+
+		if(result != 0){
+			sprintf(meg, " EnumProcessModules() : SUCCESS");
+			strcpy(buf, "SUCCESS");
+		}else{
+			strcpy(meg, GetErrorMessage(" EnumProcessModules() : FAIL \n\n Error Message :", GetLastError()));
+		}
+	}else
+		strcpy(meg, GetErrorMessage(" 프로세스를 open하지 못했습니다. \n\n OpenProcess 함수를 다시 체크하십시오. \n\n Error Message :", GetLastError()));
+	wresult(__FILE__, __LINE__, "EnumProcessModules", buf, "SUCCESS", meg);
+
+	return true;
+}
+
+BOOL test_K32EnumProcessModulesEx(){
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	DWORD arProc[1024];
+	DWORD cb;
+
+	HMODULE hModule;
+	HANDLE hProcess;
+	BOOL result;
+
+	// 프로세스의 목록을 배열에 구하고 개수를 계산한다.
+	EnumProcesses(arProc,sizeof(arProc),&cb);
+
+	int pid = GetCurrentProcessId();
+
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,FALSE, pid);
+
+	if(hProcess){
+
+		// 첫번째 모듈(=프로세스 그 자체)의 이름을 구해 출력한다.
+		result=EnumProcessModulesEx(hProcess, &hModule, sizeof(hModule), &cb, LIST_MODULES_ALL);
+
+		if(result != 0){
+			sprintf(meg, " EnumProcessModulesEx() : SUCCESS");
+			strcpy(buf, "SUCCESS");
+		}else{
+			strcpy(meg, GetErrorMessage(" EnumProcessModulesEx() : FAIL \n\n Error Message :", GetLastError()));
+		}
+	}else
+		strcpy(meg, GetErrorMessage(" 프로세스를 open하지 못했습니다. \n\n OpenProcess 함수를 다시 체크하십시오. \n\n Error Message :", GetLastError()));
+	wresult(__FILE__, __LINE__, "EnumProcessModulesEx", buf, "SUCCESS", meg);
+
+	return true;
+}
+
+
+
+BOOL test_K32GetModuleBaseNameA(){
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+
+	HANDLE hProcess;
+	HMODULE hMod;
+
+	int pid = GetCurrentProcessId();
+	TCHAR szProcessName[MAX_PATH] = L"<unknown>";
+
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,FALSE, pid);
+	DWORD result = GetModuleBaseNameA(hProcess, hMod, (LPSTR)szProcessName, sizeof(szProcessName)/sizeof(TCHAR) );
+
+	if(result == 0){
+		strcpy(meg, GetErrorMessage(" K32GetModuleBaseNameA() : FAIL \n\n Error Message :", GetLastError()));
+	}else{
+
+		sprintf(meg, " K32GetModuleBaseNameA() : SUCCESS");
+		strcpy(buf, "SUCCESS");
+	}
+	wresult(__FILE__, __LINE__, "K32GetModuleBaseNameA", buf, "SUCCESS", meg);
+	return true;
+}
+
+BOOL test_K32GetModuleBaseNameW(){
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	HANDLE hProcess;
+	HMODULE hMod;
+
+	int pid = GetCurrentProcessId();
+	TCHAR szProcessName[MAX_PATH] = L"<unknown>";
+
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,FALSE, pid);
+	DWORD result = GetModuleBaseNameW(hProcess, hMod, szProcessName, sizeof(szProcessName)/sizeof(TCHAR) );
+
+	if(result == 0){
+		strcpy(meg, GetErrorMessage(" GetModuleBaseNameW() : FAIL \n\n Error Message :", GetLastError()));
+	}else{
+
+		sprintf(meg, " GetModuleBaseNameW() : SUCCESS");
+		strcpy(buf, "SUCCESS");
+	}
+	wresult(__FILE__, __LINE__, "GetModuleBaseNameW", buf, "SUCCESS", meg);
+	return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
 BOOL test_GetProcessGroupAffinity(){
 
@@ -476,6 +674,7 @@ BOOL test_GetProcessWorkingSetSizeEx(){
 	BOOL result;
 	HANDLE hProcess;
 	SIZE_T dwMin, dwMax;
+	//PDWORD Flags = QUOTA_LIMITS_HARDWS_MIN_DISABLE;
 
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
@@ -496,33 +695,20 @@ BOOL test_GetProcessWorkingSetSizeEx(){
 
 	/**	process의 working set size를 가져옴	*/
 	/** 0xC0000005: 0x00000000 위치를 기록하는 동안 액세스 위반이 발생했습니다. */
-	result = GetProcessWorkingSetSizeEx(hProcess, &dwMin, &dwMax, 0);
+	//result = GetProcessWorkingSetSizeEx(hProcess, &dwMin, &dwMax, QUOTA_LIMITS_HARDWS_MIN_DISABLE);
 	
-	if(!result){
+
+	/*if(!result){
 		sprintf(meg, " GetProcessWorkingSetSizeEx() : SUCCESS \n\n ProcessId : %d \n MinimumWorkingSetSize : %lu KB \n MaximumWorkingSetSize : %lu KB", pid, dwMin, dwMax);
 		strcpy(buf, "SUCCESS");
 	}else{
-		strcpy(buf, GetErrorMessage(" GetProcessWorkingSetSize() : FAIL \n\n Error Message :", GetLastError()));
+		strcpy(buf, GetErrorMessage(" GetProcDNessWorkingSetSize() : FAIL \n\n Error Message :", GetLastError()));
 	}
 	wresult(__FILE__, __LINE__, "GetProcessWorkingSetSizeEx", buf, "SUCCESS", meg);
-
+*/
 	return true;
 }
 
-
-BOOL test_SetProcessPriorityBoost(){
-
-	BOOL result;
-	//HANDLE hProcess = OpenProcess( PROCESS_QUERY_INFORMATION, FALSE, pe32.th32ProcessID);
-
-	//result = SetProcessPriorityBoost(hProcess, TRUE);
-	if(result != 0)
-		printf("a");
-	else
-		printf("b");
-
-	return true;
-}
 
 
 /** 지정된 process의 쓰기 캐쉬를 지움(flush) 

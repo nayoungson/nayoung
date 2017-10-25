@@ -242,11 +242,11 @@ BOOL test_GetNumaNodeProcessorMaskEx(){
 	USHORT NodeNumber = 0;
 	PGROUP_AFFINITY ProcessorMask;
 
-	struct _GROUP_AFFINITY {
+	struct PGROUP_AFFINITY {
 		KAFFINITY Mask;
 		WORD      Group;
 		WORD      Reserved[3];
-	} 
+	} ;
 	result = GetNumaNodeProcessorMaskEx(NodeNumber, ProcessorMask);
 
 	if (result != 0){
@@ -256,7 +256,6 @@ BOOL test_GetNumaNodeProcessorMaskEx(){
 		strcpy(meg, GetErrorMessage(" GetNumaNodeProcessorMaskEx() : FAIL \n\n Error Message :", GetLastError()));
 
 	wresult(__FILE__, __LINE__, "GetNumaNodeProcessorMaskEx", buf, "SUCCESS", meg);
-
 
 	return true;
 }
