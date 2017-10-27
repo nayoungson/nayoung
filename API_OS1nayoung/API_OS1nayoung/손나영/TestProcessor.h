@@ -12,9 +12,10 @@ BOOL test_GetLogicalProcessorInformationEx();
 BOOL test_GetCurrentProcessorNumber();
 
 //3ÁÖÂ÷
-BOOL test_GetMaximumProcessorGroupCount();
-BOOL test_GetNumaProcessorNode();
-BOOL test_GetNumaNodeNumberFromHandle();
+
+
 BOOL test_GetNumaProcessorNodeEx();
 BOOL test_GetNumaNodeProcessorMaskEx();
+BOOL test_GetCurrentProcessorNumberEx();
+
 #endif

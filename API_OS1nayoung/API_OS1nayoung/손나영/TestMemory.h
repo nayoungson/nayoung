@@ -14,9 +14,10 @@ BOOL test_FreeUserPhysicalPages();
 BOOL test_MapUserPhysicalPages();
 BOOL test_GetLargePageMinimum();
 
-BOOL test_GetApplicationRestartSettings();
+
 
 BOOL test_VirtualAllocExNuma();
 BOOL test_AllocateUserPhysicalPagesNuma();
+BOOL test_K32GetProcessMemoryInfo();
 
 #endif

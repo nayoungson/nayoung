@@ -19,21 +19,24 @@ BOOL test_GetProcessId();
 BOOL test_GetProcessWorkingSetSize();
 BOOL test_IsProcessInJob();
 BOOL test_GetProcessHandleCount();
+BOOL test_GetMaximumProcessorGroupCount();
+BOOL test_GetNumaProcessorNode();
+BOOL test_GetNumaNodeNumberFromHandle();
 BOOL test_GetProcessDEPPolicy();
 
 //4ÁÖÂ÷
+
 BOOL test_FlushProcessWriteBuffers();
 BOOL test_SetProcessPriorityBoost();
 BOOL test_K32EnumProcesses();
 BOOL test_K32EnumProcessModules();
 BOOL test_K32EnumProcessModulesEx();
-BOOL test_K32GetModuleBaseNameA();
-BOOL test_K32GetModuleBaseNameW();
+
 
 //BOOL test_GetProcessGroupAffinity();
 
 
-BOOL test_GetProcessWorkingSetSizeEx();
+//BOOL test_GetProcessWorkingSetSizeEx();
 
 
 

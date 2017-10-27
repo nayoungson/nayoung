@@ -1,5 +1,6 @@
 #include "TestMemory.h"
 #include <WERAPI.H>
+#include <Psapi.h>
 
 /**
 	AllocateUserPhysicalPages() : 지정된 프로세스의 AWE(Address Windowing Extensions) 영역 내에서 매핑 및 매핑 해제 할 물리적 메모리 페이지를 할당
@@ -178,66 +179,6 @@ BOOL test_MapUserPhysicalPages(){
 
 
 
-/**
-	특정 process에 등록된 재시작 정보 검색
-*/
-BOOL test_GetApplicationRestartSettings(){
-
-	#ifdef OQADBGPRINT
-	printf("test_GetApplicationRestartSettings\n");
-	#endif
-
-	HRESULT hr = S_OK;
-	WCHAR wsCommandLine[RESTART_MAX_CMD_LINE + 1];
-	DWORD cchCmdLine = sizeof(wsCommandLine) / sizeof(WCHAR);
-	DWORD dwFlags = 0;
-	LPWSTR pwsCmdLine = NULL;
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ];
-
-	hr = RegisterApplicationRestart(L"/restart -f .\\filename.ext", 0);
-
-	if (SUCCEEDED(hr))    {
-		hr = GetApplicationRestartSettings(GetCurrentProcess(), wsCommandLine, &cchCmdLine, &dwFlags);
-
-		if(SUCCEEDED(hr)){
-			sprintf(meg, " GetApplicationRestartSettings() : SUCCESS \n\n ▶RegisterApplicationRestart → success \n GetApplicationRestartSettings → success");
-			strcpy(buf, "SUCCESS");
-		}else
-			sprintf(meg, " GetApplicationRestartSettings() : FAIL \n\n ▶RegisterApplicationRestart → success \n GetApplicationRestartSettings → fail");
-	}else
-		sprintf(meg, "GetApplicationRestartSettings() : FAIL \n\n ▶RegisterApplicationRestart → fail \n GetApplicationRestartSettings → fail");
-
-
-	// 참고용 : Returns S_OK instead of ERROR_INSUFFICIENT_BUFFER when pBuffer is NULL and size is 0.
-	/**
-	hr = GetApplicationRestartSettings(GetCurrentProcess(), (PWSTR)pwsCmdLine, &cchCmdLine, &dwFlags);
-
-	if(SUCCEEDED(hr)){
-		pwsCmdLine = (LPWSTR)malloc(cchCmdLine * sizeof(WCHAR));
-
-		if(pwsCmdLine){
-			hr = GetApplicationRestartSettings(GetCurrentProcess(), (PWSTR)pwsCmdLine, &cchCmdLine, &dwFlags);
-			if(FAILED(hr)){
-				wprintf(L"GetApplicationRestartSettings failed with 0x%x\n", hr);
-			}
-			wprintf(L"Command line: %s\n", pwsCmdLine);
-		}else {
-			wprintf(L"Allocating the command-line buffer failed.\n");
-		}
-	}else{
-		if (hr != HRESULT_FROM_WIN32(ERROR_NOT_FOUND)){ // Not a restart.
-			wprintf(L"GetApplicationRestartSettings failed with 0x%x\n", hr);
-
-		}
-	}
-	*/
-
-	wresult(__FILE__, __LINE__, "GetApplicationRestartSettings", buf, "SUCCESS", meg);
-
-	return true;
-}
 
 /**
 	예비 또는 지정된 process의 가상 주소 공간에 메모리 영역을 commit하고,
@@ -422,6 +363,79 @@ BOOL test_AllocateUserPhysicalPagesNuma(){
 		strcpy(meg, GetErrorMessage(" AllocateUserPhysicalPagesNuma() : FAIL  \n\n Error Message :" , GetLastError()));
 	}
 	wresult(__FILE__, __LINE__, "AllocateUserPhysicalPagesNuma", buf, "SUCCESS", meg);
+
+	return true;
+}
+
+/**
+	특정 프로세스의 메모리 사용에 대한 정보를 검색	
+*/
+BOOL test_K32GetProcessMemoryInfo(){
+
+	#ifdef OQADBGPRINT
+	printf("test_K32GetProcessMemoryInfo\n");
+	#endif
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ]="FAIL";
+
+	int result;
+	int pid = GetCurrentProcessId();
+
+	HANDLE hProcess;
+	PROCESS_MEMORY_COUNTERS pmc;
+
+	hProcess = OpenProcess(  PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid );
+	if (NULL == hProcess)
+		return 0;
+
+	result = GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc));
+
+	if(result != 0){
+		strcpy(buf, "SUCCESS");
+		sprintf(meg, " K32GetProcessMemoryInfo() : SUCCESS \n\n Process ID : %u \n PageFaultCount: 0x%08X ", pid, pmc.PageFaultCount);
+	}else{
+		strcpy(buf, "FAIL");
+		strcpy(meg, GetErrorMessage(" K32GetProcessMemoryInfo() : FAIL  \n\n Error Message :" , GetLastError()));
+	}
+	wresult(__FILE__, __LINE__, "K32GetProcessMemoryInfo", buf, "SUCCESS", meg);
+	/**
+		printf( "\tPageFaultCount: 0x%08X\n", pmc.PageFaultCount );
+		printf( "\tPeakWorkingSetSize: 0x%08X\n", pmc.PeakWorkingSetSize );
+		printf( "\tWorkingSetSize: 0x%08X\n", pmc.WorkingSetSize );
+		printf( "\tQuotaPeakPagedPoolUsage: 0x%08X\n", pmc.QuotaPeakPagedPoolUsage );
+		printf( "\tQuotaPagedPoolUsage: 0x%08X\n", pmc.QuotaPagedPoolUsage );
+		printf( "\tQuotaPeakNonPagedPoolUsage: 0x%08X\n", pmc.QuotaPeakNonPagedPoolUsage );
+		printf( "\tQuotaNonPagedPoolUsage: 0x%08X\n", pmc.QuotaNonPagedPoolUsage );
+		printf( "\tPagefileUsage: 0x%08X\n", pmc.PagefileUsage ); 
+		printf( "\tPeakPagefileUsage: 0x%08X\n", pmc.PeakPagefileUsage );
+	*/
+
+	CloseHandle( hProcess );
+
+	return true;
+}
+
+BOOL test_GetLargePageMinimum(){
+
+	#ifdef OQADBGPRINT
+	printf("test_GetLargePageMinimum\n");
+	#endif
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ];
+
+	SIZE_T size = GetLargePageMinimum();
+	printf("%d", size);
+
+	if(size != 0){
+		sprintf(meg, " GetLargePageMinimum() : SUCCESS \n\n →minimum size of a large page : %d Byte", size);
+		strcpy(buf, "SUCCESS");
+	}else{
+		sprintf(meg, " GetLargePageMinimum() : FAIL \n\n 이 프로세서는 large pages를 지원하지 않습니다.");
+	}
+
+	wresult(__FILE__, __LINE__, "GetLargePageMinimum", buf, "SUCCESS", meg);
 
 	return true;
 }

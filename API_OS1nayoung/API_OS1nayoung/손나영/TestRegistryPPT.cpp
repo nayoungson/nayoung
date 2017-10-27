@@ -1,38 +1,44 @@
 #include "TestRegistryPPT.h"
 
 BOOL SetPrivilege(HANDLE hToken, LPCWSTR nameOfPrivilege,BOOL bEnablePrivilege){
-    TOKEN_PRIVILEGES tp;
-    LUID luid;
+	TOKEN_PRIVILEGES tp;
+	LUID luid;
 
-    if (!LookupPrivilegeValue(NULL,nameOfPrivilege,&luid)){
-        printf("LookupPrivilegeValue error: %u\n", GetLastError());
-        return FALSE;
-    }
+	if (!LookupPrivilegeValue(NULL,nameOfPrivilege,&luid)){
+		printf("LookupPrivilegeValue error: %u\n", GetLastError());
+		return FALSE;
+	}
 
-    tp.PrivilegeCount = 1;
-    tp.Privileges[0].Luid = luid;
-    if (bEnablePrivilege)
-        tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-    else
-        tp.Privileges[0].Attributes = 0;
+	tp.PrivilegeCount = 1;
+	tp.Privileges[0].Luid = luid;
 
-    if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES)NULL, (PDWORD)NULL)){
-        printf("AdjustTokenPrivileges error: %u\n", GetLastError());
-        return FALSE;
-    }
+	if (bEnablePrivilege)
+		tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+	else
+		tp.Privileges[0].Attributes = 0;
 
-    if(GetLastError() == ERROR_NOT_ALL_ASSIGNED){
-        printf("The token does not have the specified privilege. \n");
-        return FALSE;
-    }
+	if (!AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES)NULL, (PDWORD)NULL)){
+		printf("AdjustTokenPrivileges error: %u\n", GetLastError());
+		return FALSE;
+	}
 
-    return TRUE;
+	if(GetLastError() == ERROR_NOT_ALL_ASSIGNED){
+		printf("The token does not have the specified privilege. \n");
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 BOOL test_RegLoadKeyA(){
 
+	#ifdef OQADBGPRINT
+	printf("test_RegLoadKeyA \n");
+	#endif
+
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
+	DWORD errorCode = 0;
 
     HANDLE proccessHandle = GetCurrentProcess();     // get the handle to the current proccess
     DWORD typeOfAccess = TOKEN_ADJUST_PRIVILEGES;   //  requiered to enable or disable the privilege
@@ -44,12 +50,11 @@ BOOL test_RegLoadKeyA(){
 
     if (OpenProcessToken(proccessHandle, typeOfAccess, &tokenHandle)){
         // Enabling RESTORE and BACKUP privileges
-        SetPrivilege(tokenHandle, SE_RESTORE_NAME, TRUE);
-        SetPrivilege(tokenHandle, SE_BACKUP_NAME, TRUE);
-		printf("a");
+        SetPrivilege(tokenHandle, SE_RESTORE_NAME , TRUE);
+        SetPrivilege(tokenHandle, SE_BACKUP_NAME , TRUE);
 
     }else{
-        wprintf(L"Error getting the access token.\n");
+       // wprintf(L"Error getting the access token.\n");
     }
 
 	//if((RegDeleteKeyExA(hKey, "\\NAYOUNG_API_PPT",KEY_WOW64_32KEY,0)) == ERROR_SUCCESS)
@@ -64,7 +69,9 @@ BOOL test_RegLoadKeyA(){
 		sprintf(meg, "RegLoadKeyA() : SUCCESS");
 		strcpy(buf, "SUCCESS");
     }else{
-        strcpy(meg, GetErrorMessage(" RegLoadKeyA() : FAIL \n\n Error Message :", GetLastError()));
+		errorCode = GetLastError();
+		printf("errorCode = %d\n", errorCode);
+        strcpy(meg, GetErrorMessage(" RegLoadKeyA() : FAIL \n\n Error Message :", errorCode));
 	}
 	wresult(__FILE__, __LINE__, "RegLoadKeyA", buf, "SUCCESS", meg);
 
@@ -73,31 +80,39 @@ BOOL test_RegLoadKeyA(){
 
 BOOL test_RegLoadKeyW(){
 
+	#ifdef OQADBGPRINT
+	printf("test_RegLoadKeyW \n");
+	#endif
+
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
 
     HANDLE proccessHandle = GetCurrentProcess();     // get the handle to the current proccess
-	printf("%d \n\n", proccessHandle);
     DWORD typeOfAccess = TOKEN_ADJUST_PRIVILEGES;   //  requiered to enable or disable the privilege
-	printf("%f", typeOfAccess);
     HANDLE tokenHandle;                             //  handle to the opened access token
 
     HKEY hKey = HKEY_LOCAL_MACHINE;
-    LPCWSTR subKeyName = L"NAYOUNG_API_PPT";
+    LPCWSTR subKeyName = L"NAYOUNG_API_1";
     LPCWSTR pHive = L"C:\\load4.reg";
 
     if (OpenProcessToken(proccessHandle, typeOfAccess, &tokenHandle)){
         // Enabling RESTORE and BACKUP privileges
-        SetPrivilege(tokenHandle, SE_RESTORE_NAME, TRUE);
-        SetPrivilege(tokenHandle, SE_BACKUP_NAME, TRUE);
+        SetPrivilege(tokenHandle, SE_RESTORE_NAME , TRUE);
+        SetPrivilege(tokenHandle, SE_BACKUP_NAME , TRUE);
 
     }else{
-        wprintf(L"Error getting the access token.\n");
+       // wprintf(L"Error getting the access token.\n");
     }
 
-	LONG loadKeyW = RegLoadKeyW(hKey, subKeyName, pHive);
+	//if((RegDeleteKeyExA(hKey, "\\NAYOUNG_API_PPT",KEY_WOW64_32KEY,0)) == ERROR_SUCCESS)
+	//	printf("a");
+	//else
+	//	printf("b");
+	////KEY 삭제해야함. 권한.
 
-    if (loadKeyW == ERROR_SUCCESS){
+	LONG loadKeyA = RegLoadKeyW(hKey, subKeyName, pHive);
+
+    if (loadKeyA == ERROR_SUCCESS){
 		sprintf(meg, "RegLoadKeyW() : SUCCESS");
 		strcpy(buf, "SUCCESS");
     }else{
@@ -108,8 +123,11 @@ BOOL test_RegLoadKeyW(){
     return true;
 }
 
-
 BOOL test_RegUnLoadKeyA(){
+
+	#ifdef OQADBGPRINT
+	printf("test_RegUnLoadKeyA \n");
+	#endif
 
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
@@ -128,7 +146,7 @@ BOOL test_RegUnLoadKeyA(){
 		SetPrivilege(tokenHandle, SE_BACKUP_NAME, TRUE);
 
 	}else{
-		wprintf(L"Error getting the access token.\n");
+		//wprintf(L"Error getting the access token.\n");
 	}
 
 	LONG loadKeyA = RegLoadKeyA(hKey, subKeyName, pHive);
@@ -151,6 +169,10 @@ BOOL test_RegUnLoadKeyA(){
 }
 
 BOOL test_RegUnLoadKeyW(){
+	
+	#ifdef OQADBGPRINT
+	printf("test_RegUnLoadKeyW \n");
+	#endif
 
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
@@ -169,7 +191,7 @@ BOOL test_RegUnLoadKeyW(){
 		 SetPrivilege(tokenHandle, SE_BACKUP_NAME, TRUE);
 
 	 }else{
-		 wprintf(L"Error getting the access token.\n");
+		// wprintf(L"Error getting the access token.\n");
 	 }
 
 	 LONG loadKeyW = RegLoadKeyW(hKey, subKeyName, pHive);
@@ -191,8 +213,11 @@ BOOL test_RegUnLoadKeyW(){
 	 return true;
 }
 
-
 BOOL test_RegSaveKeyExA(){
+
+	#ifdef OQADBGPRINT
+	printf("test_RegSaveKeyExA \n");
+	#endif
 
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
@@ -211,7 +236,7 @@ BOOL test_RegSaveKeyExA(){
 		SetPrivilege(tokenHandle, SE_BACKUP_NAME, TRUE);
 
 	}else{
-		wprintf(L"Error getting the access token.\n");
+	//	wprintf(L"Error getting the access token.\n");
 	}
 
 	DeleteFileA(lpFile);
@@ -238,11 +263,16 @@ BOOL test_RegSaveKeyExA(){
 	wresult(__FILE__, __LINE__, "RegSaveKeyExA", buf, "SUCCESS", meg);
 
 	DeleteFileA(lpFile);
+	RegCloseKey(hKey);
 
 	return true;
 }
 
 BOOL test_RegSaveKeyExW(){
+
+	#ifdef OQADBGPRINT
+	printf("test_RegSaveKeyExW \n");
+	#endif
 
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
@@ -261,7 +291,7 @@ BOOL test_RegSaveKeyExW(){
 		SetPrivilege(tokenHandle, SE_BACKUP_NAME, TRUE);
 
 	}else{
-		wprintf(L"Error getting the access token.\n");
+	//	wprintf(L"Error getting the access token.\n");
 	}
 
 	DeleteFile(lpFile);
@@ -288,27 +318,32 @@ BOOL test_RegSaveKeyExW(){
 	wresult(__FILE__, __LINE__, "RegSaveKeyExW", buf, "SUCCESS", meg);
 
 	DeleteFile(lpFile);
+	RegCloseKey(hKey);
 
 	return true;
 }
 
-
+/**
 BOOL test_RegRestoreKeyA(){
+
+	#ifdef OQADBGPRINT
+	printf("test_RegRestoreKeyA \n");
+	#endif
 
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
 
 	HKEY hKey = HKEY_CURRENT_USER;
+	HKEY newKey;
 
     HANDLE proccessHandle = GetCurrentProcess();     // get the handle to the current proccess
     DWORD typeOfAccess = TOKEN_ADJUST_PRIVILEGES;   //  requiered to enable or disable the privilege
     HANDLE tokenHandle;                             //  handle to the opened access token
 
-	LPSTR lpFile = "C:\\test_RegSaveKeyExA.reg";
+	LPSTR lpFile = "C:\\test_RegRestoreKeyA.reg";
 
 	if (OpenProcessToken(proccessHandle, typeOfAccess, &tokenHandle)){
 		// Enabling RESTORE and BACKUP privileges
-		SetPrivilege(tokenHandle, SE_RESTORE_NAME, TRUE);
 		SetPrivilege(tokenHandle, SE_BACKUP_NAME, TRUE);
 
 	}else{
@@ -317,67 +352,34 @@ BOOL test_RegRestoreKeyA(){
 
 	DeleteFileA(lpFile);
 
+	if(RegCreateKey(hKey, L"SOFTWARE\\NAYOUNG_API_TEST\\RegiTest\\Position",&newKey)==ERROR_SUCCESS){
 
-	LONG result = RegRestoreKeyA(hKey, lpFile, REG_FORCE_RESTORE);
+		if(RegOpenKeyEx(hKey, L"SOFTWARE\\NAYOUNG_API_TEST\\RegiTest\\Position",0, KEY_ALL_ACCESS, &newKey) == ERROR_SUCCESS){
 
-	if (result == ERROR_SUCCESS){
-		sprintf(meg, "RegRestoreKeyA() : SUCCESS");
-		strcpy(buf, "SUCCESS");
-	}else{
-		printf("%d", GetLastError());
-		strcpy(meg, GetErrorMessage(" RegRestoreKeyA() : FAIL \n\n Error Message :", GetLastError()));
-	}
+			LONG result = RegRestoreKeyA(hKey, lpFile, 0);
+
+			if (result == ERROR_SUCCESS){
+				sprintf(meg, "RegRestoreKeyA() : SUCCESS");
+				strcpy(buf, "SUCCESS");
+			}else{
+				printf("%d", GetLastError());
+				strcpy(meg, GetErrorMessage(" RegRestoreKeyA() : FAIL \n\n Error Message :", GetLastError()));
+			}
+		}else{
+			strcpy(meg, GetErrorMessage(" Registry Key 오픈 실패 \n\n RegOpenKeyEx 함수를 다시 확인하세요", GetLastError()));
+		}
+	}else
+		strcpy(meg, GetErrorMessage(" Registry Key 생성 실패 \n\n RegCreateKey 함수를 다시 확인하세요", GetLastError()));
 
 	wresult(__FILE__, __LINE__, "RegRestoreKeyA", buf, "SUCCESS", meg);
 
 	DeleteFileA(lpFile);
+	RegCloseKey(hKey);
 
 	return true;
+
 }
-
-
-BOOL test_RegRestoreKeyW(){
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
-
-	HKEY hKey = HKEY_CURRENT_USER;
-
-    HANDLE proccessHandle = GetCurrentProcess();     // get the handle to the current proccess
-    DWORD typeOfAccess = TOKEN_ADJUST_PRIVILEGES;   //  requiered to enable or disable the privilege
-    HANDLE tokenHandle;                             //  handle to the opened access token
-
-	LPCWSTR lpFile = L"C:\\test_RegSaveKeyExW.reg";
-
-	if (OpenProcessToken(proccessHandle, typeOfAccess, &tokenHandle)){
-		// Enabling RESTORE and BACKUP privileges
-		SetPrivilege(tokenHandle, SE_RESTORE_NAME, TRUE);
-		SetPrivilege(tokenHandle, SE_BACKUP_NAME, TRUE);
-
-	}else{
-		wprintf(L"Error getting the access token.\n");
-	}
-
-	DeleteFile(lpFile);
-
-
-	LONG result = RegRestoreKeyW(hKey, lpFile, REG_FORCE_RESTORE);
-
-	if (result == ERROR_SUCCESS){
-		sprintf(meg, "RegRestoreKeyW() : SUCCESS");
-		strcpy(buf, "SUCCESS");
-	}else{
-		printf("%d", GetLastError());
-		strcpy(meg, GetErrorMessage(" RegRestoreKeyW() : FAIL \n\n Error Message :", GetLastError()));
-	}
-
-	wresult(__FILE__, __LINE__, "RegRestoreKeyW", buf, "SUCCESS", meg);
-
-	DeleteFile(lpFile);
-
-	return true;
-}
-
+*/
 
 /**
 레지스트리 키 트리를 삭제합니다.
@@ -387,15 +389,19 @@ BOOL test_RegRestoreKeyW(){
 
 BOOL test_RegDeleteTreeW(){
 
+	#ifdef OQADBGPRINT
+	printf("test_RegDeleteTreeW \n");
+	#endif
+
+	#ifdef OQADBGPRINT
+	printf("test_RegDeleteTreeW \n");
+	#endif
+
 	HKEY newKey;
 	LSTATUS result;
 	HKEY hKey = HKEY_CURRENT_USER;
 
 	char meg[BUFSIZ] = "FAIL";
-
-	#ifdef OQADBGPRINT
-	printf("test_RegDeleteTreeW  \n");
-	#endif
 
 	result = RegCreateKey(hKey, L"SOFTWARE\\NAYOUNG_API_TEST_2\\RegiTest\\Position",&newKey);
 
@@ -425,6 +431,11 @@ BOOL test_RegDeleteTreeW(){
 }
 
 BOOL test_RegEnumKeyExA(){
+
+	#ifdef OQADBGPRINT
+	printf("test_RegEnumKeyExA \n");
+	#endif
+
 	HKEY key = HKEY_CURRENT_USER;
 	char lpSubKey[MAX_PATH];
 	char lpBuffer[MAX_PATH];
@@ -435,10 +446,6 @@ BOOL test_RegEnumKeyExA(){
 	HWND hList = 0;
 	char meg[BUFSIZ] = "FAIL";
 
-	#ifdef OQADBGPRINT
-	printf("test_RegEnumKeyExW\n");
-	#endif
-	
 	Result=ERROR_SUCCESS;
 	#ifdef OQADBGPRINT
 	printf("▼RegEnumKeyExW() 출력▼ \n");
@@ -486,6 +493,10 @@ BOOL test_RegDisablePredefinedCacheEx(){
 #define BUFFER 8192
 BOOL test_RegGetValueW(){
 	
+	#ifdef OQADBGPRINT
+	printf("test_RegGetValueW\n");
+	#endif
+
 	RECT rt;
 	HKEY newKey;
 	LONG result;
@@ -495,10 +506,6 @@ BOOL test_RegGetValueW(){
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
 	int wresult_value = 0;
-
-	#ifdef OQADBGPRINT
-	printf("test_RegGetValueW\n");
-	#endif
 
 	/** Registry 생성 */
 	result = RegCreateKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\NAYOUNG_API_TEST\\RegiTest\\Position", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS,NULL,&newKey, NULL);
@@ -567,6 +574,10 @@ BOOL test_RegOpenCurrentUser(){
 
 BOOL test_RegOpenCurrentUser(){
 	/** 사용자 current thread의 핸들 검색 */
+
+	#ifdef OQADBGPRINT
+	printf("test_RegOpenCurrentUser \n");
+	#endif
 
 	HKEY keyCurrentUser;
 

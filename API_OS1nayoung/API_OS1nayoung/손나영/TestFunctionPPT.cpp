@@ -146,7 +146,7 @@ BOOL test_FatalAppExitW(){ // 에러 핸들링
 BOOL test_FatalExit(){
 	
 	#ifdef OQADBGPRINT
-	printf("test_FatalAppExitW \n");
+	printf("test_FatalExit \n");
 	#endif
 
 	/*
@@ -156,31 +156,6 @@ BOOL test_FatalExit(){
 	*/
 
 	WinExec("손나영\\FatalExit_exe_file_test.exe", SW_SHOW);
-
-	return true;
-}
-
-
-BOOL test_GetLargePageMinimum(){
-
-	#ifdef OQADBGPRINT
-	printf("test_GetLargePageMinimum\n");
-	#endif
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ];
-
-	SIZE_T size = GetLargePageMinimum();
-	printf("%d", size);
-
-	if(size != 0){
-		sprintf(meg, " GetLargePageMinimum() : SUCCESS \n\n →minimum size of a large page : %d Byte", size);
-		strcpy(buf, "SUCCESS");
-	}else{
-		sprintf(meg, " GetLargePageMinimum() : FAIL \n\n 이 프로세서는 large pages를 지원하지 않습니다.");
-	}
-
-	wresult(__FILE__, __LINE__, "GetLargePageMinimum", buf, "SUCCESS", meg);
 
 	return true;
 }
@@ -222,6 +197,10 @@ BOOL test_GetFinalPathNameByHandleA(){
 
 
 BOOL test_CreateHardLinkTransactedA(){
+
+	#ifdef OQADBGPRINT
+	printf("test_GetFinalPathNameByHandleA\n");
+	#endif
 
 	HWND hWnd = 0;
 	HANDLE hFile = NULL;
@@ -290,6 +269,11 @@ BOOL test_CreateHardLinkTransactedA(){
 
 BOOL test_CreateHardLinkTransactedW(){
 
+	#ifdef OQADBGPRINT
+	printf("test_CreateHardLinkTransactedW\n");
+	#endif
+
+
 	HWND hWnd = 0;
 	HANDLE hFile = NULL;
 	HANDLE hTranscation;
@@ -352,4 +336,66 @@ BOOL test_CreateHardLinkTransactedW(){
 	CloseHandle(hFile);
 
 	return TRUE;
+}
+
+
+/**
+	특정 process에 등록된 재시작 정보 검색
+*/
+BOOL test_GetApplicationRestartSettings(){
+
+	#ifdef OQADBGPRINT
+	printf("test_GetApplicationRestartSettings\n");
+	#endif
+
+	HRESULT hr = S_OK;
+	WCHAR wsCommandLine[RESTART_MAX_CMD_LINE + 1];
+	DWORD cchCmdLine = sizeof(wsCommandLine) / sizeof(WCHAR);
+	DWORD dwFlags = 0;
+	LPWSTR pwsCmdLine = NULL;
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ];
+
+	hr = RegisterApplicationRestart(L"/restart -f .\\filename.ext", 0);
+
+	if (SUCCEEDED(hr))    {
+		hr = GetApplicationRestartSettings(GetCurrentProcess(), wsCommandLine, &cchCmdLine, &dwFlags);
+
+		if(SUCCEEDED(hr)){
+			sprintf(meg, " GetApplicationRestartSettings() : SUCCESS \n\n ▶RegisterApplicationRestart → success \n GetApplicationRestartSettings → success");
+			strcpy(buf, "SUCCESS");
+		}else
+			sprintf(meg, " GetApplicationRestartSettings() : FAIL \n\n ▶RegisterApplicationRestart → success \n GetApplicationRestartSettings → fail");
+	}else
+		sprintf(meg, "GetApplicationRestartSettings() : FAIL \n\n ▶RegisterApplicationRestart → fail \n GetApplicationRestartSettings → fail");
+
+
+	// 참고용 : Returns S_OK instead of ERROR_INSUFFICIENT_BUFFER when pBuffer is NULL and size is 0.
+	/**
+	hr = GetApplicationRestartSettings(GetCurrentProcess(), (PWSTR)pwsCmdLine, &cchCmdLine, &dwFlags);
+
+	if(SUCCEEDED(hr)){
+		pwsCmdLine = (LPWSTR)malloc(cchCmdLine * sizeof(WCHAR));
+
+		if(pwsCmdLine){
+			hr = GetApplicationRestartSettings(GetCurrentProcess(), (PWSTR)pwsCmdLine, &cchCmdLine, &dwFlags);
+			if(FAILED(hr)){
+				wprintf(L"GetApplicationRestartSettings failed with 0x%x\n", hr);
+			}
+			wprintf(L"Command line: %s\n", pwsCmdLine);
+		}else {
+			wprintf(L"Allocating the command-line buffer failed.\n");
+		}
+	}else{
+		if (hr != HRESULT_FROM_WIN32(ERROR_NOT_FOUND)){ // Not a restart.
+			wprintf(L"GetApplicationRestartSettings failed with 0x%x\n", hr);
+
+		}
+	}
+	*/
+
+	wresult(__FILE__, __LINE__, "GetApplicationRestartSettings", buf, "SUCCESS", meg);
+
+	return true;
 }

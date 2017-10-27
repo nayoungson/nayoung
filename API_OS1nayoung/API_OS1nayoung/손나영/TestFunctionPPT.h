@@ -16,6 +16,7 @@ BOOL test_FatalAppExitW();
 //3주차
 BOOL test_FatalExit();
 BOOL test_GetFinalPathNameByHandleA();
+BOOL test_GetApplicationRestartSettings();
 
 //14주차
 BOOL test_CreateHardLinkTransactedA();

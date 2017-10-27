@@ -19,10 +19,9 @@ BOOL test_RegUnLoadKeyA();
 BOOL test_RegUnLoadKeyW();
 BOOL test_RegSaveKeyExA();
 BOOL test_RegSaveKeyExW();
-BOOL test_RegRestoreKeyA();
-BOOL test_RegRestoreKeyW();
+//BOOL test_RegRestoreKeyA();
+//BOOL test_RegRestoreKeyW();
 
 BOOL test_RegOpenCurrentUser();
-
 
 #endif

@@ -115,15 +115,19 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		CreateWindow(L"button", L"GetNumaProcessorNodeEx", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,700,250,40,hWnd,(HMENU)46,g_hInst,NULL);
 		CreateWindow(L"button", L"GetNumaNodeProcessorMaskEx - block", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,750,250,40,hWnd,(HMENU)47,g_hInst,NULL);
 
-		CreateWindow(L"button", L"GetProcessWorkingSetSizeEx ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,400,250,40,hWnd,(HMENU)56,g_hInst,NULL);
+		CreateWindow(L"button", L"GetCurrentProcessorNumberEx ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,400,250,40,hWnd,(HMENU)56,g_hInst,NULL);
 		CreateWindow(L"button", L"SetProcessPriorityBoost ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,450,250,40,hWnd,(HMENU)57,g_hInst,NULL);
 		CreateWindow(L"button", L"K32EnumProcesses ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,500,250,40,hWnd,(HMENU)58,g_hInst,NULL);
 		CreateWindow(L"button", L"K32EnumProcessModules ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,550,250,40,hWnd,(HMENU)59,g_hInst,NULL);
 		CreateWindow(L"button", L"K32EnumProcessModulesEx ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,600,250,40,hWnd,(HMENU)60,g_hInst,NULL);
 		CreateWindow(L"button", L"K32GetModuleBaseNameA ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,650,250,40,hWnd,(HMENU)61,g_hInst,NULL);
 		CreateWindow(L"button", L"K32GetModuleBaseNameW ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,700,250,40,hWnd,(HMENU)62,g_hInst,NULL);
+		CreateWindow(L"button", L"K32GetProcessMemoryInfo ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,750,250,40,hWnd,(HMENU)63,g_hInst,NULL);
+		CreateWindow(L"button", L"K32GetModuleFileNameExA ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,0,250,40,hWnd,(HMENU)64,g_hInst,NULL);
+		CreateWindow(L"button", L"K32GetModuleFileNameExW ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,50,250,40,hWnd,(HMENU)65,g_hInst,NULL);
+		CreateWindow(L"button", L"K32GetModuleInformation ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,100,250,40,hWnd,(HMENU)66,g_hInst,NULL);
 
-
+		
 		//CreateWindow(L"button", L"FlushProcessWriteBuffers", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,500,250,40,hWnd,(HMENU)43,g_hInst,NULL);
 		//CreateWindow(L"button", L"AllocateUserPhysicalPagesNuma-BLOCK", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,300,250,40,hWnd,(HMENU)38,g_hInst,NULL);
 		//CreateWindow(L"button", L"GetProcessGroupAffinity-BLOCK", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,450,250,40,hWnd,(HMENU)41,g_hInst,NULL);
@@ -182,18 +186,20 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		case 51:	test_RegUnLoadKeyW();						break;
 		case 52:	test_RegSaveKeyExA();						break;
 		case 53:	test_RegSaveKeyExW();						break;
-		case 54:	test_RegRestoreKeyA();						break;
-		case 55:	test_RegRestoreKeyW();						break;
+	//	case 54:	test_RegRestoreKeyA();						break;
+	//	case 55:	test_RegRestoreKeyW();						break;
 		
-		case 56:	test_GetProcessWorkingSetSizeEx();			break;
+		case 56:	test_GetCurrentProcessorNumberEx();			break;
 		case 57:	test_SetProcessPriorityBoost();				break;
 		case 58:	test_K32EnumProcesses();					break;
 		case 59:	test_K32EnumProcessModules();				break;
 		case 60:	test_K32EnumProcessModulesEx();				break;
 		case 61:	test_K32GetModuleBaseNameA();				break;
 		case 62:	test_K32GetModuleBaseNameW();				break;
-
-			
+		case 63:	test_K32GetProcessMemoryInfo();				break;
+		case 64:	test_K32GetModuleFileNameExA();				break;
+		case 65:	test_K32GetModuleFileNameExW();				break;
+		case 66:	test_K32GetModuleInformation();				break;
 		}		
 		return 0;
 

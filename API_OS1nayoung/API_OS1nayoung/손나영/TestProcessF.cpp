@@ -128,7 +128,7 @@ BOOL test_K32InitializeProcessForWsWatch(){
 
 	hFile = CreateFile(L"손나영\\test_K32InitializeProcessForWsWatch.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
-	BOOL result = InitializeProcessForWsWatch(hFile);
+	BOOL result = K32InitializeProcessForWsWatch(hFile);
 	
 	if(result != 0)
 		strcpy(meg, "InitializeProcessForWsWatch() : SUCCESS");	
@@ -404,9 +404,6 @@ BOOL test_FlushProcessWriteBuffers(){
 	FlushProcessWriteBuffers();
 	unsigned __int64 t2 = __rdtsc() ;
 	
-	printf("%d \n", t1);
-	printf("%d \n", t2);
-
 	if(t1 != t2){
 		sprintf(meg, " FlushProcessWriteBuffers() : SUCCESS");
 		//sprintf(meg, " FlushProcessWriteBuffers() : SUCCESS \n\n Flush 전 __rdtsc = %d \n Flush 후 __rdtsc = %d ", t1, t2);
@@ -463,7 +460,7 @@ BOOL test_K32EnumProcesses(){
 	char meg[BUFSIZ] = "FAIL";
 
 	// 프로세스의 목록을 배열에 구하고 개수를 계산한다.
-	result = EnumProcesses(arProc,sizeof(arProc),&cb);
+	result = K32EnumProcesses(arProc,sizeof(arProc),&cb);
 	
 	if(result != 0){
 		sprintf(meg, " EnumProcesses() : SUCCESS");
@@ -478,6 +475,10 @@ BOOL test_K32EnumProcesses(){
 }
 
 BOOL test_K32EnumProcessModules(){
+
+	#ifdef OQADBGPRINT
+	printf("test_K32EnumProcessModules\n");
+	#endif
 
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
@@ -499,7 +500,7 @@ BOOL test_K32EnumProcessModules(){
 	if(hProcess){
 
 		// 첫번째 모듈(=프로세스 그 자체)의 이름을 구해 출력한다.
-		result=EnumProcessModules(hProcess,&hModule,sizeof(hModule),&cb);
+		result=K32EnumProcessModules(hProcess,&hModule,sizeof(hModule),&cb);
 
 		if(result != 0){
 			sprintf(meg, " EnumProcessModules() : SUCCESS");
@@ -516,6 +517,10 @@ BOOL test_K32EnumProcessModules(){
 
 BOOL test_K32EnumProcessModulesEx(){
 
+	#ifdef OQADBGPRINT
+	printf("test_K32EnumProcessModulesEx\n");
+	#endif
+
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
 
@@ -536,7 +541,7 @@ BOOL test_K32EnumProcessModulesEx(){
 	if(hProcess){
 
 		// 첫번째 모듈(=프로세스 그 자체)의 이름을 구해 출력한다.
-		result=EnumProcessModulesEx(hProcess, &hModule, sizeof(hModule), &cb, LIST_MODULES_ALL);
+		result=K32EnumProcessModulesEx(hProcess, &hModule, sizeof(hModule), &cb, LIST_MODULES_ALL);
 
 		if(result != 0){
 			sprintf(meg, " EnumProcessModulesEx() : SUCCESS");
@@ -551,70 +556,86 @@ BOOL test_K32EnumProcessModulesEx(){
 	return true;
 }
 
+BOOL test_GetMaximumProcessorGroupCount(){
 
-
-BOOL test_K32GetModuleBaseNameA(){
-
+	char meg[BUFSIZ] = "FAIL";																							
 	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
 
+	DWORD result = GetMaximumProcessorGroupCount();
 
-	HANDLE hProcess;
-	HMODULE hMod;
-
-	int pid = GetCurrentProcessId();
-	TCHAR szProcessName[MAX_PATH] = L"<unknown>";
-
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,FALSE, pid);
-	DWORD result = GetModuleBaseNameA(hProcess, hMod, (LPSTR)szProcessName, sizeof(szProcessName)/sizeof(TCHAR) );
-
-	if(result == 0){
-		strcpy(meg, GetErrorMessage(" K32GetModuleBaseNameA() : FAIL \n\n Error Message :", GetLastError()));
-	}else{
-
-		sprintf(meg, " K32GetModuleBaseNameA() : SUCCESS");
+	#ifdef OQADBGPRINT
+	printf("test_GetMaximumProcessorGroupCount \n");
+	#endif
+	
+	if(result != 0){
+		sprintf(meg, " GetMaximumProcessorGroupCount() : SUCCESS \n\n 프로세서 그룹 최대 개수 : %d", result);
 		strcpy(buf, "SUCCESS");
-	}
-	wresult(__FILE__, __LINE__, "K32GetModuleBaseNameA", buf, "SUCCESS", meg);
+	}else 
+		strcpy(meg, GetErrorMessage(" GetMaximumProcessorGroupCount() : FAIL \n\n Error Message :", GetLastError()));
+
+	wresult(__FILE__, __LINE__, "GetMaximumProcessorGroupCount", buf, "SUCCESS", meg);
+
 	return true;
 }
 
-BOOL test_K32GetModuleBaseNameW(){
+BOOL test_GetNumaNodeNumberFromHandle(){
 
-	char buf[BUFSIZ];
+	BOOL result;
+
 	char meg[BUFSIZ] = "FAIL";
+	char buf[BUFSIZ];
 
-	HANDLE hProcess;
-	HMODULE hMod;
+	USHORT nodeNumber = 255;
+	HANDLE hFile = CreateFile(L"손나영\\test_GetNumaNodeNumberFromHandle.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
-	int pid = GetCurrentProcessId();
-	TCHAR szProcessName[MAX_PATH] = L"<unknown>";
+	result = GetNumaNodeNumberFromHandle(hFile, &nodeNumber);
 
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,FALSE, pid);
-	DWORD result = GetModuleBaseNameW(hProcess, hMod, szProcessName, sizeof(szProcessName)/sizeof(TCHAR) );
+	if(result != 0){
+			sprintf(meg, " GetNumaNodeNumberFromHandle() : SUCCESS");
+			strcpy(buf, "SUCCESS");
+	}else 
+			strcpy(meg, GetErrorMessage(" GetNumaNodeNumberFromHandle() : FAIL \n\n Error Message :", GetLastError()));
+	
+	wresult(__FILE__, __LINE__, "GetNumaNodeNumberFromHandle", buf, "SUCCESS", meg);
 
-	if(result == 0){
-		strcpy(meg, GetErrorMessage(" GetModuleBaseNameW() : FAIL \n\n Error Message :", GetLastError()));
-	}else{
-
-		sprintf(meg, " GetModuleBaseNameW() : SUCCESS");
-		strcpy(buf, "SUCCESS");
-	}
-	wresult(__FILE__, __LINE__, "GetModuleBaseNameW", buf, "SUCCESS", meg);
 	return true;
 }
 
+/** 
+	node number for the specified processor.
+	NUMA(Non-Uniform Memory Access) NODE : 
+	NUMA 아키텍처는 각 프로세서 그룹에 자체 메모리가 있으며 자체 I/O 채널이 있는 경우도 있다. 
+	그러나 각 CPU는 일관된 방법으로 다른 그룹과 연결된 메모리에 액세스 한다. 각 그룹을 NUMA노드라 한다.  
+	하나의 CPU 소켓에 코어 여러개가 들어가 있을 수 있기에 같은 지역 메모리를 사용하는 CPU 코어들을 묶어서 하나의 NUMA 노드로 친다.
+	8코어 4소켓 CPU라면 (하이퍼스레딩을 가정하지 않을 때에) 0~7번 코어는 NUMA 노드 0번, 8~15번 코어는 NUMA 노드 1번과 같은 방식.
 
+*/
+BOOL test_GetNumaProcessorNode(){
+	
+	BOOL result;
+	
+	char meg[BUFSIZ] = "FAIL";
+	char buf[BUFSIZ];
 
+	/** processor가 존재하지 않는다면 node number(두 번째 파라미터)는 0xFF */
+	DWORD processorNumber = GetCurrentProcessorNumber();
 
+	if(processorNumber != -1){
+		// 255
+		UCHAR nodeNumber = 255;
+		result = GetNumaProcessorNode((UCHAR)processorNumber, &nodeNumber);
 
+		if(result != 0){
+			sprintf(meg, " GetNumaProcessorNode() : SUCCESS \n\n number of processor the current thread : %d", processorNumber);
+			strcpy(buf, "SUCCESS");
+		}else 
+			strcpy(buf, GetErrorMessage(" GetCurrentProcessorNumber() : FAIL \n\n Error Message :", GetLastError()));
+	}else
+		strcpy(meg, GetErrorMessage(" processor number 조회에 실패했습니다. \n\n Error Message :", GetLastError()));
 
-
-
-
-
-
-
+	wresult(__FILE__, __LINE__, "GetCurrentProcessorNumber", buf, "SUCCESS", meg);
+	return true;
+}
 
 /**
 BOOL test_GetProcessGroupAffinity(){
@@ -669,29 +690,30 @@ BOOL test_GetProcessGroupAffinity(){
 
 */
 
+/**
 BOOL test_GetProcessWorkingSetSizeEx(){
 	
-	BOOL result;
+//	BOOL result;
 	HANDLE hProcess;
-	SIZE_T dwMin, dwMax;
+//	SIZE_T dwMin, dwMax;
 	//PDWORD Flags = QUOTA_LIMITS_HARDWS_MIN_DISABLE;
 
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
 
 	/** process 식별자 가져옴 */
-	int pid = GetCurrentProcessId();
+	//int pid = GetCurrentProcessId();
 
 	/**	PROCESS_QUERY_INFORMATION : access right(security)
 		FALSE : process do not inherit this handle	
 		pid : GetCurrentProcessId()		*/
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
+	//hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
 
 	/** OpenProcess() 실패	*/
-	if (!hProcess) {
-		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
-		return 1;
-	}
+	//if (!hProcess) {
+	//	strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
+	//	return 1;
+	//}
 
 	/**	process의 working set size를 가져옴	*/
 	/** 0xC0000005: 0x00000000 위치를 기록하는 동안 액세스 위반이 발생했습니다. */
@@ -706,8 +728,8 @@ BOOL test_GetProcessWorkingSetSizeEx(){
 	}
 	wresult(__FILE__, __LINE__, "GetProcessWorkingSetSizeEx", buf, "SUCCESS", meg);
 */
-	return true;
-}
+	//return true;
+//}
 
 
 

@@ -24,28 +24,6 @@ BOOL test_GetMaximumProcessorCount(){
 	return true;
 }
 
-BOOL test_GetMaximumProcessorGroupCount(){
-
-	char meg[BUFSIZ] = "FAIL";																							
-	char buf[BUFSIZ];
-
-	DWORD result = GetMaximumProcessorGroupCount();
-
-	#ifdef OQADBGPRINT
-	printf("test_GetMaximumProcessorGroupCount \n");
-	#endif
-	
-	if(result != 0){
-		sprintf(meg, " GetMaximumProcessorGroupCount() : SUCCESS \n\n 프로세서 그룹 최대 개수 : %d", result);
-		strcpy(buf, "SUCCESS");
-	}else 
-		strcpy(meg, GetErrorMessage(" GetMaximumProcessorGroupCount() : FAIL \n\n Error Message :", GetLastError()));
-
-	wresult(__FILE__, __LINE__, "GetMaximumProcessorGroupCount", buf, "SUCCESS", meg);
-
-	return true;
-}
-
 /**
 	시스템 안이나 프로세서 그룹에서 active 상태의 프로세서들의 수를 검색
 */
@@ -74,14 +52,14 @@ BOOL test_GetActiveProcessorCount(){
 
 BOOL test_GetActiveProcessorGroupCount(){
 
+	#ifdef OQADBGPRINT
+	printf("test_GetActiveProcessorGroupCount \n");
+	#endif
+
 	char meg[BUFSIZ] = "FAIL";																							
 	char buf[BUFSIZ];
 
 	DWORD result = GetActiveProcessorGroupCount();
-
-	#ifdef OQADBGPRINT
-	printf("test_GetActiveProcessorGroupCount \n");
-	#endif
 
 	if(result != 0){
 		sprintf(meg, " GetActiveProcessorGroupCount() : SUCCESS \n\n 활성 프로세서 그룹 개수 : %d", result);
@@ -145,67 +123,16 @@ BOOL test_GetCurrentProcessorNumber(){
 	return true;
 }
 
-/** 
-	node number for the specified processor.
-	NUMA(Non-Uniform Memory Access) NODE : 
-	NUMA 아키텍처는 각 프로세서 그룹에 자체 메모리가 있으며 자체 I/O 채널이 있는 경우도 있다. 
-	그러나 각 CPU는 일관된 방법으로 다른 그룹과 연결된 메모리에 액세스 한다. 각 그룹을 NUMA노드라 한다.  
-	하나의 CPU 소켓에 코어 여러개가 들어가 있을 수 있기에 같은 지역 메모리를 사용하는 CPU 코어들을 묶어서 하나의 NUMA 노드로 친다.
-	8코어 4소켓 CPU라면 (하이퍼스레딩을 가정하지 않을 때에) 0~7번 코어는 NUMA 노드 0번, 8~15번 코어는 NUMA 노드 1번과 같은 방식.
 
-*/
-BOOL test_GetNumaProcessorNode(){
-	
-	BOOL result;
-	
-	char meg[BUFSIZ] = "FAIL";
-	char buf[BUFSIZ];
 
-	/** processor가 존재하지 않는다면 node number(두 번째 파라미터)는 0xFF */
-	DWORD processorNumber = GetCurrentProcessorNumber();
 
-	if(processorNumber != -1){
-		// 255
-		UCHAR nodeNumber = 255;
-		result = GetNumaProcessorNode((UCHAR)processorNumber, &nodeNumber);
-
-		if(result != 0){
-			sprintf(meg, " GetNumaProcessorNode() : SUCCESS \n\n number of processor the current thread : %d", processorNumber);
-			strcpy(buf, "SUCCESS");
-		}else 
-			strcpy(buf, GetErrorMessage(" GetCurrentProcessorNumber() : FAIL \n\n Error Message :", GetLastError()));
-	}else
-		strcpy(meg, GetErrorMessage(" processor number 조회에 실패했습니다. \n\n Error Message :", GetLastError()));
-
-	wresult(__FILE__, __LINE__, "GetCurrentProcessorNumber", buf, "SUCCESS", meg);
-	return true;
-}
-
-BOOL test_GetNumaNodeNumberFromHandle(){
-
-	BOOL result;
-
-	char meg[BUFSIZ] = "FAIL";
-	char buf[BUFSIZ];
-
-	USHORT nodeNumber = 255;
-	HANDLE hFile = CreateFile(L"손나영\\test_GetNumaNodeNumberFromHandle.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	result = GetNumaNodeNumberFromHandle(hFile, &nodeNumber);
-
-	if(result != 0){
-			sprintf(meg, " GetNumaNodeNumberFromHandle() : SUCCESS");
-			strcpy(buf, "SUCCESS");
-	}else 
-			strcpy(meg, GetErrorMessage(" GetNumaNodeNumberFromHandle() : FAIL \n\n Error Message :", GetLastError()));
-	
-	wresult(__FILE__, __LINE__, "GetNumaNodeNumberFromHandle", buf, "SUCCESS", meg);
-
-	return true;
-}
 
 //노드 번호 검색
 BOOL test_GetNumaProcessorNodeEx(){
+
+	#ifdef OQADBGPRINT
+	printf("test_GetNumaProcessorNodeEx \n");
+	#endif
 
 	BOOL result;
 
@@ -234,20 +161,20 @@ BOOL test_GetNumaProcessorNodeEx(){
 
 BOOL test_GetNumaNodeProcessorMaskEx(){
 
-	BOOL result;
+	BOOL result = 0;
 
 	char meg[BUFSIZ] = "FAIL";
 	char buf[BUFSIZ];
 
 	USHORT NodeNumber = 0;
-	PGROUP_AFFINITY ProcessorMask;
+	//PGROUP_AFFINITY ProcessorMask ;
 
 	struct PGROUP_AFFINITY {
 		KAFFINITY Mask;
 		WORD      Group;
 		WORD      Reserved[3];
 	} ;
-	result = GetNumaNodeProcessorMaskEx(NodeNumber, ProcessorMask);
+	//result = GetNumaNodeProcessorMaskEx(NodeNumber, ProcessorMask);
 
 	if (result != 0){
 		sprintf(meg, " GetNumaNodeProcessorMaskEx() : SUCCESS");
@@ -256,6 +183,35 @@ BOOL test_GetNumaNodeProcessorMaskEx(){
 		strcpy(meg, GetErrorMessage(" GetNumaNodeProcessorMaskEx() : FAIL \n\n Error Message :", GetLastError()));
 
 	wresult(__FILE__, __LINE__, "GetNumaNodeProcessorMaskEx", buf, "SUCCESS", meg);
+
+	return true;
+}
+
+BOOL test_GetCurrentProcessorNumberEx(){
+
+	#ifdef OQADBGPRINT
+	printf("test_GetCurrentProcessorNumberEx \n");
+	#endif
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	DWORD result1, result2;
+	PROCESSOR_NUMBER ProcNumber;
+
+	GetCurrentProcessorNumberEx(&ProcNumber);
+
+	result1 = GetActiveProcessorGroupCount();
+	result2 = GetCurrentProcessorNumber();
+
+	if(result1 != -1 && result2 != -1){
+		sprintf(meg, "GetCurrentProcessorNumberEx() : SUCCESS \n\n활성 프로세서 그룹 개수 : %d \n현재 실행중인 thread의 number : %d", result1, result2);
+		//sprintf(meg, " FlushProcessWriteBuffers() : SUCCESS \n\n Flush 전 __rdtsc = %d \n Flush 후 __rdtsc = %d ", t1, t2);
+		strcpy(buf, "SUCCESS");
+	}else{
+		strcpy(buf, GetErrorMessage(" GetCurrentProcessorNumberEx() : FAIL \n\n Error Message :", GetLastError()));
+	}
+	wresult(__FILE__, __LINE__, "GetCurrentProcessorNumberEx", buf, "SUCCESS", meg);
 
 	return true;
 }
