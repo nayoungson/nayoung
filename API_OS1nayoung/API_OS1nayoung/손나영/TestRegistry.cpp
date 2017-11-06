@@ -605,3 +605,14 @@ BOOL test_RegNotifyChangeKeyValue(){
 
 	return true;
 }
+/**
+BOOL test_RegLoadMUIStringA(){
+
+
+
+	RegLoadMUIStringA(syscall.Handle(k), pname, &buf[0], uint32(len(buf)), &buflen, 0, pdir);
+
+	return true;
+}
+*/
+

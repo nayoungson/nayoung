@@ -1,6 +1,7 @@
 #include "TestMemory.h"
 #include <WERAPI.H>
 #include <Psapi.h>
+#include <TlHelp32.h>
 
 /**
 	AllocateUserPhysicalPages() : 지정된 프로세스의 AWE(Address Windowing Extensions) 영역 내에서 매핑 및 매핑 해제 할 물리적 메모리 페이지를 할당
@@ -41,7 +42,8 @@ BOOL test_AllocateUserPhysicalPages(){
 		FALSE : process do not inherit this handle	
 		num : GetCurrentProcessId()		*/
 	HANDLE hProcess = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ | PROCESS_TERMINATE , FALSE, num);
-	result = AllocateUserPhysicalPages(hProcess, &NumberOfPages,aPFNs);
+	//result = AllocateUserPhysicalPages(hProcess, &NumberOfPages,aPFNs);
+	result = AllocateUserPhysicalPages(GetCurrentProcess(), &NumberOfPages, aPFNs);
 
 	if(result == TRUE ){
 		sprintf(meg, " AllocateUserPhysicalPages() : SUCCESS \n\n This computer has page size : %d \n Requesting a PFN array of %d bytes \n ", sSysInfo.dwPageSize, PFNArraySize);
@@ -51,10 +53,47 @@ BOOL test_AllocateUserPhysicalPages(){
 		strcpy(buf, "FAIL");
 	}
 	if(NumberOfPagesInitial != NumberOfPages) {
+		//printf("numberofpagesinitial function is 
 		//printf(("Allocated only %p pages.\n"), NumberOfPages );
 		return 0;
 	}
 	wresult(__FILE__, __LINE__, "AllocateUserPhysicalPages", buf, "SUCCESS", meg);
+
+	return true;
+
+}
+
+
+BOOL test_AllocateUserPhysicalPagesNuma(){
+	
+	int PFNArraySize;
+	char buf[BUFSIZ];
+	char meg[BUFSIZ]="FAIL";
+	
+	BOOL result;
+	ULONG_PTR *aPFNs;
+	SYSTEM_INFO sSysInfo; 
+	ULONG_PTR NumberOfPages;
+
+	//할당할 실제 메모리의 크기
+	//출력 시 매개변수가 실제 할당된 페이지 수를 수신함. 요청된 수보다 적을 수 있음.
+	NumberOfPages = MEMORY_REQUESTED/sSysInfo.dwPageSize;
+	PFNArraySize = NumberOfPages * sizeof(ULONG_PTR);
+
+	//할당된 메모리의 페이지 프레임 번호 저장하는 배열에 대한 포인터
+	//최소한 ULONG_PTR데이터 형식의 NumberOfPages배 이상이어야 함.
+	aPFNs = (ULONG_PTR *)HeapAlloc(GetProcessHeap(), 0, PFNArraySize);
+
+	result = AllocateUserPhysicalPagesNuma(GetCurrentProcess(), &NumberOfPages, aPFNs, 0);
+
+	if(result != FALSE){
+		strcpy(buf, "SUCCESS");
+		strcpy(meg, " AllocateUserPhysicalPagesNuma() : SUCCESS");
+	}else{
+		strcpy(buf, "FAIL");
+		strcpy(meg, GetErrorMessage(" AllocateUserPhysicalPagesNuma() : FAIL  \n\n Error Message :" , GetLastError()));
+	}
+	wresult(__FILE__, __LINE__, "AllocateUserPhysicalPagesNuma", buf, "SUCCESS", meg);
 
 	return true;
 }
@@ -184,7 +223,7 @@ BOOL test_MapUserPhysicalPages(){
 	예비 또는 지정된 process의 가상 주소 공간에 메모리 영역을 commit하고,
 	물리적 메모리의 NUMA 노드를 지정
 */
-#define _WIN32_WINNT 0x0602
+//#define _WIN32_WINNT 0x0602
 BOOL test_VirtualAllocExNuma(){
 
 	#ifdef OQADBGPRINT
@@ -320,52 +359,53 @@ BOOL test_WerUnregisterMemoryBlock(){
 	return true;
 }
 
-
+/**
 BOOL test_AllocateUserPhysicalPagesNuma(){
-	
-	char buf[BUFSIZ];
-	char meg[BUFSIZ]="FAIL";
-	int PFNArraySize;               // memory to request for PFN array
-	
-	BOOL result;
-	UCHAR i = 0;
-	UCHAR NodeNumber;
 
-	DWORD num = GetCurrentProcessId();
-	printf("%d", num);
-	HANDLE hProcess = OpenProcess(PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ | PROCESS_TERMINATE , FALSE, num);
-	
+	SYSTEM_INFO siSysInfo;
+
+	GetSystemInfo(&siSysInfo);
+
+	printf("Hardware information: \n");  
+	printf("OEM ID: %u\n", siSysInfo.dwOemId);
+	printf("Number of processors: %u\n", siSysInfo.dwNumberOfProcessors); 
+	printf("Page size: %u\n", siSysInfo.dwPageSize); 
+	printf("Processor type: %u\n", siSysInfo.dwProcessorType); 
+	printf("Minimum application address: %lx\n", siSysInfo.lpMinimumApplicationAddress); 
+	printf("Maximum application address: %lx\n", siSysInfo.lpMaximumApplicationAddress); 
+	printf("Active processor mask: %u\n", siSysInfo.dwActiveProcessorMask); 
+
+#define MEMORY_REQUESTED 1024*1024
+
+
+	BOOL result;                   // generic Boolean value
 	ULONG_PTR NumberOfPages;        // number of pages to request
 	ULONG_PTR NumberOfPagesInitial; // initial number of pages requested
 	ULONG_PTR *aPFNs;               // page info; holds opaque data
 	SYSTEM_INFO sSysInfo;           // useful system information
 
+	int PFNArraySize;  
+	char buf[BUFSIZ];
+	char meg[BUFSIZ]="FAIL";
+	
 	GetSystemInfo(&sSysInfo);  // fill the system information structure
 
 	NumberOfPages = MEMORY_REQUESTED/sSysInfo.dwPageSize;
 	PFNArraySize = NumberOfPages * sizeof (ULONG_PTR);
-	
 	aPFNs = (ULONG_PTR *) HeapAlloc(GetProcessHeap(), 0, PFNArraySize);
 
 	NumberOfPagesInitial = NumberOfPages;
 
-	if(!GetNumaProcessorNode(i,&NodeNumber)){
-		// printf("GetNumaProcessorNode failed: %d\n", GetLastError());
-	}
+	DWORD nnddPreferred = 
 
-	result = AllocateUserPhysicalPagesNuma(hProcess,&NumberOfPages,aPFNs,NodeNumber);
 
-	if(result == TRUE){
-		strcpy(buf, "SUCCESS");
-		strcpy(meg, " AllocateUserPhysicalPagesNuma() : SUCCESS");
-	}else{
-		strcpy(buf, "FAIL");
-		strcpy(meg, GetErrorMessage(" AllocateUserPhysicalPagesNuma() : FAIL  \n\n Error Message :" , GetLastError()));
-	}
-	wresult(__FILE__, __LINE__, "AllocateUserPhysicalPagesNuma", buf, "SUCCESS", meg);
+
 
 	return true;
 }
+
+**/
+
 
 /**
 	특정 프로세스의 메모리 사용에 대한 정보를 검색	
@@ -436,6 +476,113 @@ BOOL test_GetLargePageMinimum(){
 	}
 
 	wresult(__FILE__, __LINE__, "GetLargePageMinimum", buf, "SUCCESS", meg);
+
+	return true;
+}
+
+BOOL test_AddSecureMemoryCacheCallback(){
+	
+	#ifdef OQADBGPRINT
+	printf("test_AddSecureMemoryCacheCallback\n");
+	#endif
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ];
+
+	PSECURE_MEMORY_CACHE_CALLBACK pfnCallBack = NULL;
+
+	// 보안 메모리 범위가 해제되거나 보호가 변경될 때 호출되는 콜백 함수를 등록
+	// BOOLEAN CALLBACK SecureMemoryCacheCallback(PVOID Addr, SIZE_T Range)
+	BOOL result = AddSecureMemoryCacheCallback(pfnCallBack);
+
+	if(result == TRUE){
+		sprintf(meg, " AddSecureMemoryCacheCallback() : SUCCESS");
+		strcpy(buf, "SUCCESS");
+	}else{
+		sprintf(meg, " AddSecureMemoryCacheCallback() : FAIL \n\n ");
+
+		result = FALSE;
+	}
+	
+	// AddSecureMemoryCacheCallback함수로 등록된 콜백 함수의 등록을 취소
+	result = RemoveSecureMemoryCacheCallback(pfnCallBack);
+
+	if(result == FALSE)
+
+	AddSecureMemoryCacheCallback(pfnCallBack);
+
+	wresult(__FILE__, __LINE__, "GetLargePageMinimum", buf, "SUCCESS", meg);
+
+	return result;
+}
+
+BOOL test_RemoveSecureMemoryCacheCallback(){
+
+	#ifdef OQADBGPRINT
+	printf("test_RemoveSecureMemoryCacheCallback\n");
+	#endif
+
+	char meg[BUFSIZ];
+	char buf[BUFSIZ] = "FAIL";
+	
+	PSECURE_MEMORY_CACHE_CALLBACK pfnCallBack = NULL;
+
+	// 보안 메모리 범위가 해제되거나 보호가 변경될 때 호출되는 콜백 함수를 등록
+	// BOOLEAN CALLBACK SecureMemoryCacheCallback(PVOID Addr, SIZE_T Range)
+	DWORD err = GetLastError();
+	BOOL result = AddSecureMemoryCacheCallback(pfnCallBack);
+
+	if(result == TRUE){
+
+		result = RemoveSecureMemoryCacheCallback(pfnCallBack);
+			if(result == TRUE){
+				strcpy(buf, "SUCCESS");
+				sprintf(meg, "RemoveSecureMemoryCacheCallback() : SUCCESS");
+			}else
+				sprintf(meg, "RemoveSecureMemoryCacheCallback() 실패 \n\nError Code : %d", err);
+	
+	}else{
+		sprintf(meg, " RemoveSecureMemoryCacheCallback() : FAIL \n\n ");
+		result = FALSE;
+	}
+
+	wresult(__FILE__, __LINE__, "RemoveSecureMemoryCacheCallback", buf, "SUCCESS", meg);
+
+	return result;
+}
+
+// process id로 process의 memory 읽기. ReadProcessMemory의 편리한 버전
+BOOL test_Toolhelp32ReadProcessMemory(){
+
+	DWORD pid = GetCurrentProcessId();
+	
+	//HANDLE hProcess = OpenProcess(PROCESS_VM_READ, FALSE, pid);
+
+	LONGLONG addr = 0x04d2; //1234
+	CHAR buffer[100];
+	SIZE_T bytesRead;
+
+	BOOL result;
+
+	char meg[BUFSIZ];
+	char buf[BUFSIZ] = "FAIL";
+
+	//GetModuleHandle : 지정된 모듈에 대한 핸들 검색
+	result = Toolhelp32ReadProcessMemory(pid, GetModuleHandle(NULL), &buffer, 100, 0);
+	//result = ReadProcessMemory(hProcess, (LPCVOID)addr, &buffer, 100, 0);
+	//result = WriteProcessMemory(hProcess, (LPVOID)addr, &buffer, 100, 0);
+
+	int err = GetLastError();
+	//if(result == FALSE){ //오류가 발생하면 0을 반환하도록 보장됨. 성공의 경우 다른 것을 반환할 수 있음. 그러니까 FALSE로 비교
+	if(result == TRUE){
+		strcpy(buf, "SUCCESS");
+		sprintf(meg, "Toolhelp32ReadProcessMemory() : SUCCESS");
+	}else{
+		strcpy(meg, GetErrorMessage(" Toolhelp32ReadProcessMemory() : FAIL  \n\n Error Message :" , GetLastError()));
+		result = FALSE;
+	}
+
+	wresult(__FILE__, __LINE__, "Toolhelp32ReadProcessMemory", buf, "SUCCESS", meg);
 
 	return true;
 }

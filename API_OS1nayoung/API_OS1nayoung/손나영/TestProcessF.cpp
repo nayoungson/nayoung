@@ -268,6 +268,47 @@ BOOL test_GetProcessWorkingSetSize(){
 	return true;
 }
 
+BOOL test_GetProcessWorkingSetSizeEx(){
+	BOOL result;
+	HANDLE hProcess;
+	SIZE_T dwMin, dwMax;
+	DWORD flags = QUOTA_LIMITS_HARDWS_MIN_DISABLE;
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	/** process 식별자 가져옴 */
+	int pid = GetCurrentProcessId();
+
+	/**	PROCESS_QUERY_INFORMATION : access right(security)
+		FALSE : process do not inherit this handle	
+		pid : GetCurrentProcessId()		*/
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
+
+	/** OpenProcess() 실패	*/
+	if (!hProcess) {
+		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
+		return 1;
+	}
+
+	/**	process의 working set size를 가져옴	*/
+	result = GetProcessWorkingSetSizeEx(hProcess, &dwMin, &dwMax, &flags);
+
+	if (result != 0){
+		sprintf(meg, " GetProcessWorkingSetSizeEx() : SUCCESS \n\n ProcessId : %d \n MinimumWorkingSetSize : %lu KB \n MaximumWorkingSetSize : %lu KB", pid, dwMin, dwMax);
+		strcpy(buf, "SUCCESS");
+
+	}else {
+		strcpy(buf, GetErrorMessage(" GetProcessWorkingSetSizeEx() : FAIL \n\n Error Message :", GetLastError()));
+		return FALSE;
+	}
+	wresult(__FILE__, __LINE__, "GetProcessWorkingSetSizeEx", buf, "SUCCESS", meg);
+
+    CloseHandle(hProcess);
+
+	return true;
+}
+
 BOOL test_IsProcessInJob(){
 
 	#ifdef OQADBGPRINT
@@ -446,6 +487,41 @@ BOOL test_SetProcessPriorityBoost(){
 	return true;
 }
 
+BOOL test_GetProcessPriorityBoost(){
+	
+	#ifdef OQADBGPRINT
+	printf("test_SetProcessPriorityBoost\n");
+	#endif
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+	int pid = GetCurrentProcessId();
+	LONG err = GetLastError();
+
+	BOOL result;
+	BOOL set_result;
+	// This handle must have the PROCESS_SET_INFORMATION access right.
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_QUERY_LIMITED_INFORMATION , FALSE, pid);
+
+	set_result = SetProcessPriorityBoost(hProcess, FALSE);
+
+	// To restore normal behavior, call SetProcessPriorityBoost with DisablePriorityBoost set to FALSE.
+	result = GetProcessPriorityBoost(hProcess, &set_result);
+
+	if(result == 0){
+		strcpy(meg, GetErrorMessage(" GetProcessPriorityBoost() : FAIL \n\n Error Message :", GetLastError()));
+		printf("에러코드 : %d" ,GetLastError());
+	}else{
+		sprintf(meg, " GetProcessPriorityBoost() : SUCCESS");
+		strcpy(buf, "SUCCESS");
+		
+	}
+
+	wresult(__FILE__, __LINE__, "GetProcessPriorityBoost", buf, "SUCCESS", meg);
+
+	return true;
+}
+
 
 BOOL test_K32EnumProcesses(){
 
@@ -580,6 +656,10 @@ BOOL test_GetMaximumProcessorGroupCount(){
 
 BOOL test_GetNumaNodeNumberFromHandle(){
 
+	#ifdef OQADBGPRINT
+	printf("test_GetNumaNodeNumberFromHandle \n");
+	#endif
+
 	BOOL result;
 
 	char meg[BUFSIZ] = "FAIL";
@@ -612,6 +692,10 @@ BOOL test_GetNumaNodeNumberFromHandle(){
 */
 BOOL test_GetNumaProcessorNode(){
 	
+	#ifdef OQADBGPRINT
+	printf("test_GetNumaProcessorNode \n");
+	#endif
+
 	BOOL result;
 	
 	char meg[BUFSIZ] = "FAIL";
@@ -637,109 +721,69 @@ BOOL test_GetNumaProcessorNode(){
 	return true;
 }
 
-/**
+#define WIN32_WINNT 0x0601
 BOOL test_GetProcessGroupAffinity(){
 
+	#ifdef OQADBGPRINT
+	printf("test_GetProcessGroupAffinity \n");
+	#endif
+
 	int pid;
-	
+	int wresult_value = 0;
+
 	char buf[BUFSIZ];
 	char meg[BUFSIZ] = "FAIL";
 
 	HANDLE hProcess;
-	USHORT gcount;
-	USHORT *garray;
+	USHORT gcount = GetMaximumProcessorGroupCount();
+	USHORT *garray = &gcount; //!
 
 	pid = GetCurrentProcessId();
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
 
-	/** OpenProcess() 실패	
-	if (!hProcess) {
-		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
-		return 1;
-	}
-
-	if (GetProcessGroupAffinity(hProcess, &gcount, garray) != 0){
-		printf("ds");
-	}else{
-		printf("%d", GetLastError());
-		strcpy(meg, GetErrorMessage(" GetProcessGroupAffinity() : FAIL \n\n Error Message : ", GetLastError()));
-	}
-	/**
-	if (GetProcessGroupAffinity(hProcess, &gcount, garray) == 0) {
+	if(!hProcess){
 		DWORD err = GetLastError();
 
-		if (err == ERROR_INSUFFICIENT_BUFFER) {
-			gcount = gcount * sizeof(garray[0]);
+		switch(err){
+		case ERROR_ACCESS_DENIED:
+			sprintf(meg, "Process Open 실패 \n\n ProcessID : %ld \n Error : ERROR_ACCESS_DENIED");
+			break;
+		case ERROR_INVALID_PARAMETER:
+			sprintf(meg, "Process Open 실패 \n\n ProcessID : %ld \n Error : ERROR_INVALID_PARAMETER");
+			break;
+		default:
+			sprintf(meg, "Process Open 실패 \n\n ProcessID : %ld");
+		}
+		return FALSE;
+	}
+	if(GetProcessGroupAffinity(hProcess, &gcount, garray) == 0){
+		DWORD err = GetLastError();
 
-			if (GetProcessGroupAffinity(hProcess, &gcount, garray) != 0) {
-				printf("sdf");
-				strcpy(buf, "SUCCESS");
-
+		//gcount가 너무 작으면 ERROR_INSUFFICIENT_BUFFER 발생
+		if(err == ERROR_INSUFFICIENT_BUFFER){
+			garray = (USHORT *)realloc(garray, gcount * sizeof(garray[0]));
+			if (garray == NULL) {
+				sprintf(meg, "GetProcessGroupAffinity() 실패 → ERROR : ERROR_INSUFFICIENT_BUFFER \n → garray == NULL인 경우");
+				gcount = 0;
 				CloseHandle(hProcess);
-				return 0;
+				return FALSE;
 			}
-		} 
-	}
-	
-
-	CloseHandle(hProcess);
-
-	wresult(__FILE__, __LINE__, "GetProcessDEPPolicy", buf, "SUCCESS", meg);
-	return true;
-}
-
-*/
-
-/**
-BOOL test_GetProcessWorkingSetSizeEx(){
-	
-//	BOOL result;
-	HANDLE hProcess;
-//	SIZE_T dwMin, dwMax;
-	//PDWORD Flags = QUOTA_LIMITS_HARDWS_MIN_DISABLE;
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
-
-	/** process 식별자 가져옴 */
-	//int pid = GetCurrentProcessId();
-
-	/**	PROCESS_QUERY_INFORMATION : access right(security)
-		FALSE : process do not inherit this handle	
-		pid : GetCurrentProcessId()		*/
-	//hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
-
-	/** OpenProcess() 실패	*/
-	//if (!hProcess) {
-	//	strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
-	//	return 1;
-	//}
-
-	/**	process의 working set size를 가져옴	*/
-	/** 0xC0000005: 0x00000000 위치를 기록하는 동안 액세스 위반이 발생했습니다. */
-	//result = GetProcessWorkingSetSizeEx(hProcess, &dwMin, &dwMax, QUOTA_LIMITS_HARDWS_MIN_DISABLE);
-	
-
-	/*if(!result){
-		sprintf(meg, " GetProcessWorkingSetSizeEx() : SUCCESS \n\n ProcessId : %d \n MinimumWorkingSetSize : %lu KB \n MaximumWorkingSetSize : %lu KB", pid, dwMin, dwMax);
-		strcpy(buf, "SUCCESS");
+			if(GetProcessGroupAffinity(hProcess, &gcount, garray) == 0){
+				DWORD err = GetLastError();
+				printf("GetProcessGroupAffinity() 실패 → ERROR : ERROR_INSUFFICIENT_BUFFER \n → garray != NULL인 경우");
+				CloseHandle(hProcess);
+				return FALSE;
+			}
+		} else {
+			sprintf(meg, "GetProcessGroupAffinity() : FAIL \n\n ProcessID : %ld \n error 0x%08x(%d)\n\n error code 998 → ", pid, (unsigned int) err, err);
+			CloseHandle(hProcess);
+		}
 	}else{
-		strcpy(buf, GetErrorMessage(" GetProcDNessWorkingSetSize() : FAIL \n\n Error Message :", GetLastError()));
+		wresult_value = 1;
+		sprintf(meg, "GetProcessGroupAffinity() : SUCCESS \n\nProcessID : %ld ", pid);
 	}
-	wresult(__FILE__, __LINE__, "GetProcessWorkingSetSizeEx", buf, "SUCCESS", meg);
-*/
-	//return true;
-//}
+	sprintf(buf, "%d", wresult_value);
+	wresult(__FILE__, __LINE__, "GetProcessGroupAffinity", buf, "1", meg);
 
-
-
-/** 지정된 process의 쓰기 캐쉬를 지움(flush) 
-BOOL test_FlushProcessWriteBuffers(){
-	
-	FlushProcessWriteBuffers();
-	printf("Sdfds");  // 실패상황
-
-	return true;
-}
-*/
-
+	return TRUE;
+}	

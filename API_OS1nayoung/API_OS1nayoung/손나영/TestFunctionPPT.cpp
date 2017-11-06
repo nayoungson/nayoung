@@ -1,5 +1,14 @@
 #include "TestFunctionPPT.h"
+/**
 #include <ktmw32.h>
+#include <stdio.h>
+#include <strsafe.h>
+*/
+
+#include <ktmw32.h>
+#include <stdio.h>
+#include <strsafe.h>
+#include <WinError.h>
 
 BOOL test_SetFileInformationByHandle(){
 
@@ -253,15 +262,12 @@ BOOL test_CreateHardLinkTransactedA(){
 
 	sprintf(buf, "%d", wresult_value);
 	wresult(__FILE__, __LINE__, "CreateHardLinkTransactedA", buf, "1", meg);
-
-	//CreateHardLinkTransactedA한거 삭제
-	DeleteFileTransactedA("손나영\\CreateHardLinkTransactedA.link", hTranscation);
+	
+	CloseHandle(hFile);
 
 	//파일 확실히 삭제(CreateHardLink때)
 	DeleteFile(L"손나영\\CreateHardLinkTransactedA.link"); //Delete하지 않은 상태에서 다시 CreateHardLinkW를 진행하면 FAIL됨. 반드시 삭제해야 함.
 	DeleteFile(L"손나영\\CreateHardLinkTransactedA.txt");
-
-	CloseHandle(hFile);
 
 	return TRUE;
 }
@@ -326,14 +332,11 @@ BOOL test_CreateHardLinkTransactedW(){
 	sprintf(buf, "%d", wresult_value);
 	wresult(__FILE__, __LINE__, "CreateHardLinkTransactedW", buf, "1", meg);
 
-	//CreateHardLinkTransactedA한거 삭제
-	DeleteFileTransactedW(L"손나영\\CreateHardLinkTransactedW.link", hTranscation);
+	CloseHandle(hFile);
 
 	//파일 확실히 삭제(CreateHardLink때)
 	DeleteFile(L"손나영\\CreateHardLinkTransactedW.link"); //Delete하지 않은 상태에서 다시 CreateHardLinkW를 진행하면 FAIL됨. 반드시 삭제해야 함.
 	DeleteFile(L"손나영\\CreateHardLinkTransactedW.txt");
-
-	CloseHandle(hFile);
 
 	return TRUE;
 }
@@ -389,6 +392,7 @@ BOOL test_GetApplicationRestartSettings(){
 		}
 	}else{
 		if (hr != HRESULT_FROM_WIN32(ERROR_NOT_FOUND)){ // Not a restart.
+		
 			wprintf(L"GetApplicationRestartSettings failed with 0x%x\n", hr);
 
 		}
@@ -399,3 +403,136 @@ BOOL test_GetApplicationRestartSettings(){
 
 	return true;
 }
+
+BOOL test_RegisterApplicationRestart(){
+
+	int wresult_value=0;
+	char buf[BUFSIZ];
+	char meg[BUFSIZ];
+
+	HRESULT result = RegisterApplicationRestart(L"avc", RESTART_NO_CRASH|RESTART_NO_HANG);
+
+	if(result == S_OK){
+		strcpy(meg, "RegisterApplicationRestart() : SUCCESS");
+		wresult_value=1;
+
+	}else{
+		strcpy(meg, "RegisterApplicationRestart() : FAIL");
+		printf("에러 코드 : %d \n", GetLastError());
+		printf(GetErrorMessage("RegisterApplicationRestart() : FAIL \nError Message : ", GetLastError()));
+	}
+
+	sprintf(buf, "%d", wresult_value);
+	wresult(__FILE__, __LINE__, "RegisterApplicationRestart", buf, "1", meg);
+
+	return result;
+}
+
+BOOL test_UnregisterApplicationRestart(){
+
+	int wresult_value=0;
+	char buf[BUFSIZ];
+	char meg[BUFSIZ];
+
+	HRESULT result = UnregisterApplicationRestart();
+
+	if(result == S_OK){
+		strcpy(meg, "UnregisterApplicationRestart() : SUCCESS");
+		wresult_value=1;
+
+	}else{
+		strcpy(meg, "UnregisterApplicationRestart() : FAIL");
+		printf("에러 코드 : %d \n", GetLastError());
+		printf(GetErrorMessage("UnregisterApplicationRestart() : FAIL \nError Message : ", GetLastError()));
+	}
+
+	sprintf(buf, "%d", wresult_value);
+	wresult(__FILE__, __LINE__, "UnregisterApplicationRestart", buf, "1", meg);
+
+	return result;
+}
+
+BOOL test_CreateSymbolicLinkTransactedA(){
+#ifdef OQADBGPRINT
+	printf("test_CreateSymbolicLinkTransactedA\n");
+#endif
+
+	HWND hWnd = 0;
+	HANDLE hTranscation;
+
+	int wresult_value=0;
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	hTranscation = CreateTransaction(NULL, 0, TRANSACTION_DO_NOT_PROMOTE, 0,0,0, NULL);
+
+	if(hTranscation == INVALID_HANDLE_VALUE){
+		strcpy(meg, "CreateTransaction에 실패했습니다. \nCreateHardLinkTransactedA를 진행할 수 없습니다. ");
+	}else{
+
+		//BOOL result = CreateSymbolicLinkTransactedA("C:\\Users\\Tmax\\Desktop\\test\\test.link", "C:\\Users\\Tmax\\Desktop\\test\\test.txt", 0x0, hTranscation);
+		BOOL result = CreateSymbolicLinkTransactedA("손나영\\test.link", "손나영\\test.txt", 0x0, hTranscation);
+
+		//CreateSymbolicLinkTransactedW가 0이 아니면 성공
+		if(result != 0){
+			strcpy(meg, "CreateSymbolicLinkTransactedA() : PASS");
+			wresult_value=1;
+
+		}else{
+			strcpy(meg, "CreateSymbolicLinkTransactedA() : FAIL");
+			printf("에러 코드 : %d \n", GetLastError());
+			printf(GetErrorMessage("CreateSymbolicLinkTransactedA() : FAIL \nError Message : ", GetLastError()));
+
+			return FALSE;
+		}
+	}
+	CloseHandle(hTranscation);
+
+	sprintf(buf, "%d", wresult_value);
+	wresult(__FILE__, __LINE__, "CreateSymbolicLinkTransactedA", buf, "1", meg);
+
+	return TRUE;
+}
+
+BOOL test_CreateSymbolicLinkTransactedW(){
+#ifdef OQADBGPRINT
+	printf("test_CreateSymbolicLinkTransactedW\n");
+#endif
+
+	HWND hWnd = 0;
+	HANDLE hTranscation;
+
+	int wresult_value=0;
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	hTranscation = CreateTransaction(NULL, 0, TRANSACTION_DO_NOT_PROMOTE, 0,0,0, NULL);
+
+	if(hTranscation == INVALID_HANDLE_VALUE){
+		strcpy(meg, "CreateTransaction에 실패했습니다. \nCreateHardLinkTransactedW를 진행할 수 없습니다. ");
+	}else{
+
+		//BOOL result = CreateSymbolicLinkTransactedW(L"C:\\Users\\Tmax\\Desktop\\test\\test.link", L"C:\\Users\\Tmax\\Desktop\\test\\test.txt", 0x0, hTranscation);
+		BOOL result = CreateSymbolicLinkTransactedW(L"손나영\\test.link", L"손나영\\test.txt", 0x0, hTranscation);
+
+		//CreateSymbolicLinkTransactedW가 0이 아니면 성공
+		if(result != 0){
+			strcpy(meg, "CreateSymbolicLinkTransactedW() : PASS");
+			wresult_value=1;
+
+		}else{
+			strcpy(meg, "CreateSymbolicLinkTransactedW() : FAIL");
+			//printf("에러 코드 : %d \n", GetLastError());
+			//printf(GetErrorMessage("CreateSymbolicLinkTransactedW() : FAIL \nError Message : ", GetLastError()));
+
+			return FALSE;
+		}
+	}
+	CloseHandle(hTranscation);
+
+	sprintf(buf, "%d", wresult_value);
+	wresult(__FILE__, __LINE__, "CreateSymbolicLinkTransactedW", buf, "1", meg);
+
+	return TRUE;
+}
+

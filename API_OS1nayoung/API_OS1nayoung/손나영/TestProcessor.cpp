@@ -159,6 +159,33 @@ BOOL test_GetNumaProcessorNodeEx(){
 	return true;
 }
 
+BOOL test_GetNumaNodeProcessorMask(){
+
+	#ifdef OQADBGPRINT
+	printf("test_GetNumaNodeProcessorMask \n");
+	#endif
+
+	BOOL result;
+	//UCHAR Node;
+	ULONGLONG ProcessorMask;
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+
+	result = GetNumaNodeProcessorMask(0, &ProcessorMask);
+
+	if(result != 0){
+		sprintf(meg, " GetNumaNodeProcessorMask() : SUCCESS");
+		strcpy(buf, "SUCCESS");
+	}else 
+		strcpy(meg, GetErrorMessage(" GetNumaNodeProcessorMask() : FAIL \n\n Error Message :", GetLastError()));
+
+	wresult(__FILE__, __LINE__, "GetNumaNodeProcessorMask", buf, "SUCCESS", meg);
+
+	return true;
+}
+
+
 BOOL test_GetNumaNodeProcessorMaskEx(){
 
 	BOOL result = 0;
@@ -167,14 +194,9 @@ BOOL test_GetNumaNodeProcessorMaskEx(){
 	char buf[BUFSIZ];
 
 	USHORT NodeNumber = 0;
-	//PGROUP_AFFINITY ProcessorMask ;
+	GROUP_AFFINITY ProcessorMask ;
 
-	struct PGROUP_AFFINITY {
-		KAFFINITY Mask;
-		WORD      Group;
-		WORD      Reserved[3];
-	} ;
-	//result = GetNumaNodeProcessorMaskEx(NodeNumber, ProcessorMask);
+	result = GetNumaNodeProcessorMaskEx(NodeNumber, &ProcessorMask);
 
 	if (result != 0){
 		sprintf(meg, " GetNumaNodeProcessorMaskEx() : SUCCESS");

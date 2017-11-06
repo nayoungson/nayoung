@@ -57,6 +57,9 @@
     <ClCompile Include="손나영\TestMemory.cpp">
       <Filter>소스 파일\손나영</Filter>
     </ClCompile>
+    <ClCompile Include="소스.cpp">
+      <Filter>소스 파일\손나영</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyUtil.h">

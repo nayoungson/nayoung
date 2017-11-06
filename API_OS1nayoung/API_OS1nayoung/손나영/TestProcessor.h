@@ -12,10 +12,10 @@ BOOL test_GetLogicalProcessorInformationEx();
 BOOL test_GetCurrentProcessorNumber();
 
 //3주차
-
-
 BOOL test_GetNumaProcessorNodeEx();
-BOOL test_GetNumaNodeProcessorMaskEx();
 BOOL test_GetCurrentProcessorNumberEx();
 
+//4주차
+BOOL test_GetNumaNodeProcessorMask();
+BOOL test_GetNumaNodeProcessorMaskEx();
 #endif

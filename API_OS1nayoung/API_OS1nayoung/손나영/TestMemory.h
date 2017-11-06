@@ -19,5 +19,8 @@ BOOL test_GetLargePageMinimum();
 BOOL test_VirtualAllocExNuma();
 BOOL test_AllocateUserPhysicalPagesNuma();
 BOOL test_K32GetProcessMemoryInfo();
+BOOL test_RemoveSecureMemoryCacheCallback();
+BOOL test_AddSecureMemoryCacheCallback();
+BOOL test_Toolhelp32ReadProcessMemory();
 
 #endif

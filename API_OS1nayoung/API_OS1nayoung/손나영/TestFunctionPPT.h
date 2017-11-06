@@ -8,6 +8,8 @@
 #include "../MyUtil.h"
 
 
+
+
 BOOL test_SetFileInformationByHandle();
 BOOL test_SetCriticalSectionSpinCount();
 BOOL test_GetVolumeInformationByHandleW();
@@ -18,12 +20,20 @@ BOOL test_FatalExit();
 BOOL test_GetFinalPathNameByHandleA();
 BOOL test_GetApplicationRestartSettings();
 
-//14주차
+//4주차
 BOOL test_CreateHardLinkTransactedA();
 BOOL test_CreateHardLinkTransactedW();
 BOOL test_WerRegisterMemoryBlock();
 BOOL test_WerUnregisterMemoryBlock();
 
+//5주차
+BOOL test_RegisterApplicationRestart();
+BOOL test_UnregisterApplicationRestart();
+BOOL test_CreateSymbolicLinkTransactedA();
+BOOL test_CreateSymbolicLinkTransactedW();
+
+BOOL test_RegLoadMUIStringA();
+BOOL test_RegLoadMUIStringW();
 
 
 #endif

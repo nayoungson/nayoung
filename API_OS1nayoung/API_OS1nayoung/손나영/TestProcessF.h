@@ -33,12 +33,10 @@ BOOL test_K32EnumProcessModules();
 BOOL test_K32EnumProcessModulesEx();
 
 
-//BOOL test_GetProcessGroupAffinity();
-
-
-//BOOL test_GetProcessWorkingSetSizeEx();
-
-
+//5ÁÖÂ÷
+BOOL test_GetProcessWorkingSetSizeEx();
+BOOL test_GetProcessGroupAffinity();
+BOOL test_GetProcessPriorityBoost();
 
 
 #endif

@@ -221,8 +221,10 @@ BOOL test_GetProfileIntW(){   //GetProfileInt 정수 반환
 	UINT result = GetProfileIntW(L"SOFTWARE\\NAYOUNG_API_TEST\\RegiTest\\Position", L"Left", 0);
 
 	if(result == 0)
+		//성공일 경우
 		wresult(__FILE__, __LINE__, "GetProfileIntW", "1", "1", "GetProfileIntW : PASS");  
 	else
+		//실패일 경우
 		wresult(__FILE__, __LINE__, "GetProfileIntW", "0", "1", "GetProfileIntW : FAIL");  
 	return true;
 }

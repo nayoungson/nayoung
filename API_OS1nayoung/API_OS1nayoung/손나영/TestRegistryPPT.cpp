@@ -32,6 +32,7 @@ BOOL SetPrivilege(HANDLE hToken, LPCWSTR nameOfPrivilege,BOOL bEnablePrivilege){
 
 BOOL test_RegLoadKeyA(){
 
+
 	#ifdef OQADBGPRINT
 	printf("test_RegLoadKeyA \n");
 	#endif
@@ -65,7 +66,7 @@ BOOL test_RegLoadKeyA(){
 
 	LONG loadKeyA = RegLoadKeyA(hKey, subKeyName, pHive);
 
-    if (loadKeyA == ERROR_SUCCESS){
+    if (loadKeyA == FALSE){
 		sprintf(meg, "RegLoadKeyA() : SUCCESS");
 		strcpy(buf, "SUCCESS");
     }else{
@@ -93,7 +94,7 @@ BOOL test_RegLoadKeyW(){
 
     HKEY hKey = HKEY_LOCAL_MACHINE;
     LPCWSTR subKeyName = L"NAYOUNG_API_1";
-    LPCWSTR pHive = L"C:\\load4.reg";
+    LPCWSTR pHive = L"C:\\load44.reg";
 
     if (OpenProcessToken(proccessHandle, typeOfAccess, &tokenHandle)){
         // Enabling RESTORE and BACKUP privileges
@@ -103,7 +104,7 @@ BOOL test_RegLoadKeyW(){
     }else{
        // wprintf(L"Error getting the access token.\n");
     }
-
+	
 	//if((RegDeleteKeyExA(hKey, "\\NAYOUNG_API_PPT",KEY_WOW64_32KEY,0)) == ERROR_SUCCESS)
 	//	printf("a");
 	//else
@@ -112,7 +113,7 @@ BOOL test_RegLoadKeyW(){
 
 	LONG loadKeyA = RegLoadKeyW(hKey, subKeyName, pHive);
 
-    if (loadKeyA == ERROR_SUCCESS){
+    if (loadKeyA == FALSE){
 		sprintf(meg, "RegLoadKeyW() : SUCCESS");
 		strcpy(buf, "SUCCESS");
     }else{
@@ -228,7 +229,7 @@ BOOL test_RegSaveKeyExA(){
     HANDLE proccessHandle = GetCurrentProcess();     // get the handle to the current proccess
     DWORD typeOfAccess = TOKEN_ADJUST_PRIVILEGES;   //  requiered to enable or disable the privilege
     HANDLE tokenHandle;                             //  handle to the opened access token
-
+	
 	LPSTR lpFile = "C:\\test_RegSaveKeyExA.reg";
 
 	if (OpenProcessToken(proccessHandle, typeOfAccess, &tokenHandle)){
@@ -603,55 +604,269 @@ BOOL test_RegOpenCurrentUser(){
 }
 
 
-/**
-BOOL test_RegRestoreKeyA(){
-
-	/** 두 번째 파라미터 lpFile : name of the file with the registry information. 
-								  created by using the RegSaveKey function. 
-								  → RegSaveKey(hKey, lpFile, lpSecurityAttributes(NULL이면 default security descriptor 가져옴))	
-	LONG result2;
-	HKEY newKey;
-	LSTATUS result;
-
-	char meg[BUFSIZ] = "FAIL";
-	char buf[BUFSIZ];
-	
+BOOL test_RegOpenUserClassesRoot(){
 
 	#ifdef OQADBGPRINT
-	printf("test_RegCreateKeyExW\n");
-	#endif
+	printf("test_RegOpenUserClassesRoot \n");
 
-	result = RegCreateKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\NAYOUNG_API_TEST\\RegiTest\\Position", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS,NULL,&newKey, NULL);
+	#endif
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+	int wresult_value = 0;
+
+	HANDLE proccessHandle = GetCurrentProcess();     // get the handle to the current proccess
+	DWORD typeOfAccess = TOKEN_QUERY;   //  requiered to enable or disable the privilege
+	HANDLE tokenHandle;                             //  handle to the opened access token
+	
+	HKEY newKey;
+	LONG result = 0;
+	DWORD err = GetLastError();
+
+	if (OpenProcessToken(proccessHandle, typeOfAccess, &tokenHandle) != 0){
+
+		result = RegOpenUserClassesRoot(tokenHandle, 0, KEY_ALL_ACCESS, &newKey);
+
+		if(result == ERROR_SUCCESS){
+			strcpy(meg, " RegOpenUserClassesRoot : SUCCESS");
+			wresult_value=1;
+		
+		}else
+			strcpy(meg, " RegOpenUserClassesRoot : FAIL");
+
+	}else
+		strcpy(meg, " OpenProcessToken() 비정상 \n\n process와 연관된 Access Token을 다시 여십시오 ");
+		
+		sprintf(buf, "%d", wresult_value);
+		wresult(__FILE__, __LINE__, "RegOpenUserClassesRoot", buf, "1", meg);
+
+		return result;
+	}
+
+
+
+BOOL test_RegRestoreKeyA(){
+
+#ifdef OQADBGPRINT
+	printf("test_RegRestoreKeyA \n");
+#endif
+
+	/** 두 번째 파라미터 lpFile : name of the file with the registry information. 
+	created by using the RegSaveKey function. 
+	→ RegSaveKey(hKey, lpFile, lpSecurityAttributes(NULL이면 default security descriptor 가져옴))	
+	*/
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+	int wresult_value = 0;
+	LSTATUS result;
+	HKEY newKey;
+	LPSTR lpFile = "C:\\test_RegSaveKeyExA.reg";
+
+	HANDLE proccessHandle = GetCurrentProcess();     // get the handle to the current proccess
+	DWORD typeOfAccess = TOKEN_ADJUST_PRIVILEGES;   //  requiered to enable or disable the privilege
+	HANDLE tokenHandle;                             //  handle to the opened access token
+
+	HKEY hKey = HKEY_CURRENT_USER;
+
+	if (OpenProcessToken(proccessHandle, typeOfAccess, &tokenHandle)){
+		// Enabling RESTORE and BACKUP privileges
+		SetPrivilege(tokenHandle, SE_RESTORE_NAME, TRUE);
+		SetPrivilege(tokenHandle, SE_BACKUP_NAME, TRUE);
+
+	}else{
+		//wprintf(L"Error getting the access token.\n");
+	}
+
+	RegCloseKey(hKey);
+	//RegCreateKey(hKey, L"SOFTWARE\\NAYOUNG_API_TEST\\RegiTest\\Position",&newKey);
+	//RegOpenKeyEx(hKey, L"SOFTWARE\\NAYOUNG_API_TEST\\RegiTest\\Position",0, KEY_ALL_ACCESS, &newKey);
+	//RegSaveKeyExA(hKey, lpFile, NULL, REG_LATEST_FORMAT);
+
+	RegCloseKey(hKey);
+	result = RegRestoreKeyA(hKey, lpFile, REG_FORCE_RESTORE);
 
 	if(result == ERROR_SUCCESS){
-		printf("create성공");
-			
+		wresult_value=1;
+		strcpy(meg, "RegRestoreKeyA : SUCCESS");
 	}else
-		printf("create실패");
+		strcpy(meg, "RegRestoreKeyA : FAIL");
 
-	Sleep(2000);
+	sprintf(buf, "%d", wresult_value);
+	wresult(__FILE__, __LINE__, "RegRestoreKeyA", buf, "1", meg);
 
-	LPCTSTR lpFile = L"C:\\Users\\Tmax\\Desktop\\test\\dbg_log.dat";
+	RegCloseKey(hKey);
+	CloseHandle(tokenHandle);
 
-	//result2 = RegSaveKey(HKEY_CURRENT_USER, lpFile, NULL);
-	
-	//if(result2 == ERROR_SUCCESS)
-	//	printf("save 성공");
-	//else{
-	//	printf("save 실패");
-	//	strcpy(meg, GetErrorMessage(" GetProcessId() : FAIL \n\n Error Message :", GetLastError()));
-	//}
-	//wresult(__FILE__, __LINE__, "GetProcessId", buf, "SUCCESS", meg);
-		
-
-	Sleep(2000);
-
-	result = RegRestoreKeyA(HKEY_CURRENT_USER, (LPSTR)(LPCTSTR)result, REG_FORCE_RESTORE);
-
-	if(result == ERROR_SUCCESS)
-		printf("restore 성공");
-	else
-		printf("restore 실패");
 	return true;
 }
-*/
+
+
+BOOL test_RegRestoreKeyW(){
+
+#ifdef OQADBGPRINT
+	printf("test_RegRestoreKeyW \n");
+#endif
+
+	/** 두 번째 파라미터 lpFile : name of the file with the registry information. 
+	created by using the RegSaveKey function. 
+	→ RegSaveKey(hKey, lpFile, lpSecurityAttributes(NULL이면 default security descriptor 가져옴))	
+	*/
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+	int wresult_value = 0;
+	LSTATUS result;
+	//HKEY newKey;
+	LPCTSTR lpFile = L"C:\\test_RegSaveKeyExA.reg";
+
+	HANDLE proccessHandle = GetCurrentProcess();     // get the handle to the current proccess
+	DWORD typeOfAccess = TOKEN_ADJUST_PRIVILEGES;   //  requiered to enable or disable the privilege
+	HANDLE tokenHandle;                             //  handle to the opened access token
+
+	HKEY hKey = HKEY_CURRENT_USER;
+
+	if (OpenProcessToken(proccessHandle, typeOfAccess, &tokenHandle)){
+		// Enabling RESTORE and BACKUP privileges
+		SetPrivilege(tokenHandle, SE_RESTORE_NAME, TRUE);
+		SetPrivilege(tokenHandle, SE_BACKUP_NAME, TRUE);
+
+	}else{
+		//wprintf(L"Error getting the access token.\n");
+	}
+
+	RegCloseKey(hKey);
+	//RegCreateKey(hKey, L"SOFTWARE\\NAYOUNG_API_TEST\\RegiTest\\Position",&newKey);
+	//RegOpenKeyEx(hKey, L"SOFTWARE\\NAYOUNG_API_TEST\\RegiTest\\Position",0, KEY_ALL_ACCESS, &newKey);
+	//RegSaveKeyExA(hKey, lpFile, NULL, REG_LATEST_FORMAT);
+
+	RegCloseKey(hKey);
+	result = RegRestoreKeyW(hKey, lpFile, REG_FORCE_RESTORE);
+
+	if(result == ERROR_SUCCESS){
+		wresult_value=1;
+		strcpy(meg, "RegRestoreKeyW : SUCCESS");
+	}else
+		strcpy(meg, "RegRestoreKeyW : FAIL");
+
+	sprintf(buf, "%d", wresult_value);
+	wresult(__FILE__, __LINE__, "RegRestoreKeyW", buf, "1", meg);
+
+	RegCloseKey(hKey);
+	CloseHandle(tokenHandle);
+
+	return true;
+}
+
+//#define UNICODE
+//#define _WIN32_WINNT 0x0600 
+BOOL test_RegLoadMUIStringA(){
+
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+	int wresult_value = 0;
+
+	HKEY hKEY = HKEY_CURRENT_USER;
+	LPSTR pszValue = "value";
+	LPSTR pszOutBuf = NULL;
+	DWORD cbOutBuf = sizeof(pszOutBuf);
+	LPDWORD pcbData = &cbOutBuf;
+	DWORD flags = REG_MUI_STRING_TRUNCATE;
+	LPCSTR pszDirectory = "C:\\Users\\Tmax\\Desktop\\test";
+
+	LONG result = RegLoadMUIStringA(hKEY, pszValue, pszOutBuf, cbOutBuf, pcbData, flags, pszDirectory);
+	DWORD err = GetLastError();
+
+	if(result == ERROR_SUCCESS){
+		wresult_value=1;
+		strcpy(meg, "RegLoadMUIStringA : SUCCESS");
+	}else if(result == ERROR_MORE_DATA)
+		strcpy(meg, "RegLoadMUIStringA : FAIL \n\n pcbData가 너무 작습니다.");
+	else if(result == ERROR_CALL_NOT_IMPLEMENTED)
+		strcpy(meg, "RegLoadMUIStringA : FAIL \n\n ANSI version → 정상");
+	else
+		strcpy(meg, "RegLoadMUIStringA : FAIL");
+	
+	sprintf(buf, "%d", wresult_value);
+	wresult(__FILE__, __LINE__, "RegLoadMUIString", buf, "1", meg);
+
+	return true;
+}
+
+#include <SubAuth.h>
+
+BOOL test_RegLoadMUIStringW(){
+	
+	//int wresult_value = 0;
+	//char buf[BUFSIZ];
+	//char meg[BUFSIZ] = "FAIL";
+
+	//DWORD err = GetLastError();
+	////DWORD dwSize = 0;
+	////LONG result = RegLoadMUIStringW(HKEY_CURRENT_USER, pszValue, cbOutBuf, MAX_PATH, &dwSize, NULL, NULL);
+
+	//BOOL result;
+	//DWORD size;
+	//TCHAR pszOutBuf[MAX_PATH]; //3
+
+	//HKEY hKey = HKEY_CURRENT_USER;
+	//HKEY newKey;
+	//RECT rt;
+	//HWND hWnd =0;
+	//RegCreateKey(hKey, L"SOFTWARE\\NAYOUNG_API_TEST_2\\RegiTest\\Position",&newKey);
+	//RegSetValueExW(newKey, L"Top",0,REG_DWORD,(LPBYTE)&rt.top,sizeof(LONG));
+
+	////REG_MUI_STRING_TRUNCATE : 문자열은 pszOutBuf 버퍼의 사용 가능한 크기에 맞게 잘림.이 flags 지정되면 pcbData는 null
+	////result = RegLoadMUIStringW(HKEY_CURRENT_CONFIG, L"display",	pszOutBuf, sizeof(pszOutBuf), (LPDWORD)&pszOutBuf, REG_MUI_STRING_TRUNCATE, NULL);
+	////result = RegLoadMUIStringW(hKey, L"Top", pszOutBuf, MAX_PATH, NULL, NULL, NULL);
+
+	//UNICODE_STRING valueW, baseDirW;
+ //   WCHAR *pwszBuffer;
+ //   DWORD cbData = MAX_PATH * sizeof(WCHAR);
+ // 
+ //   valueW.Buffer = baseDirW.Buffer = pwszBuffer = NULL;
+ //  
+ //   result = RegLoadMUIStringW(hKey, valueW.Buffer, pwszBuffer, cbData, (LPDWORD)REG_MUI_STRING_TRUNCATE, NULL, baseDirW.Buffer);
+
+	//if(result == ERROR_SUCCESS){
+	//	wresult_value=1;
+	//	strcpy(meg, "RegLoadMUIStringW : SUCCESS");
+	//}else if(result == ERROR_MORE_DATA)
+	//	strcpy(meg, "RegLoadMUIStringW : FAIL \n\n pcbData가 너무 작습니다.");
+	//else if(result == ERROR_CALL_NOT_IMPLEMENTED)
+	//	strcpy(meg, "RegLoadMUIStringW : FAIL \n\n ANSI version → 정상");
+	//else
+	//	strcpy(meg, "RegLoadMUIStringW : FAIL");
+
+	//sprintf(buf, "%d", wresult_value);
+	//wresult(__FILE__, __LINE__, "RegLoadMUIStringW", buf, "1", meg);
+	char buf[BUFSIZ];
+	char meg[BUFSIZ] = "FAIL";
+	int wresult_value = 0;
+
+	HKEY hKEY = HKEY_CURRENT_USER;
+	LPCWSTR pszValue = L"value";
+	LPWSTR pszOutBuf = NULL;
+	DWORD cbOutBuf = sizeof(pszOutBuf);
+	LPDWORD pcbData = &cbOutBuf;
+	DWORD flags = REG_MUI_STRING_TRUNCATE;
+	LPCWSTR pszDirectory = L"C:\\Users\\Tmax\\Desktop\\test";
+
+	LONG result = RegLoadMUIStringW(hKEY, pszValue, pszOutBuf, cbOutBuf, pcbData, flags, pszDirectory);
+	DWORD err = GetLastError();
+
+	printf("%d", err);
+	if(result == ERROR_SUCCESS){
+		wresult_value=1;
+		strcpy(meg, "RegLoadMUIStringW : SUCCESS");
+	}else if(result == ERROR_MORE_DATA)
+		strcpy(meg, "RegLoadMUIStringW : FAIL \n\n pcbData가 너무 작습니다.");
+	else if(result == ERROR_CALL_NOT_IMPLEMENTED)
+		strcpy(meg, "RegLoadMUIStringW : FAIL \n\n ANSI version → 정상");
+	else
+		strcpy(meg, "RegLoadMUIStringW : FAIL");
+	
+	sprintf(buf, "%d", wresult_value);
+	wresult(__FILE__, __LINE__, "RegLoadMUIStringW", buf, "1", meg);
+
+	return result;
+}  

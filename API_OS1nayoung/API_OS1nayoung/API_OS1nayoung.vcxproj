@@ -79,6 +79,7 @@
     <ClCompile Include="MyUtil.cpp" />
     <ClCompile Include="OSQA.cpp" />
     <ClCompile Include="Win32Main.cpp" />
+    <ClCompile Include="소스.cpp" />
     <ClCompile Include="손나영\TestCriticalSection.cpp" />
     <ClCompile Include="손나영\TestFunctionPPT.cpp" />
     <ClCompile Include="손나영\TestFunction.cpp" />

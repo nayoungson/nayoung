@@ -48,7 +48,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 	switch (iMessage) {  
 	case WM_CREATE:
 
-		CreateWindow(L"button", L"------------ 9/22 - 9/28 [1주차] ------------", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 20,0,250,40,hWnd,(HMENU)0,g_hInst,NULL);	
+		CreateWindow(L"button", L"------------ 9/22 - 9/28 [1주차] ------------", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 20,0,250,40,hWnd,(HMENU)0,g_hInst,NULL);	// 9개
 		CreateWindow(L"button", L"SetFileInformationByHandle", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 20,50,250,40,hWnd,(HMENU)1,g_hInst,NULL);
 		CreateWindow(L"button", L"SetCriticalSectionSpinCount", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 20,100,250,40,hWnd,(HMENU)2,g_hInst,NULL); 
 		CreateWindow(L"button", L"RegDeleteTreeW", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 20,150,250,40,hWnd,(HMENU)3,g_hInst,NULL);
@@ -59,7 +59,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		CreateWindow(L"button", L"RegDisablePredefinedCacheEx", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 20,400,250,40,hWnd,(HMENU)8,g_hInst,NULL);	
 		CreateWindow(L"button", L"GetProcessShutdownParameters", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 20,450,250,40,hWnd,(HMENU)9,g_hInst,NULL);
 
-		CreateWindow(L"button", L"------------ 9/29 - 10/12 [2주차] ------------", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 20,500,250,40,hWnd,(HMENU)10,g_hInst,NULL);	
+		CreateWindow(L"button", L"------------ 9/29 - 10/12 [2주차] ------------", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 20,500,250,40,hWnd,(HMENU)10,g_hInst,NULL);	// 11개
 		CreateWindow(L"button", L"LoadModule", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 20,550,250,40,hWnd,(HMENU)11,g_hInst,NULL);
 		CreateWindow(L"button", L"GetVolumeInformationByHandleW", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 20,600,250,40,hWnd,(HMENU)12,g_hInst,NULL);	
 		CreateWindow(L"button", L"K32InitializeProcessForWsWatch", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 20,650,250,40,hWnd,(HMENU)13,g_hInst,NULL);	
@@ -74,7 +74,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 
 
 
-		CreateWindow(L"button", L"------------ 10/13 - 10/19 [3주차] ------------", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,300,250,40,hWnd,(HMENU)22,g_hInst,NULL);
+		CreateWindow(L"button", L"------------ 10/13 - 10/19 [3주차] ------------", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,300,250,40,hWnd,(HMENU)22,g_hInst,NULL); // 17개
 		CreateWindow(L"button", L"GetProcessId", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,350,250,40,hWnd,(HMENU)23,g_hInst,NULL);
 		CreateWindow(L"button", L"GetProcessWorkingSetSize", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,400,250,40,hWnd,(HMENU)24,g_hInst,NULL);
 		CreateWindow(L"button", L"IsProcessInJob", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,450,250,40,hWnd,(HMENU)25,g_hInst,NULL);
@@ -94,7 +94,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		CreateWindow(L"button", L"GetProcessDEPPolicy", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,350,250,40,hWnd,(HMENU)39,g_hInst,NULL);
 	
 
-		CreateWindow(L"button", L"------------ 10/20 - 10/26 [4주차] ------------", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,400,250,40,hWnd,(HMENU)40,g_hInst,NULL);
+		CreateWindow(L"button", L"------------ 10/20 - 10/26 [4주차] ------------", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,400,250,40,hWnd,(HMENU)40,g_hInst,NULL);	// 23개
 		CreateWindow(L"button", L"RegLoadKeyA", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,0,250,40,hWnd,(HMENU)48,g_hInst,NULL);
 		CreateWindow(L"button", L"RegLoadKeyW", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,50,250,40,hWnd,(HMENU)49,g_hInst,NULL);
 
@@ -104,8 +104,8 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		CreateWindow(L"button", L"RegSaveKeyExA", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,200,250,40,hWnd,(HMENU)52,g_hInst,NULL);
 		CreateWindow(L"button", L"RegSaveKeyExW", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,250,250,40,hWnd,(HMENU)53,g_hInst,NULL);
 
-		CreateWindow(L"button", L"RegRestoreKeyA", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,300,250,40,hWnd,(HMENU)54,g_hInst,NULL);
-		CreateWindow(L"button", L"RegRestoreKeyW", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,350,250,40,hWnd,(HMENU)55,g_hInst,NULL);
+		CreateWindow(L"button", L"K32GetModuleFileNameExA", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,300,250,40,hWnd,(HMENU)54,g_hInst,NULL);
+		CreateWindow(L"button", L"K32GetModuleFileNameExW", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,350,250,40,hWnd,(HMENU)55,g_hInst,NULL);
 
 		CreateWindow(L"button", L"CreateHardLinkTransactedA", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,450,250,40,hWnd,(HMENU)41,g_hInst,NULL);
 		CreateWindow(L"button", L"CreateHardLinkTransactedW", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,500,250,40,hWnd,(HMENU)42,g_hInst,NULL);
@@ -113,29 +113,40 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		CreateWindow(L"button", L"WerRegisterMemoryBlock", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,600,250,40,hWnd,(HMENU)44,g_hInst,NULL);
 		CreateWindow(L"button", L"WerUnregisterMemoryBlock", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,650,250,40,hWnd,(HMENU)45,g_hInst,NULL);
 		CreateWindow(L"button", L"GetNumaProcessorNodeEx", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,700,250,40,hWnd,(HMENU)46,g_hInst,NULL);
-		CreateWindow(L"button", L"GetNumaNodeProcessorMaskEx - block", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,750,250,40,hWnd,(HMENU)47,g_hInst,NULL);
+		CreateWindow(L"button", L"SetProcessPriorityBoost ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,750,250,40,hWnd,(HMENU)47,g_hInst,NULL);
 
 		CreateWindow(L"button", L"GetCurrentProcessorNumberEx ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,400,250,40,hWnd,(HMENU)56,g_hInst,NULL);
-		CreateWindow(L"button", L"SetProcessPriorityBoost ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,450,250,40,hWnd,(HMENU)57,g_hInst,NULL);
+		CreateWindow(L"button", L"K32GetProcessMemoryInfo ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,450,250,40,hWnd,(HMENU)57,g_hInst,NULL);
 		CreateWindow(L"button", L"K32EnumProcesses ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,500,250,40,hWnd,(HMENU)58,g_hInst,NULL);
 		CreateWindow(L"button", L"K32EnumProcessModules ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,550,250,40,hWnd,(HMENU)59,g_hInst,NULL);
 		CreateWindow(L"button", L"K32EnumProcessModulesEx ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,600,250,40,hWnd,(HMENU)60,g_hInst,NULL);
 		CreateWindow(L"button", L"K32GetModuleBaseNameA ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,650,250,40,hWnd,(HMENU)61,g_hInst,NULL);
 		CreateWindow(L"button", L"K32GetModuleBaseNameW ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,700,250,40,hWnd,(HMENU)62,g_hInst,NULL);
-		CreateWindow(L"button", L"K32GetProcessMemoryInfo ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,750,250,40,hWnd,(HMENU)63,g_hInst,NULL);
-		CreateWindow(L"button", L"K32GetModuleFileNameExA ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,0,250,40,hWnd,(HMENU)64,g_hInst,NULL);
-		CreateWindow(L"button", L"K32GetModuleFileNameExW ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,50,250,40,hWnd,(HMENU)65,g_hInst,NULL);
-		CreateWindow(L"button", L"K32GetModuleInformation ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,100,250,40,hWnd,(HMENU)66,g_hInst,NULL);
-
+		CreateWindow(L"button", L"K32GetModuleInformation ", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 860,750,250,40,hWnd,(HMENU)63,g_hInst,NULL);
 		
-		//CreateWindow(L"button", L"FlushProcessWriteBuffers", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,500,250,40,hWnd,(HMENU)43,g_hInst,NULL);
-		//CreateWindow(L"button", L"AllocateUserPhysicalPagesNuma-BLOCK", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,300,250,40,hWnd,(HMENU)38,g_hInst,NULL);
-		//CreateWindow(L"button", L"GetProcessGroupAffinity-BLOCK", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,450,250,40,hWnd,(HMENU)41,g_hInst,NULL);
-		//CreateWindow(L"button", L"GetProcessWorkingSetSizeEx", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,400,250,40,hWnd,(HMENU)25,g_hInst,NULL);
-		//CreateWindow(L"button", L"GetProcessDEPPolicy", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 300,450,250,40,hWnd,(HMENU)26,g_hInst,NULL);
-		//	CreateWindow(L"button", L"CreateHardLinkTransactedA", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 580,500,250,40,hWnd,(HMENU)42,g_hInst,NULL);
-		//CreateWindow(L"button", L"", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,0,250,40,hWnd,(HMENU)50,g_hInst,NULL);
-		//CreateWindow(L"button", L"", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,50,250,40,hWnd,(HMENU)51,g_hInst,NULL);
+		CreateWindow(L"button", L"------------ 10/27 - 11/2 [5주차] ------------", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,0,250,40,hWnd,(HMENU)64,g_hInst,NULL);
+		CreateWindow(L"button", L"GetNumaNodeProcessorMask", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,50,250,40,hWnd,(HMENU)65,g_hInst,NULL);
+		CreateWindow(L"button", L"GetNumaNodeProcessorMaskEx", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,100,250,40,hWnd,(HMENU)66,g_hInst,NULL);
+		CreateWindow(L"button", L"GetProcessWorkingSetSizeEx", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,150,250,40,hWnd,(HMENU)67,g_hInst,NULL);
+		CreateWindow(L"button", L"RegisterApplicationRestart", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,200,250,40,hWnd,(HMENU)68,g_hInst,NULL);
+		CreateWindow(L"button", L"UnregisterApplicationRestart", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,250,250,40,hWnd,(HMENU)69,g_hInst,NULL);
+		CreateWindow(L"button", L"AddSecureMemoryCacheCallback", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,300,250,40,hWnd,(HMENU)70,g_hInst,NULL);
+		CreateWindow(L"button", L"RegOpenUserClassesRoot", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,350,250,40,hWnd,(HMENU)71,g_hInst,NULL);
+		CreateWindow(L"button", L"CreateSymbolicLinkTransactedA", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,400,250,40,hWnd,(HMENU)72,g_hInst,NULL);
+		CreateWindow(L"button", L"CreateSymbolicLinkTransactedW", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,450,250,40,hWnd,(HMENU)73,g_hInst,NULL);
+		CreateWindow(L"button", L"GetProcessGroupAffinity", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,500,250,40,hWnd,(HMENU)74,g_hInst,NULL);
+		CreateWindow(L"button", L"RemoveSecureMemoryCacheCallback", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,550,250,40,hWnd,(HMENU)75,g_hInst,NULL);
+		
+		CreateWindow(L"button", L"------------ 11/3 - 11/10 [6주차] ------------", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,600,250,40,hWnd,(HMENU)76,g_hInst,NULL);
+		CreateWindow(L"button", L"GetProcessPriorityBoost", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,650,250,40,hWnd,(HMENU)77,g_hInst,NULL);
+		CreateWindow(L"button", L"Toolhelp32ReadProcessMemory", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,700,250,40,hWnd,(HMENU)78,g_hInst,NULL);
+		CreateWindow(L"button", L"AllocateUserPhysicalPagesNuma", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,750,250,40,hWnd,(HMENU)79,g_hInst,NULL);
+		CreateWindow(L"button", L"RegLoadMUIStringA", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,800,250,40,hWnd,(HMENU)80,g_hInst,NULL);
+		CreateWindow(L"button", L"RegLoadMUIStringW", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,850,250,40,hWnd,(HMENU)81,g_hInst,NULL);
+		CreateWindow(L"button", L"RegRestoreKeyA", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,900,250,40,hWnd,(HMENU)82,g_hInst,NULL);
+		CreateWindow(L"button", L"RegRestoreKeyW", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 1140,950,250,40,hWnd,(HMENU)83,g_hInst,NULL);
+		
+		
 	
 		break;
 
@@ -153,6 +164,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		case 19:	test_GetLogicalProcessorInformationEx();	break;
 		case 20:	test_GetMaximumProcessorCount();			break;
 		case 21:	test_RegGetValueW();						break;
+
 		//3주차
 		case 23:	test_GetProcessId();						break;
 		case 24:	test_GetProcessWorkingSetSize();			break;
@@ -171,6 +183,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		case 37:	test_VirtualAllocExNuma();					break;
 		case 38:	test_GetProcessHandleCount();				break;
 		case 39:	test_GetProcessDEPPolicy();					break;
+
 		//4주차
 		case 41:	test_CreateHardLinkTransactedA();			break; 
 		case 42:	test_CreateHardLinkTransactedW();			break;				
@@ -178,7 +191,7 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		case 44:	test_WerRegisterMemoryBlock();				break;
 		case 45:	test_WerUnregisterMemoryBlock();			break;
 		case 46:	test_GetNumaProcessorNodeEx();				break;
-		case 47:	test_GetNumaNodeProcessorMaskEx();			break;
+		case 47:	test_SetProcessPriorityBoost();				break;
 
 		case 48:	test_RegLoadKeyA();							break;
 		case 49:	test_RegLoadKeyW();							break;
@@ -186,21 +199,41 @@ LRESULT CALLBACK WndProc(HWND hWnd,UINT iMessage,WPARAM wParam,LPARAM lParam)
 		case 51:	test_RegUnLoadKeyW();						break;
 		case 52:	test_RegSaveKeyExA();						break;
 		case 53:	test_RegSaveKeyExW();						break;
-	//	case 54:	test_RegRestoreKeyA();						break;
-	//	case 55:	test_RegRestoreKeyW();						break;
+		case 54:	test_K32GetModuleFileNameExA();				break;
+		case 55:	test_K32GetModuleFileNameExW();				break;
 		
 		case 56:	test_GetCurrentProcessorNumberEx();			break;
-		case 57:	test_SetProcessPriorityBoost();				break;
+		case 57:	test_K32GetProcessMemoryInfo();				break;
 		case 58:	test_K32EnumProcesses();					break;
 		case 59:	test_K32EnumProcessModules();				break;
 		case 60:	test_K32EnumProcessModulesEx();				break;
 		case 61:	test_K32GetModuleBaseNameA();				break;
 		case 62:	test_K32GetModuleBaseNameW();				break;
-		case 63:	test_K32GetProcessMemoryInfo();				break;
-		case 64:	test_K32GetModuleFileNameExA();				break;
-		case 65:	test_K32GetModuleFileNameExW();				break;
-		case 66:	test_K32GetModuleInformation();				break;
-		}		
+		case 63:	test_K32GetModuleInformation();				break;
+		
+		//5주차
+		case 65:	test_GetNumaNodeProcessorMask();			break;
+		case 66:	test_GetNumaNodeProcessorMaskEx();			break;
+		case 67:	test_GetProcessWorkingSetSizeEx();			break;
+		case 68:	test_RegisterApplicationRestart();			break;
+		case 69:	test_UnregisterApplicationRestart();		break;
+		case 70:	test_AddSecureMemoryCacheCallback();		break;
+		case 71:	test_RegOpenUserClassesRoot();				break;
+		case 72:	test_CreateSymbolicLinkTransactedA();		break;
+		case 73:	test_CreateSymbolicLinkTransactedW();		break;
+		case 74:	test_GetProcessGroupAffinity();				break;
+		case 75:	test_RemoveSecureMemoryCacheCallback();		break;
+		
+		//6주차
+		case 77:	test_GetProcessPriorityBoost();				break;
+		case 78:	test_Toolhelp32ReadProcessMemory();			break;
+		case 79:	test_AllocateUserPhysicalPagesNuma();		break;
+		case 80:	test_RegLoadMUIStringA();					break;
+		case 81:	test_RegLoadMUIStringW();					break;
+		case 82:	test_RegRestoreKeyA();						break;
+		case 83:	test_RegRestoreKeyW();						break;
+
+		}
 		return 0;
 
 
