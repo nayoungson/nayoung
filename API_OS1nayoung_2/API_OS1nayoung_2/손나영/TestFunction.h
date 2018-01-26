@@ -12,12 +12,13 @@
 BOOL test_Beep();
 BOOL test_CreateHardLinkW();				   
 BOOL test_CreateJobObjectW();			
-BOOL test_SetInformationJobObject();
 BOOL test_FatalAppExitA();
+BOOL test_GetPriorityClass();
 BOOL test_GetProfileIntW();
 BOOL test_SetHandleCount();
+BOOL test_SetInformationJobObject();
 BOOL test_SetPriorityClass();
-BOOL test_GetPriorityClass();
+
 
 #endif
 

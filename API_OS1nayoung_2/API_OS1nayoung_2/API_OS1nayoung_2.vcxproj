@@ -66,7 +66,8 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);OQADBG;OQADBGPRINT</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -76,31 +77,44 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MakeButton.cpp" />
+    <ClCompile Include="MergedWinMain.cpp" />
     <ClCompile Include="MyUtil.cpp" />
     <ClCompile Include="OSQA.cpp" />
-    <ClCompile Include="WinMain.cpp" />
+    <ClCompile Include="Paging.cpp" />
+    <ClCompile Include="손나영\TestConsole.cpp" />
     <ClCompile Include="손나영\TestCriticalSection.cpp" />
     <ClCompile Include="손나영\TestEventHG.cpp" />
     <ClCompile Include="손나영\TestFunction.cpp" />
     <ClCompile Include="손나영\TestFunctionPPT.cpp" />
     <ClCompile Include="손나영\TestMemory.cpp" />
+    <ClCompile Include="손나영\TestMetafile.cpp" />
     <ClCompile Include="손나영\TestModule.cpp" />
     <ClCompile Include="손나영\TestProcessF.cpp" />
     <ClCompile Include="손나영\TestProcessor.cpp" />
     <ClCompile Include="손나영\TestRegistry.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MakeButton.h" />
+    <ClInclude Include="MergedWinMain.h" />
     <ClInclude Include="MyUtil.h" />
+    <ClInclude Include="OS1HeaderList.h" />
     <ClInclude Include="OSQA.h" />
+    <ClInclude Include="Paging.h" />
+    <ClInclude Include="손나영\TestConsole.h" />
     <ClInclude Include="손나영\TestCriticalSection.h" />
     <ClInclude Include="손나영\TestEventHG.h" />
     <ClInclude Include="손나영\TestFunction.h" />
     <ClInclude Include="손나영\TestFunctionPPT.h" />
     <ClInclude Include="손나영\TestMemory.h" />
+    <ClInclude Include="손나영\TestMetafile.h" />
     <ClInclude Include="손나영\TestModule.h" />
     <ClInclude Include="손나영\TestProcessF.h" />
     <ClInclude Include="손나영\TestProcessor.h" />
     <ClInclude Include="손나영\TestRegistry.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Text.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

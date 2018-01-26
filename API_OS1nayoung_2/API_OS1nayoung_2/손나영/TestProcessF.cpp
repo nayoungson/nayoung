@@ -1,393 +1,197 @@
-#include "TestProcessF.h"
+ï»¿#include "TestProcessF.h"
 #include <TlHelp32.h>
 
-BOOL test_SetProcessDEPPolicy(){
-	
-	#ifdef OQADBGPRINT
-	printf("test_SetProcessDEPPolicy\n");
-	#endif
-
-	BOOL result = true;
-	
-	char *buf = NULL;
-	char meg[BUFSIZ] = "FAIL";
-	
-	// DEP(Data Execution Prevention) : µ¥ÀÌÅ¸ ½ÇÇà ¹æÁö
-	// SetProcessDEPPolicy ÇÔ¼ö´Â 32bit process¸¦ À§ÇÑ setting
-	// µû¶ó¼­, Çö windows È¯°æ(64bit)¿¡¼­´Â fail ¶ß´Â °Í0ÀÌ Á¤»ó
-
-	// ÆÄ¶ó¹ÌÅÍ °ª 0 
-	// DEP ½Ã½ºÅÛ Á¤Ã¥ÀÌ Optln ÀÌ°Å³ª OptOut, ¶Ç´Â ÇØ´ç ÇÁ·Î¼¼¼­¿¡ DEP »ç¿ëÇÒ ¶§\
-	// °ªÀ» 0À¸·Î ÁÖ¸é ¡æ DEP°¡ ºñÈ°¼ºÈ­ Ã³¸® µÊ
-	if(SetProcessDEPPolicy(0))
-		strcpy(meg, "SetProcessDEPPolicy() : SUCCESS");	
-	else 
-		strcpy(meg, GetErrorMessage(" SetProcessDEPPolicy() : FAIL \n\n \n(ÇØ´ç ÇÔ¼ö´Â 32 bit Àü¿ëÀÔ´Ï´Ù. \nµû¶ó¼­ ÇöÀç Å×½ºÆ®ÇÏ°í ÀÖ´Â windows È¯°æÀÌ \n64bit¶ó¸é failÀÌ Á¤»óÀÔ´Ï´Ù.)\n\nError Message :", GetLastError()));
-		
-	wresult(__FILE__, __LINE__, "SetProcessDEPPolicy", meg, "SetProcessDEPPolicy() : SUCCESS", meg);
-
-	return true;
-}
-
-BOOL test_SetProcessAffinityUpdateMode(){
-
-	#ifdef OQADBGPRINT
-	printf("test_SetProcessAffinityUpdateMode\ n");
-	#endif
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
-
-	// 0 : Disables dynamic update of the process affinity by the system.
-	// PROCESS_AFFINITY_ENABLE_AUTO_UPDATE : Enables dynamic update of the process affinity by the system.
-	// ÇÁ·Î¼¼½ºÀÇ À¯¿¬¼ºÀ» ¾÷µ¥ÀÌÆ®
-	// Ã¹ ¹øÂ° ÆÄ¶ó¹ÌÅÍ : GetCurrentProcessÇÔ¼ö ¹İÈ¯ÇØ¾ß ÇÔ
-	if(SetProcessAffinityUpdateMode(GetCurrentProcess(), 0)!=0){
-		sprintf(meg, "SetProcessAffinityUpdateMode() : SUCCESS \n\nÇÁ·Î¼¼½ºÀÇ affinity °»½Å ¢º value °ª : 0 \n¡æ ½Ã½ºÅÛ¿¡ ÀÇÇÑ ÇÁ·Î¼¼½º affinity µ¿Àû °»½Å ºÒ°¡·Î ¼³Á¤ \n\n(PROCESS_AFFINITY_ENABLE_AUTO_UPDATE·Î ¼³Á¤ ½Ã \n½Ã½ºÅÛÀÇ ÇÁ·Î¼¼½º ¼±È£µµ¸¦ µ¿ÀûÀ¸·Î ¾÷µ¥ÀÌÆ® °¡´É)");
-		strcpy(buf, "SUCCESS");
-	}else {
-		strcpy(buf, GetErrorMessage(" SetProcessAffinityUpdateMode() : FAIL \n\n Error Message :", GetLastError()));
-	}
-
-	wresult(__FILE__, __LINE__, "SetProcessAffinityUpdateMode", buf, "SUCCESS", meg);
-	return true;
-}
-
-BOOL test_SetProcessShutdownParameters(){
-
-	#ifdef OQADBGPRINT
-	printf("test_SetProcessShutdownParameters\n");
-	#endif
-
-	char meg[BUFSIZ] = "FAIL";
-
-	// ÇöÀç È£ÃâÁßÀÎ ÇÁ·Î¼¼½ºÀÇ Á¾·á ¸Å°³ º¯¼ö¸¦ ¼³Á¤
-	// Ã¹ ¹øÂ° ÆÄ¶ó¹ÌÅÍ : ÇÁ·Î¼¼½º Á¾·á ¿ì¼± ¼øÀ§. value °ª ´Ù¼¸ °¡Áö Áß¿¡ set.
-	// 000 ~ 0FF ½Ã½ºÅÛÀº ¸¶Áö¸· Á¾·á ¹üÀ§¸¦ ¿¹¾àÇÔ	/ 100-1FF ÀÀ¿ë ÇÁ·Î±×·¥Àº ¸¶Áö¸· Á¾·á ¹üÀ§¸¦ ¿¹¾àÇÔ
-	// 200-2FF ÀÀ¿ë ÇÁ·Î±×·¥ÀÌ "Á¾·á ¹üÀ§"»çÀÌ¿¡ ¿¹¾àµÊ	/ 300-3FF ÀÀ¿ë ÇÁ·Î±×·¥ÀÌ Ã¹ ¹øÂ° Á¾·á ¹üÀ§¸¦ ¿¹¾àÇÔ
-	// 400-4FF ½Ã½ºÅÛÀÌ Ã¹ ¹øÂ° Á¾·á ¹üÀ§¸¦ ¿¹¾àÇÔ
-	// µÎ ¹øÂ° ÆÄ¶ó¹ÌÅÍ : SHUTDOWN_NORETRY ¡æ ½Ã½ºÅÛÀº »ç¿ëÀÚ¿¡ ´ëÇÑ Àç½Ãµµ ´ëÈ­ »óÀÚ¸¦ Ç¥½ÃÇÏÁö ¾Ê°í ÇÁ·Î¼¼½º¸¦ Á¾·á
-	if(SetProcessShutdownParameters(0x3ff, SHUTDOWN_NORETRY) != 0)
-		strcpy(meg, "SetProcessShutdownParameters() : SUCCESS");	
-	else 
-		strcpy(meg, GetErrorMessage(" SetProcessShutdownParameters() : FAIL \n\n Error Message :", GetLastError()));
-	
-	wresult(__FILE__, __LINE__, "SetProcessShutdownParameters", meg, "SetProcessShutdownParameters() : SUCCESS", meg);
-	return true;
-}
-
-BOOL test_GetProcessShutdownParameters(){
-
-	#ifdef OQADBGPRINT
-	printf("test_GetProcessShutdownParameters\n");
-	#endif
-
-	char meg[BUFSIZ] = "FAIL";
-
-	DWORD lpdwLevel;
-	DWORD lpdwFlags;
-
-	// ÇöÀç È£Ãâ ÁßÀÎ ÇÁ·Î¼¼½ºÀÇ Á¾·á ¸Å°³ º¯¼ö¸¦ °Ë»ö. ÇÔ¼ö ¼º°ø ½Ã nonzero.
-	if(GetProcessShutdownParameters(&lpdwLevel, &lpdwFlags) != 0)
-		strcpy(meg, "GetProcessShutdownParameters() : SUCCESS");	
-	else 
-		strcpy(meg, GetErrorMessage(" GetProcessShutdownParameters() : FAIL \n\n Error Message :", GetLastError()));
-	
-	wresult(__FILE__, __LINE__, "GetProcessShutdownParameters", meg, "GetProcessShutdownParameters() : SUCCESS", meg);
-
-	return true;
-}
 
 /**
-BOOL test_K32EnumProcessModules(){
-	
-	HANDLE hFile = CreateFileW(L"C:\\Users\\Tmax\\Desktop\\test.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	DWORD processId = GetProcessId(hFile);
-	printf("%d", processId);
-
-	return true;
-}
+* VOID WINAPI FlushProcessWriteBuffers(void);
+* í˜„ì¬ í”„ë¡œì„¸ìŠ¤ì˜ ìŠ¤ë ˆë“œë¥¼ ì‹¤í–‰ì¤‘ì¸ ê° í”„ë¡œì„¸ì„œì˜ ì“°ê¸° íë¥¼ í”ŒëŸ¬ì‹œ
+* @author : ì†ë‚˜ì˜
+*
+* @param void
+* @return ì—†ìŒ.
 */
 
-/**
-	ÁöÁ¤µÈ processÀÇ working setÀ» ¸ğ´ÏÅÍ¸µ ½ÃÀÛ(ÃÊ±âÈ­)
-*/
-BOOL test_K32InitializeProcessForWsWatch(){
+BOOL test_FlushProcessWriteBuffers(){
 
 	#ifdef OQADBGPRINT
-	printf("test_K32InitializeProcessForWsWatch\n");
+	printf("test_FlushProcessWriteBuffers\n");
 	#endif
 
-	char meg[BUFSIZ] = "FAIL";
+	char buf[BUFSIZ] = "FAIL";
+	char msg[BUFSIZ] = "FAIL";
 
-	/** hFile¿¡ »ı¼ºÇÑ ÆÄÀÏ */
-	HANDLE hFile = CreateFile(L"¼Õ³ª¿µ\\test_K32InitializeProcessForWsWatch.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	BOOL result = FALSE;
+
+	//__rdtsc : í”„ë¡œì„¸ì„œ ì‹œê°„ ìŠ¤íƒ¬í”„ ë°˜í™˜. ë§ˆì§€ë§‰ ì¬ì„¤ì • í›„ í´ë¡ ì£¼ê¸° ìˆ˜ ê¸°ë¡.
+
+	unsigned __int64 t1 = __rdtsc();
+	FlushProcessWriteBuffers();
+	unsigned __int64 t2 = __rdtsc() ;
 	
-	//HANDLE hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	//hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	hFile = CreateFile(L"¼Õ³ª¿µ\\test_K32InitializeProcessForWsWatch.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	BOOL result = K32InitializeProcessForWsWatch(hFile);
-	
-	if(result != 0)
-		strcpy(meg, "InitializeProcessForWsWatch() : SUCCESS");	
-	else 
-		strcpy(meg, GetErrorMessage(" InitializeProcessForWsWatch() : FAIL \n\n Error Message :", GetLastError()));
-	
-	wresult(__FILE__, __LINE__, "InitializeProcessForWsWatch", meg, "InitializeProcessForWsWatch() : SUCCESS", meg);
-
-	//Ãß°¡µÈ ÆäÀÌÁö °Ë»öÇÏ·Á¸é GetWsChangesEx() function.
-	return true;
-}
-
-/**
-	Æ¯Á¤ ÇÁ·Î¼¼½ºÀÇ update mode °Ë»ö
-*/
-BOOL test_QueryProcessAffinityUpdateMode(){
-
-	#ifdef OQADBGPRINT
-	printf("test_QueryProcessAffinityUpdateMode\n");
-	#endif
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
-	
-	DWORD Flags = PROCESS_AFFINITY_ENABLE_AUTO_UPDATE;
-
-	/** hFile¿¡ »ı¼ºÇÑ ÆÄÀÏ */
-	HANDLE hFile = CreateFile(L"¼Õ³ª¿µ\\test_QueryProcessAffinityUpdateMode.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	//HANDLE hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test2.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	//hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test2.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	hFile = CreateFile(L"¼Õ³ª¿µ\\test_QueryProcessAffinityUpdateMode.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	/** µÎ ¹øÂ° ÆÄ¶ó¹ÌÅÍ 0 : ½Ã½ºÅÛ¿¡ ÀÇÇÑ ÇÁ·Î¼¼½º affinityÀÇ µ¿Àû °»½Å ºÒ°¡ 
-					    PROCESS_AFFINITY_ENABLE_AUTO_UPDATE : ½Ã½ºÅÛ¿¡ ÀÇÇÑ ÇÁ·Î¼¼½º affinityÀÇ µ¿Àû °»½Å °¡´É	*/
-	BOOL result = QueryProcessAffinityUpdateMode(hFile, &Flags);
-
-	if(result != 0){
-		
-		sprintf(meg, "QueryProcessAffinityUpdateMode() : SUCCESS \n\n affinity update mode : %u", Flags);	
+	if(t1 != t2){
+		sprintf(msg, " FlushProcessWriteBuffers() : SUCCESS");
+		//sprintf(msg, " FlushProcessWriteBuffers() : SUCCESS \n\n Flush ì „ __rdtsc = %d \n Flush í›„ __rdtsc = %d ", t1, t2);
 		strcpy(buf, "SUCCESS");
-	}else 
-		strcpy(meg, GetErrorMessage(" QueryProcessAffinityUpdateMode() : FAIL \n\n Error Message :", GetLastError()));
-	
-	wresult(__FILE__, __LINE__, "QueryProcessAffinityUpdateMode", buf, "SUCCESS", meg);
-
-	return true;
-} 
-
-BOOL test_GetProcessId(){
-
-	#ifdef OQADBGPRINT
-	printf("test_GetProcessId\n");
-	#endif
-
-	BOOL result;
-	HANDLE hProcess;
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
-	
-	/** process ½Äº°ÀÚ °¡Á®¿È */
-	DWORD pid = GetCurrentProcessId();
-
-	/**	PROCESS_QUERY_INFORMATION : access right(security)
-		FALSE : process do not inherit this handle	
-		pid : GetCurrentProcessId()		*/
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
-
-	/** OpenProcess() ½ÇÆĞ	*/
-	if (!hProcess) {
-		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
-		return 1;
-	}
-	
-	result = GetProcessId(hProcess);
-	
-	if(result){
-		sprintf(meg, " GetProcessId() : SUCCESS \n\n ProcessId : %d ", pid);
-		strcpy(buf, "SUCCESS");
+		result = TRUE;
 	}else{
-		strcpy(buf, GetErrorMessage(" GetProcessId() : FAIL \n\n Error Message :", GetLastError()));
+		strcpy(buf, GetErrorMessage(" FlushProcessWriteBuffers() : FAIL \n\n Error Message :", GetLastError()));
 	}
-	wresult(__FILE__, __LINE__, "GetProcessId", buf, "SUCCESS", meg);
+	wresult(__FILE__, __LINE__, "FlushProcessWriteBuffers", buf, "SUCCESS", msg);
 
-	return true;
+	return result;
+}
+
+
+/**
+* WORD GetMaximumProcessorGroupCount(void);
+* ì‹œìŠ¤í…œì´ ê°€ì§ˆ ìˆ˜ìˆëŠ” í”„ë¡œì„¸ì„œ ê·¸ë£¹ì˜ ìµœëŒ€ ìˆ˜ë¥¼ ë°˜í™˜
+* @author : ì†ë‚˜ì˜
+*
+* @param void
+* @return ì‹œìŠ¤í…œì´ ê°€ì§ˆ ìˆ˜ìˆëŠ” í”„ë¡œì„¸ì„œ ê·¸ë£¹ì˜ ìµœëŒ€ ìˆ˜
+*/
+
+BOOL test_GetMaximumProcessorGroupCount(){
+
+	char msg[BUFSIZ] = "FAIL";																							
+	char buf[BUFSIZ];
+
+	DWORD result = GetMaximumProcessorGroupCount();
+	BOOL re_result;
+
+	#ifdef OQADBGPRINT
+	printf("test_GetMaximumProcessorGroupCount \n");
+	#endif
+	
+	if(result != 0){
+		sprintf(msg, " GetMaximumProcessorGroupCount() : SUCCESS \n\n í”„ë¡œì„¸ì„œ ê·¸ë£¹ ìµœëŒ€ ê°œìˆ˜ : %d", result);
+		strcpy(buf, "SUCCESS");
+		re_result = TRUE;
+
+	}else 
+		strcpy(msg, GetErrorMessage(" GetMaximumProcessorGroupCount() : FAIL \n\n Error Message :", GetLastError()));
+
+	wresult(__FILE__, __LINE__, "GetMaximumProcessorGroupCount", buf, "SUCCESS", msg);
+
+	return re_result;
 }
 
 /**
-	process°¡ ÀÚÁÖ ÂüÁ¶ÇÏ´Â µ¥ÀÌÅÍ¸¦ ¹°¸® ¸Ş¸ğ¸® ¿µ¿ª¿¡ »óÁÖ ½ÃÄÑ¼­ 
-	page fault³ª page swap °úÁ¤ ¾øÀÌ µ¥ÀÌÅÍ ÂüÁ¶ °¡´ÉÇÏ°Ô ÇÔ.
-	process working set¿¡´Â code pages¿Í data pages°¡ Æ÷ÇÔµÊ.
-	set¿¡¼­ Á¦¿ÜÇÏ´Â °úÁ¤ Trim
+* BOOL GetNumaNodeNumberFromHandle(
+  _In_  HANDLE  hFile,
+  _Out_ PUSHORT NodeNumber
+  );
+* ì§€ì •ëœ íŒŒì¼ í•¸ë“¤ì´ ë‚˜íƒ€ë‚´ëŠ” íŒŒì¼ ë˜ëŠ” I / O ì¥ì¹˜ì™€ ì—°ê´€ëœ NUMA ë…¸ë“œë¥¼ ê²€ìƒ‰
+* @author : ì†ë‚˜ì˜
+*
+* @param íŒŒì¼ ë˜ëŠ” I / O ì¥ì¹˜ì— ëŒ€í•œ í•¸ë“¤
+* @param ì§€ì •ëœ íŒŒì¼ í•¸ë“¤ê³¼ ì—°ê´€ëœ NUMA ë…¸ë“œì˜ ë²ˆí˜¸ë¥¼ ìˆ˜ì‹ í•˜ëŠ” ë³€ìˆ˜ì— ëŒ€í•œ í¬ì¸í„°.
+* @return ê²€ìƒ‰ ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€
 */
-BOOL test_GetProcessWorkingSetSize(){
+
+BOOL test_GetNumaNodeNumberFromHandle(){
 
 	#ifdef OQADBGPRINT
-	printf("test_GetProcessWorkingSetSize\n");
+	printf("test_GetNumaNodeNumberFromHandle \n");
 	#endif
 
 	BOOL result;
-	HANDLE hProcess;
-	SIZE_T dwMin, dwMax;
+	BOOL re_result;
 
+	char msg[BUFSIZ] = "FAIL";
 	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
 
-	/** process ½Äº°ÀÚ °¡Á®¿È */
-	int pid = GetCurrentProcessId();
+	USHORT nodeNumber = 255;
+	HANDLE hFile = CreateFile(L"ì†ë‚˜ì˜\\test_GetNumaNodeNumberFromHandle.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
-	/**	PROCESS_QUERY_INFORMATION : access right(security)
-		FALSE : process do not inherit this handle	
-		pid : GetCurrentProcessId()		*/
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
-
-	/** OpenProcess() ½ÇÆĞ	*/
-	if (!hProcess) {
-		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
-		return 1;
-	}
-
-	/**	processÀÇ working set size¸¦ °¡Á®¿È	*/
-	result = GetProcessWorkingSetSize(hProcess, &dwMin, &dwMax);
-
-	if (result != 0){
-		sprintf(meg, " GetProcessWorkingSetSize() : SUCCESS \n\n ProcessId : %d \n MinimumWorkingSetSize : %lu KB \n MaximumWorkingSetSize : %lu KB", pid, dwMin, dwMax);
-		strcpy(buf, "SUCCESS");
-
-	}else 
-		strcpy(buf, GetErrorMessage(" GetProcessWorkingSetSize() : FAIL \n\n Error Message :", GetLastError()));
-
-	wresult(__FILE__, __LINE__, "GetProcessWorkingSetSize", buf, "SUCCESS", meg);
-
-    CloseHandle(hProcess);
-
-	return true;
-}
-
-BOOL test_GetProcessWorkingSetSizeEx(){
-	BOOL result;
-	HANDLE hProcess;
-	SIZE_T dwMin, dwMax;
-	DWORD flags = QUOTA_LIMITS_HARDWS_MIN_DISABLE;
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
-
-	/** process ½Äº°ÀÚ °¡Á®¿È */
-	int pid = GetCurrentProcessId();
-
-	/**	PROCESS_QUERY_INFORMATION : access right(security)
-		FALSE : process do not inherit this handle	
-		pid : GetCurrentProcessId()		*/
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
-
-	/** OpenProcess() ½ÇÆĞ	*/
-	if (!hProcess) {
-		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
-		return 1;
-	}
-
-	/**	processÀÇ working set size¸¦ °¡Á®¿È	*/
-	result = GetProcessWorkingSetSizeEx(hProcess, &dwMin, &dwMax, &flags);
-
-	if (result != 0){
-		sprintf(meg, " GetProcessWorkingSetSizeEx() : SUCCESS \n\n ProcessId : %d \n MinimumWorkingSetSize : %lu KB \n MaximumWorkingSetSize : %lu KB", pid, dwMin, dwMax);
-		strcpy(buf, "SUCCESS");
-
-	}else {
-		strcpy(buf, GetErrorMessage(" GetProcessWorkingSetSizeEx() : FAIL \n\n Error Message :", GetLastError()));
-		return FALSE;
-	}
-	wresult(__FILE__, __LINE__, "GetProcessWorkingSetSizeEx", buf, "SUCCESS", meg);
-
-    CloseHandle(hProcess);
-
-	return true;
-}
-
-BOOL test_IsProcessInJob(){
-
-	#ifdef OQADBGPRINT
-	printf("test_IsProcessInJob\n");
-	#endif
-
-	BOOL result;
-	BOOL bInJob;
-	HANDLE hProcess;
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
-	
-	/** process ½Äº°ÀÚ °¡Á®¿È */
-	int pid = GetCurrentProcessId();
-
-	/**	PROCESS_QUERY_INFORMATION : access right(security)
-		FALSE : process do not inherit this handle	
-		pid : GetCurrentProcessId()		*/
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
-
-	/** OpenProcess() ½ÇÆĞ	*/
-	if (!hProcess) {
-		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
-		return 1;
-	}
-
-	/** process°¡ ÁöÁ¤µÈ ÀÛ¾÷¿¡¼­ ½ÇÇà ÁßÀÎÁö ¿©ºÎ °áÁ¤	*/
-    result = IsProcessInJob(hProcess, 0, &bInJob);
+	result = GetNumaNodeNumberFromHandle(hFile, &nodeNumber);
 
 	if(result != 0){
-		sprintf(meg, " IsProcessInJob() : SUCCESS");
-		strcpy(buf, "SUCCESS");
-
+			sprintf(msg, " GetNumaNodeNumberFromHandle() : SUCCESS");
+			strcpy(buf, "SUCCESS");
+			re_result = TRUE;
 	}else 
-		strcpy(buf, GetErrorMessage(" IsProcessInJob() : FAIL \n\n Error Message :", GetLastError()));
+			strcpy(msg, GetErrorMessage(" GetNumaNodeNumberFromHandle() : FAIL \n\n Error Message :", GetLastError()));
+	
+	wresult(__FILE__, __LINE__, "GetNumaNodeNumberFromHandle", buf, "SUCCESS", msg);
 
-	wresult(__FILE__, __LINE__, "IsProcessInJob", buf, "SUCCESS", meg);
-
-	return true;
+	return re_result;
 }
 
 
-BOOL test_GetProcessHandleCount(){
+/**
+* BOOL WINAPI GetNumaProcessorNode(
+  _In_  UCHAR  Processor,
+  _Out_ PUCHAR NodeNumber
+  );
+* ì§€ì •ëœ í”„ë¡œì„¸ì„œì˜ ë…¸ë“œ ë²ˆí˜¸ë¥¼ ê²€ìƒ‰.
+* @author : ì†ë‚˜ì˜
+*
+* @param Processor í”„ë¡œì„¸ì„œ ë²ˆí˜¸.
+* @param NodeNumber ë…¸ë“œ ë²ˆí˜¸. í”„ë¡œì„¸ì„œê°€ ì¡´ì¬í•˜ì§€ ì•Šìœ¼ë©´ì´ ë§¤ê°œ ë³€ìˆ˜ëŠ” 0xFF.
+* @return ê²€ìƒ‰ ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€
+*/
 
+/** 
+	node number for the specified processor.
+	NUMA(Non-Uniform Memory Access) NODE : 
+	NUMA ì•„í‚¤í…ì²˜ëŠ” ê° í”„ë¡œì„¸ì„œ ê·¸ë£¹ì— ìì²´ ë©”ëª¨ë¦¬ê°€ ìˆìœ¼ë©° ìì²´ I/O ì±„ë„ì´ ìˆëŠ” ê²½ìš°ë„ ìˆë‹¤. 
+	ê·¸ëŸ¬ë‚˜ ê° CPUëŠ” ì¼ê´€ëœ ë°©ë²•ìœ¼ë¡œ ë‹¤ë¥¸ ê·¸ë£¹ê³¼ ì—°ê²°ëœ ë©”ëª¨ë¦¬ì— ì•¡ì„¸ìŠ¤ í•œë‹¤. ê° ê·¸ë£¹ì„ NUMAë…¸ë“œë¼ í•œë‹¤.  
+	í•˜ë‚˜ì˜ CPU ì†Œì¼“ì— ì½”ì–´ ì—¬ëŸ¬ê°œê°€ ë“¤ì–´ê°€ ìˆì„ ìˆ˜ ìˆê¸°ì— ê°™ì€ ì§€ì—­ ë©”ëª¨ë¦¬ë¥¼ ì‚¬ìš©í•˜ëŠ” CPU ì½”ì–´ë“¤ì„ ë¬¶ì–´ì„œ í•˜ë‚˜ì˜ NUMA ë…¸ë“œë¡œ ì¹œë‹¤.
+	8ì½”ì–´ 4ì†Œì¼“ CPUë¼ë©´ (í•˜ì´í¼ìŠ¤ë ˆë”©ì„ ê°€ì •í•˜ì§€ ì•Šì„ ë•Œì—) 0~7ë²ˆ ì½”ì–´ëŠ” NUMA ë…¸ë“œ 0ë²ˆ, 8~15ë²ˆ ì½”ì–´ëŠ” NUMA ë…¸ë“œ 1ë²ˆê³¼ ê°™ì€ ë°©ì‹.
+
+*/
+BOOL test_GetNumaProcessorNode(){
+	
 	#ifdef OQADBGPRINT
-	printf("test_GetProcessHandleCount\n");
+	printf("test_GetNumaProcessorNode \n");
 	#endif
 
 	BOOL result;
-	DWORD handlecount;
+	BOOL re_result;
 
+	char msg[BUFSIZ] = "FAIL";
 	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
-	int pid = GetCurrentProcessId();
 
-	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
-	result = GetProcessHandleCount(hProcess, &handlecount);
-	
-	/** OpenProcess() ½ÇÆĞ	*/
-	if (!hProcess) {
-		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
-		return 1;
-	}
+	/** processorê°€ ì¡´ì¬í•˜ì§€ ì•ŠëŠ”ë‹¤ë©´ node number(ë‘ ë²ˆì§¸ íŒŒë¼ë¯¸í„°)ëŠ” 0xFF */
+	DWORD processorNumber = GetCurrentProcessorNumber();
 
-	if(result != 0){
-		sprintf(meg, " GetProcessHandleCount() : SUCCESS \n\n ProcessID : %d \n HandleCount : %d", pid, handlecount);
-		
-		strcpy(buf, "SUCCESS");
+	if(processorNumber != -1){
+		// 255
+		UCHAR nodeNumber = 255;
+		result = GetNumaProcessorNode((UCHAR)processorNumber, &nodeNumber);
 
-	}else 
-		strcpy(buf, GetErrorMessage(" GetProcessHandleCount() : FAIL \n\n Error Message :", GetLastError()));
+		if(result != 0){
+			sprintf(msg, " GetNumaProcessorNode() : SUCCESS \n\n number of processor the current thread : %d", processorNumber);
+			strcpy(buf, "SUCCESS");
+			re_result = TRUE;
 
-	wresult(__FILE__, __LINE__, "GetProcessHandleCount", buf, "SUCCESS", meg);
+		}else 
+			strcpy(buf, GetErrorMessage(" GetCurrentProcessorNumber() : FAIL \n\n Error Message :", GetLastError()));
+	}else
+		strcpy(msg, GetErrorMessage(" processor number ì¡°íšŒì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤. \n\n Error Message :", GetLastError()));
 
-	return true;
+	wresult(__FILE__, __LINE__, "GetCurrentProcessorNumber", buf, "SUCCESS", msg);
+	return re_result;
 }
 
-/** 32bit ÇÁ·Î¼¼¼­¸¸ Áö¿ø */
+
+/**
+* BOOL WINAPI GetProcessDEPPolicy(
+  _In_  HANDLE  hProcess,
+  _Out_ LPDWORD lpFlags,
+  _Out_ PBOOL   lpPermanent
+  );
+* ì§€ì •ëœ 32 ë¹„íŠ¸ í”„ë¡œì„¸ìŠ¤ì— ëŒ€í•œ DEP (ë°ì´í„° ì‹¤í–‰ ë°©ì§€) ë° DEP-ATL ì½í¬ ì—ë®¬ë ˆì´ì…˜ ì„¤ì •ì„ ê°€ì ¸ì˜´.
+* @author : ì†ë‚˜ì˜
+*
+* @param hProcess í”„ë¡œì„¸ìŠ¤ì— ëŒ€í•œ í•¸ë“¤. PROCESS_QUERY_INFORMATION ê¶Œí•œ í•„ìš”.
+* @param lpFlags í”Œë˜ê·¸ ì¢…ë¥˜ 3ê°€ì§€.
+* @param lpPermanent DEPê°€ ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì— ëŒ€í•´ ì˜êµ¬ì ìœ¼ë¡œ í™œì„±í™” ë˜ëŠ” ë¹„í™œì„±í™” ëœ ê²½ìš° TRUE. ê·¸ë ‡ì§€ ì•Šìœ¼ë©´ FALSE.
+* @return ê°€ì ¸ì˜¤ê¸° ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€
+*/
+
+/** 32bit í”„ë¡œì„¸ì„œë§Œ ì§€ì› */
 BOOL test_GetProcessDEPPolicy(){
 
 	#ifdef OQADBGPRINT
@@ -396,11 +200,12 @@ BOOL test_GetProcessDEPPolicy(){
 
 	int pid;
 	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
+	char msg[BUFSIZ] = "FAIL";
 
 	HANDLE hProcess;
 	DWORD flags;
 	BOOL permanent;
+	BOOL result = FALSE;
 
 	/**	hProcess
 		PROCESS_QUERY_INFORMATION : access right(security)
@@ -411,7 +216,7 @@ BOOL test_GetProcessDEPPolicy(){
 	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
 	flags = PROCESS_DEP_ENABLE;
 	
-	/** OpenProcess() ½ÇÆĞ	*/
+	/** OpenProcess() ì‹¤íŒ¨	*/
 	if (!hProcess) {
 		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
 		return 1;
@@ -419,307 +224,33 @@ BOOL test_GetProcessDEPPolicy(){
 
 	/** DEP Flags : 0 / PROCESS_DEP_ENABLE / PROCESS_DEP_DISABLE_ATL_THUNK_EMULATION */
 	if(GetProcessDEPPolicy(hProcess, &flags, &permanent) == TRUE){
-		sprintf(meg, " GetProcessDEPPolicy() : SUCCESS");
+		sprintf(msg, " GetProcessDEPPolicy() : SUCCESS");
 		strcpy(buf, "SUCCESS");
+		result = TRUE;
 	}else{
 		strcpy(buf, GetErrorMessage(" GetProcessDEPPolicy() : FAIL \n\n Error Message :", GetLastError()));
 	}
-	wresult(__FILE__, __LINE__, "GetProcessDEPPolicy", buf, "SUCCESS", meg);
+	wresult(__FILE__, __LINE__, "GetProcessDEPPolicy", buf, "SUCCESS", msg);
 
-	return true;
-}
-
-/** ÇöÀç ÇÁ·Î¼¼½ºÀÇ ½º·¹µå¸¦ ½ÇÇàÁßÀÎ °¢ ÇÁ·Î¼¼¼­ÀÇ ¾²±â Å¥¸¦ ÇÃ·¯½ÃÇÕ´Ï´Ù. */
-BOOL test_FlushProcessWriteBuffers(){
-
-	#ifdef OQADBGPRINT
-	printf("test_FlushProcessWriteBuffers\n");
-	#endif
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
-
-	//__rdtsc : ÇÁ·Î¼¼¼­ ½Ã°£ ½ºÅÆÇÁ ¹İÈ¯. ¸¶Áö¸· Àç¼³Á¤ ÈÄ Å¬·Ï ÁÖ±â ¼ö ±â·Ï.
-
-	unsigned __int64 t1 = __rdtsc();
-	FlushProcessWriteBuffers();
-	unsigned __int64 t2 = __rdtsc() ;
-	
-	if(t1 != t2){
-		sprintf(meg, " FlushProcessWriteBuffers() : SUCCESS");
-		//sprintf(meg, " FlushProcessWriteBuffers() : SUCCESS \n\n Flush Àü __rdtsc = %d \n Flush ÈÄ __rdtsc = %d ", t1, t2);
-		strcpy(buf, "SUCCESS");
-	}else{
-		strcpy(buf, GetErrorMessage(" FlushProcessWriteBuffers() : FAIL \n\n Error Message :", GetLastError()));
-	}
-	wresult(__FILE__, __LINE__, "FlushProcessWriteBuffers", buf, "SUCCESS", meg);
-
-	return true;
+	return result;
 }
 
 
-BOOL test_SetProcessPriorityBoost(){
-	
-	#ifdef OQADBGPRINT
-	printf("test_SetProcessPriorityBoost\n");
-	#endif
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
-	int pid = GetCurrentProcessId();
-
-	BOOL result;
-	// This handle must have the PROCESS_SET_INFORMATION access right.
-	HANDLE hProcess = OpenProcess(PROCESS_SET_INFORMATION , FALSE, pid);
-
-	// To restore normal behavior, call SetProcessPriorityBoost with DisablePriorityBoost set to FALSE.
-	result = SetProcessPriorityBoost(hProcess, FALSE);
-
-	if(result != 0){
-		sprintf(meg, " SetProcessPriorityBoost() : SUCCESS");
-		strcpy(buf, "SUCCESS");
-	}else{
-		strcpy(meg, GetErrorMessage(" SetProcessPriorityBoost() : FAIL \n\n Error Message :", GetLastError()));
-	}
-
-	wresult(__FILE__, __LINE__, "SetProcessPriorityBoost", buf, "SUCCESS", meg);
-
-	return true;
-}
-
-BOOL test_GetProcessPriorityBoost(){
-	
-	#ifdef OQADBGPRINT
-	printf("test_SetProcessPriorityBoost\n");
-	#endif
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
-	int pid = GetCurrentProcessId();
-	LONG err = GetLastError();
-
-	BOOL result;
-	BOOL set_result;
-	// This handle must have the PROCESS_SET_INFORMATION access right.
-	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_QUERY_LIMITED_INFORMATION , FALSE, pid);
-
-	set_result = SetProcessPriorityBoost(hProcess, FALSE);
-
-	// To restore normal behavior, call SetProcessPriorityBoost with DisablePriorityBoost set to FALSE.
-	result = GetProcessPriorityBoost(hProcess, &set_result);
-
-	if(result == 0){
-		strcpy(meg, GetErrorMessage(" GetProcessPriorityBoost() : FAIL \n\n Error Message :", GetLastError()));
-		printf("¿¡·¯ÄÚµå : %d" ,GetLastError());
-	}else{
-		sprintf(meg, " GetProcessPriorityBoost() : SUCCESS");
-		strcpy(buf, "SUCCESS");
-		
-	}
-
-	wresult(__FILE__, __LINE__, "GetProcessPriorityBoost", buf, "SUCCESS", meg);
-
-	return true;
-}
-
-
-BOOL test_K32EnumProcesses(){
-
-	#ifdef OQADBGPRINT
-	printf("test_K32EnumProcesses\n");
-	#endif
-
-	DWORD arProc[1024],cb;
-	BOOL result;
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
-
-	// ÇÁ·Î¼¼½ºÀÇ ¸ñ·ÏÀ» ¹è¿­¿¡ ±¸ÇÏ°í °³¼ö¸¦ °è»êÇÑ´Ù.
-	result = K32EnumProcesses(arProc,sizeof(arProc),&cb);
-	
-	if(result != 0){
-		sprintf(meg, " EnumProcesses() : SUCCESS");
-		strcpy(buf, "SUCCESS");
-	}else{
-		strcpy(meg, GetErrorMessage(" EnumProcesses() : FAIL \n\n Error Message :", GetLastError()));
-	}
-
-	wresult(__FILE__, __LINE__, "EnumProcesses", buf, "SUCCESS", meg);
-
-	return true;
-}
-
-BOOL test_K32EnumProcessModules(){
-
-	#ifdef OQADBGPRINT
-	printf("test_K32EnumProcessModules\n");
-	#endif
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
-
-	DWORD arProc[1024];
-	DWORD cb;
-
-	HMODULE hModule;
-	HANDLE hProcess;
-	BOOL result;
-
-	// ÇÁ·Î¼¼½ºÀÇ ¸ñ·ÏÀ» ¹è¿­¿¡ ±¸ÇÏ°í °³¼ö¸¦ °è»êÇÑ´Ù.
-	EnumProcesses(arProc,sizeof(arProc),&cb);
-
-	int pid = GetCurrentProcessId();
-
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,FALSE, pid);
-
-	if(hProcess){
-
-		// Ã¹¹øÂ° ¸ğµâ(=ÇÁ·Î¼¼½º ±× ÀÚÃ¼)ÀÇ ÀÌ¸§À» ±¸ÇØ Ãâ·ÂÇÑ´Ù.
-		result=K32EnumProcessModules(hProcess,&hModule,sizeof(hModule),&cb);
-
-		if(result != 0){
-			sprintf(meg, " EnumProcessModules() : SUCCESS");
-			strcpy(buf, "SUCCESS");
-		}else{
-			strcpy(meg, GetErrorMessage(" EnumProcessModules() : FAIL \n\n Error Message :", GetLastError()));
-		}
-	}else
-		strcpy(meg, GetErrorMessage(" ÇÁ·Î¼¼½º¸¦ openÇÏÁö ¸øÇß½À´Ï´Ù. \n\n OpenProcess ÇÔ¼ö¸¦ ´Ù½Ã Ã¼Å©ÇÏ½Ê½Ã¿À. \n\n Error Message :", GetLastError()));
-	wresult(__FILE__, __LINE__, "EnumProcessModules", buf, "SUCCESS", meg);
-
-	return true;
-}
-
-BOOL test_K32EnumProcessModulesEx(){
-
-	#ifdef OQADBGPRINT
-	printf("test_K32EnumProcessModulesEx\n");
-	#endif
-
-	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
-
-	DWORD arProc[1024];
-	DWORD cb;
-
-	HMODULE hModule;
-	HANDLE hProcess;
-	BOOL result;
-
-	// ÇÁ·Î¼¼½ºÀÇ ¸ñ·ÏÀ» ¹è¿­¿¡ ±¸ÇÏ°í °³¼ö¸¦ °è»êÇÑ´Ù.
-	EnumProcesses(arProc,sizeof(arProc),&cb);
-
-	int pid = GetCurrentProcessId();
-
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,FALSE, pid);
-
-	if(hProcess){
-
-		// Ã¹¹øÂ° ¸ğµâ(=ÇÁ·Î¼¼½º ±× ÀÚÃ¼)ÀÇ ÀÌ¸§À» ±¸ÇØ Ãâ·ÂÇÑ´Ù.
-		result=K32EnumProcessModulesEx(hProcess, &hModule, sizeof(hModule), &cb, LIST_MODULES_ALL);
-
-		if(result != 0){
-			sprintf(meg, " EnumProcessModulesEx() : SUCCESS");
-			strcpy(buf, "SUCCESS");
-		}else{
-			strcpy(meg, GetErrorMessage(" EnumProcessModulesEx() : FAIL \n\n Error Message :", GetLastError()));
-		}
-	}else
-		strcpy(meg, GetErrorMessage(" ÇÁ·Î¼¼½º¸¦ openÇÏÁö ¸øÇß½À´Ï´Ù. \n\n OpenProcess ÇÔ¼ö¸¦ ´Ù½Ã Ã¼Å©ÇÏ½Ê½Ã¿À. \n\n Error Message :", GetLastError()));
-	wresult(__FILE__, __LINE__, "EnumProcessModulesEx", buf, "SUCCESS", meg);
-
-	return true;
-}
-
-BOOL test_GetMaximumProcessorGroupCount(){
-
-	char meg[BUFSIZ] = "FAIL";																							
-	char buf[BUFSIZ];
-
-	DWORD result = GetMaximumProcessorGroupCount();
-
-	#ifdef OQADBGPRINT
-	printf("test_GetMaximumProcessorGroupCount \n");
-	#endif
-	
-	if(result != 0){
-		sprintf(meg, " GetMaximumProcessorGroupCount() : SUCCESS \n\n ÇÁ·Î¼¼¼­ ±×·ì ÃÖ´ë °³¼ö : %d", result);
-		strcpy(buf, "SUCCESS");
-	}else 
-		strcpy(meg, GetErrorMessage(" GetMaximumProcessorGroupCount() : FAIL \n\n Error Message :", GetLastError()));
-
-	wresult(__FILE__, __LINE__, "GetMaximumProcessorGroupCount", buf, "SUCCESS", meg);
-
-	return true;
-}
-
-BOOL test_GetNumaNodeNumberFromHandle(){
-
-	#ifdef OQADBGPRINT
-	printf("test_GetNumaNodeNumberFromHandle \n");
-	#endif
-
-	BOOL result;
-
-	char meg[BUFSIZ] = "FAIL";
-	char buf[BUFSIZ];
-
-	USHORT nodeNumber = 255;
-	HANDLE hFile = CreateFile(L"¼Õ³ª¿µ\\test_GetNumaNodeNumberFromHandle.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	result = GetNumaNodeNumberFromHandle(hFile, &nodeNumber);
-
-	if(result != 0){
-			sprintf(meg, " GetNumaNodeNumberFromHandle() : SUCCESS");
-			strcpy(buf, "SUCCESS");
-	}else 
-			strcpy(meg, GetErrorMessage(" GetNumaNodeNumberFromHandle() : FAIL \n\n Error Message :", GetLastError()));
-	
-	wresult(__FILE__, __LINE__, "GetNumaNodeNumberFromHandle", buf, "SUCCESS", meg);
-
-	return true;
-}
-
-/** 
-	node number for the specified processor.
-	NUMA(Non-Uniform Memory Access) NODE : 
-	NUMA ¾ÆÅ°ÅØÃ³´Â °¢ ÇÁ·Î¼¼¼­ ±×·ì¿¡ ÀÚÃ¼ ¸Ş¸ğ¸®°¡ ÀÖÀ¸¸ç ÀÚÃ¼ I/O Ã¤³ÎÀÌ ÀÖ´Â °æ¿ìµµ ÀÖ´Ù. 
-	±×·¯³ª °¢ CPU´Â ÀÏ°üµÈ ¹æ¹ıÀ¸·Î ´Ù¸¥ ±×·ì°ú ¿¬°áµÈ ¸Ş¸ğ¸®¿¡ ¾×¼¼½º ÇÑ´Ù. °¢ ±×·ìÀ» NUMA³ëµå¶ó ÇÑ´Ù.  
-	ÇÏ³ªÀÇ CPU ¼ÒÄÏ¿¡ ÄÚ¾î ¿©·¯°³°¡ µé¾î°¡ ÀÖÀ» ¼ö ÀÖ±â¿¡ °°Àº Áö¿ª ¸Ş¸ğ¸®¸¦ »ç¿ëÇÏ´Â CPU ÄÚ¾îµéÀ» ¹­¾î¼­ ÇÏ³ªÀÇ NUMA ³ëµå·Î Ä£´Ù.
-	8ÄÚ¾î 4¼ÒÄÏ CPU¶ó¸é (ÇÏÀÌÆÛ½º·¹µùÀ» °¡Á¤ÇÏÁö ¾ÊÀ» ¶§¿¡) 0~7¹ø ÄÚ¾î´Â NUMA ³ëµå 0¹ø, 8~15¹ø ÄÚ¾î´Â NUMA ³ëµå 1¹ø°ú °°Àº ¹æ½Ä.
-
+/**
+* BOOL GetProcessGroupAffinity(
+  _In_    HANDLE  hProcess,
+  _Inout_ PUSHORT GroupCount,
+  _Out_   PUSHORT GroupArray
+  );
+* ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì˜ í”„ë¡œì„¸ì„œ ê·¸ë£¹ ì„ í˜¸ë„ë¥¼ ê°€ì ¸ì˜´.
+* @author : ì†ë‚˜ì˜
+*
+* @param hProcess í”„ë¡œì„¸ìŠ¤ì— ëŒ€í•œ í•¸ë“¤. PROCESS_QUERY_INFORMATION ë˜ëŠ” PROCESS_QUERY_LIMITED_INFORMATION ê¶Œí•œ í•„ìš”.
+* @param GroupCount ì…ë ¥ì‹œ GroupArray ë°°ì—´ ì˜ ìš”ì†Œ ìˆ˜ë¥¼ ì§€ì •. ì¶œë ¥ì‹œ ë°°ì—´ì— ê¸°ë¡ ëœ í”„ë¡œì„¸ì„œ ê·¸ë£¹ ìˆ˜ë¥¼ ì§€ì •. 
+					ë°°ì—´ì´ ë„ˆë¬´ ì‘ ìœ¼ë©´ì´ í•¨ìˆ˜ëŠ” ERROR_INSUFFICIENT_BUFFERë¡œ ì‹¤íŒ¨í•˜ê³  GroupCount ë§¤ê°œ ë³€ìˆ˜ë¥¼ í•„ìš”í•œ ìš”ì†Œ ìˆ˜ë¡œ ì„¤ì •
+* @param GroupArray í”„ë¡œì„¸ì„œ ê·¸ë£¹ ë²ˆí˜¸ ë°°ì—´
+* @return ê°€ì ¸ì˜¤ê¸° ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€
 */
-BOOL test_GetNumaProcessorNode(){
-	
-	#ifdef OQADBGPRINT
-	printf("test_GetNumaProcessorNode \n");
-	#endif
-
-	BOOL result;
-	
-	char meg[BUFSIZ] = "FAIL";
-	char buf[BUFSIZ];
-
-	/** processor°¡ Á¸ÀçÇÏÁö ¾Ê´Â´Ù¸é node number(µÎ ¹øÂ° ÆÄ¶ó¹ÌÅÍ)´Â 0xFF */
-	DWORD processorNumber = GetCurrentProcessorNumber();
-
-	if(processorNumber != -1){
-		// 255
-		UCHAR nodeNumber = 255;
-		result = GetNumaProcessorNode((UCHAR)processorNumber, &nodeNumber);
-
-		if(result != 0){
-			sprintf(meg, " GetNumaProcessorNode() : SUCCESS \n\n number of processor the current thread : %d", processorNumber);
-			strcpy(buf, "SUCCESS");
-		}else 
-			strcpy(buf, GetErrorMessage(" GetCurrentProcessorNumber() : FAIL \n\n Error Message :", GetLastError()));
-	}else
-		strcpy(meg, GetErrorMessage(" processor number Á¶È¸¿¡ ½ÇÆĞÇß½À´Ï´Ù. \n\n Error Message :", GetLastError()));
-
-	wresult(__FILE__, __LINE__, "GetCurrentProcessorNumber", buf, "SUCCESS", meg);
-	return true;
-}
 
 #define WIN32_WINNT 0x0601
 BOOL test_GetProcessGroupAffinity(){
@@ -732,7 +263,7 @@ BOOL test_GetProcessGroupAffinity(){
 	int wresult_value = 0;
 
 	char buf[BUFSIZ];
-	char meg[BUFSIZ] = "FAIL";
+	char msg[BUFSIZ] = "FAIL";
 
 	HANDLE hProcess;
 	USHORT gcount = GetMaximumProcessorGroupCount();
@@ -746,44 +277,856 @@ BOOL test_GetProcessGroupAffinity(){
 
 		switch(err){
 		case ERROR_ACCESS_DENIED:
-			sprintf(meg, "Process Open ½ÇÆĞ \n\n ProcessID : %ld \n Error : ERROR_ACCESS_DENIED");
+			sprintf(msg, "Process Open ì‹¤íŒ¨ \n\n ProcessID : %ld \n Error : ERROR_ACCESS_DENIED");
 			break;
 		case ERROR_INVALID_PARAMETER:
-			sprintf(meg, "Process Open ½ÇÆĞ \n\n ProcessID : %ld \n Error : ERROR_INVALID_PARAMETER");
+			sprintf(msg, "Process Open ì‹¤íŒ¨ \n\n ProcessID : %ld \n Error : ERROR_INVALID_PARAMETER");
 			break;
 		default:
-			sprintf(meg, "Process Open ½ÇÆĞ \n\n ProcessID : %ld");
+			sprintf(msg, "Process Open ì‹¤íŒ¨ \n\n ProcessID : %ld");
 		}
 		return FALSE;
 	}
 	if(GetProcessGroupAffinity(hProcess, &gcount, garray) == 0){
 		DWORD err = GetLastError();
 
-		//gcount°¡ ³Ê¹« ÀÛÀ¸¸é ERROR_INSUFFICIENT_BUFFER ¹ß»ı
+		//gcountê°€ ë„ˆë¬´ ì‘ìœ¼ë©´ ERROR_INSUFFICIENT_BUFFER ë°œìƒ
 		if(err == ERROR_INSUFFICIENT_BUFFER){
 			garray = (USHORT *)realloc(garray, gcount * sizeof(garray[0]));
 			if (garray == NULL) {
-				sprintf(meg, "GetProcessGroupAffinity() ½ÇÆĞ ¡æ ERROR : ERROR_INSUFFICIENT_BUFFER \n ¡æ garray == NULLÀÎ °æ¿ì");
+				sprintf(msg, "GetProcessGroupAffinity() ì‹¤íŒ¨ â†’ ERROR : ERROR_INSUFFICIENT_BUFFER \n â†’ garray == NULLì¸ ê²½ìš°");
 				gcount = 0;
 				CloseHandle(hProcess);
 				return FALSE;
 			}
 			if(GetProcessGroupAffinity(hProcess, &gcount, garray) == 0){
 				DWORD err = GetLastError();
-				printf("GetProcessGroupAffinity() ½ÇÆĞ ¡æ ERROR : ERROR_INSUFFICIENT_BUFFER \n ¡æ garray != NULLÀÎ °æ¿ì");
+				printf("GetProcessGroupAffinity() ì‹¤íŒ¨ â†’ ERROR : ERROR_INSUFFICIENT_BUFFER \n â†’ garray != NULLì¸ ê²½ìš°");
 				CloseHandle(hProcess);
 				return FALSE;
 			}
 		} else {
-			sprintf(meg, "GetProcessGroupAffinity() : FAIL \n\n ProcessID : %ld \n error 0x%08x(%d)\n\n error code 998 ¡æ ", pid, (unsigned int) err, err);
+			sprintf(msg, "GetProcessGroupAffinity() : FAIL \n\n ProcessID : %ld \n error 0x%08x(%d)\n\n error code 998 â†’ ", pid, (unsigned int) err, err);
 			CloseHandle(hProcess);
 		}
 	}else{
 		wresult_value = 1;
-		sprintf(meg, "GetProcessGroupAffinity() : SUCCESS \n\nProcessID : %ld ", pid);
+		sprintf(msg, "GetProcessGroupAffinity() : SUCCESS \n\nProcessID : %ld ", pid);
 	}
 	sprintf(buf, "%d", wresult_value);
-	wresult(__FILE__, __LINE__, "GetProcessGroupAffinity", buf, "1", meg);
+	wresult(__FILE__, __LINE__, "GetProcessGroupAffinity", buf, "1", msg);
 
 	return TRUE;
-}	
+}
+
+
+/**
+* BOOL WINAPI GetProcessHandleCount(
+  _In_    HANDLE hProcess,
+  _Inout_ PDWORD pdwHandleCount
+  );
+* ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì— ì†í•œ ì—´ë ¤ìˆëŠ” í•¸ë“¤ ìˆ˜ë¥¼ ê²€ìƒ‰
+* @author : ì†ë‚˜ì˜
+*
+* @param hProcess í•¸ë“¤ ìˆ˜ë¥¼ ìš”ì²­í•œ í”„ë¡œì„¸ìŠ¤ì˜ í•¸ë“¤. í•¸ë“¤ì—ëŠ” PROCESS_QUERY_INFORMATION ë˜ëŠ” PROCESS_QUERY_LIMITED_INFORMATION ì•¡ì„¸ìŠ¤ ê¶Œí•œì´ ìˆì–´ì•¼ í•¨.
+* @param pdwHandleCount ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì— ì†í•œ ì—´ë¦° í•¸ë“¤ ìˆ˜ë¥¼ ìˆ˜ì‹ í•˜ëŠ” ë³€ìˆ˜ì— ëŒ€í•œ í¬ì¸í„°.
+* @return ê²€ìƒ‰ ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€
+*/
+
+BOOL test_GetProcessHandleCount(){
+
+	#ifdef OQADBGPRINT
+	printf("test_GetProcessHandleCount\n");
+	#endif
+
+	BOOL result = FALSE;
+	DWORD handlecount;
+
+	char buf[BUFSIZ];
+	char msg[BUFSIZ] = "FAIL";
+	int pid = GetCurrentProcessId();
+
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
+	result = GetProcessHandleCount(hProcess, &handlecount);
+	
+	/** OpenProcess() ì‹¤íŒ¨	*/
+	if (!hProcess) {
+		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
+		return 1;
+	}
+
+	if(result != 0){
+		sprintf(msg, " GetProcessHandleCount() : SUCCESS \n\n ProcessID : %d \n HandleCount : %d", pid, handlecount);
+		strcpy(buf, "SUCCESS");
+		result = TRUE;
+
+	}else{
+		strcpy(buf, GetErrorMessage(" GetProcessHandleCount() : FAIL \n\n Error Message :", GetLastError()));
+		result = FALSE;
+	}
+
+	wresult(__FILE__, __LINE__, "GetProcessHandleCount", buf, "SUCCESS", msg);
+	return result;
+}
+
+/**
+* DWORD WINAPI GetProcessId(
+  _In_ HANDLE Process
+  );
+* ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì˜ í”„ë¡œì„¸ìŠ¤ IDë¥¼ ê²€ìƒ‰
+* @author : ì†ë‚˜ì˜
+*
+* @param Process í”„ë¡œì„¸ìŠ¤ì— ëŒ€í•œ í•¸ë“¤. í•¸ë“¤ì—ëŠ” PROCESS_QUERY_INFORMATION ë˜ëŠ” PROCESS_QUERY_LIMITED_INFORMATION ì•¡ì„¸ìŠ¤ ê¶Œí•œ ìˆì–´ì•¼ í•¨.
+* @return ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì˜ í”„ë¡œì„¸ìŠ¤ ID
+*/
+
+BOOL test_GetProcessId(){
+
+	#ifdef OQADBGPRINT
+	printf("test_GetProcessId\n");
+	#endif
+
+	BOOL result;
+	HANDLE hProcess;
+
+	char buf[BUFSIZ];
+	char msg[BUFSIZ] = "FAIL";
+	
+	/** process ì‹ë³„ì ê°€ì ¸ì˜´ */
+	DWORD pid = GetCurrentProcessId();
+
+	/**	PROCESS_QUERY_INFORMATION : access right(security)
+		FALSE : process do not inherit this handle	
+		pid : GetCurrentProcessId()		*/
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
+
+	/** OpenProcess() ì‹¤íŒ¨	*/
+	if (!hProcess) {
+		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
+		return 1;
+	}
+	
+	result = GetProcessId(hProcess);
+	
+	if(result){
+		sprintf(msg, " GetProcessId() : SUCCESS \n\n ProcessId : %d ", pid);
+		strcpy(buf, "SUCCESS");
+	}else{
+		strcpy(buf, GetErrorMessage(" GetProcessId() : FAIL \n\n Error Message :", GetLastError()));
+		return FALSE;
+	}
+	wresult(__FILE__, __LINE__, "GetProcessId", buf, "SUCCESS", msg);
+
+	return TRUE;
+}
+
+
+/**
+* BOOL WINAPI GetProcessPriorityBoost(
+  _In_  HANDLE hProcess,
+  _Out_ PBOOL  pDisablePriorityBoost
+  );
+* ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì˜ priority boost control ìƒíƒœë¥¼ ì–»ì–´ì˜´.
+* @author : ì†ë‚˜ì˜
+*
+* @param hProcess í”„ë¡œì„¸ìŠ¤ì— ëŒ€í•œ í•¸ë“¤. ì´ í•¸ë“¤ì—ëŠ” PROCESS_QUERY_INFORMATION ë˜ëŠ” PROCESS_QUERY_LIMITED_INFORMATION ì•¡ì„¸ìŠ¤ ê¶Œí•œ ì´ ìˆì–´ì•¼ í•¨.
+* @param pDisablePriorityBoost priority boost ì œì–´ ìƒíƒœë¥¼ë°›ëŠ” ë³€ìˆ˜ì— ëŒ€í•œ í¬ì¸í„°.
+* @return ê²€ìƒ‰ ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€.
+
+*/
+
+BOOL test_GetProcessPriorityBoost(){
+	
+	#ifdef OQADBGPRINT
+	printf("test_SetProcessPriorityBoost\n");
+	#endif
+
+	char buf[BUFSIZ];
+	char msg[BUFSIZ] = "FAIL";
+	int pid = GetCurrentProcessId();
+	LONG err = GetLastError();
+
+	BOOL result;
+	BOOL set_result;
+	BOOL re_result = FALSE;
+	// This handle must have the PROCESS_SET_INFORMATION access right.
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_QUERY_LIMITED_INFORMATION , FALSE, pid);
+
+	set_result = SetProcessPriorityBoost(hProcess, FALSE);
+
+	// To restore normal behavior, call SetProcessPriorityBoost with DisablePriorityBoost set to FALSE.
+	result = GetProcessPriorityBoost(hProcess, &set_result);
+
+	if(result == 0){
+		strcpy(msg, GetErrorMessage(" GetProcessPriorityBoost() : FAIL \n\n Error Message :", GetLastError()));
+		printf("ì—ëŸ¬ì½”ë“œ : %d" ,GetLastError());
+	}else{
+		re_result = TRUE;
+		sprintf(msg, " GetProcessPriorityBoost() : SUCCESS");
+		strcpy(buf, "SUCCESS");
+		
+	}
+
+	wresult(__FILE__, __LINE__, "GetProcessPriorityBoost", buf, "SUCCESS", msg);
+
+	return re_result;
+}
+
+
+/**
+* BOOL WINAPI GetProcessShutdownParameters(
+  _Out_ LPDWORD lpdwLevel,
+  _Out_ LPDWORD lpdwFlags
+  );
+* í˜„ì¬ í˜¸ì¶œì¤‘ì¸ í”„ë¡œì„¸ìŠ¤ì˜ ì¢…ë£Œ ë§¤ê°œ ë³€ìˆ˜ë¥¼ ê²€ìƒ‰
+* @author : ì†ë‚˜ì˜
+*
+* @param lpdwLevel ì¢…ë£Œ ìš°ì„  ìˆœìœ„ ìˆ˜ì¤€ì„ë°›ëŠ” ë³€ìˆ˜ì— ëŒ€í•œ í¬ì¸í„°. ë†’ì€ ìˆ«ìê°€ ë¨¼ì € ì¢…ë£Œë©ë‹ˆë‹¤. 5ê°€ì§€. ëª¨ë“  í”„ë¡œì„¸ìŠ¤ëŠ” ì¢…ë£Œ ë ˆë²¨ 0x280ì—ì„œ ì‹œì‘.
+* @param lpdwFlags ì¢…ë£Œ í”Œë˜ê·¸ë¥¼ë°›ëŠ” ë³€ìˆ˜ë¥¼ ê°€ë¦¬í‚¤ëŠ” í¬ì¸í„°. SHUTDOWN_NORETRYì¼ ìˆ˜ ìˆìŒ.
+* @return ê²€ìƒ‰ ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€
+
+*/
+
+BOOL test_GetProcessShutdownParameters(){
+
+	#ifdef OQADBGPRINT
+	printf("test_GetProcessShutdownParameters\n");
+	#endif
+
+	char buf[BUFSIZ] = "FAIL";
+	char msg[BUFSIZ] = "FAIL";
+
+	BOOL result = FALSE;
+	DWORD lpdwLevel = 0x280;
+	DWORD lpdwFlags = SHUTDOWN_NORETRY;
+
+	// í˜„ì¬ í˜¸ì¶œ ì¤‘ì¸ í”„ë¡œì„¸ìŠ¤ì˜ ì¢…ë£Œ ë§¤ê°œ ë³€ìˆ˜ë¥¼ ê°€ì ¸ì˜´. í•¨ìˆ˜ ì„±ê³µ ì‹œ nonzero.
+	result = GetProcessShutdownParameters(&lpdwLevel, &lpdwFlags);
+	if(result != 0){
+		strcpy(buf, "SUCCESS");
+		strcpy(msg, "GetProcessShutdownParameters() : SUCCESS");	
+		result = TRUE;
+	}else{ 
+		strcpy(msg, GetErrorMessage(" GetProcessShutdownParameters() : FAIL \n\n Error Message :", GetLastError()));
+		result = FALSE;
+	}
+
+	wresult(__FILE__, __LINE__, "GetProcessShutdownParameters", buf, "SUCCESS", msg);
+	return result;
+}
+
+
+/**
+* BOOL WINAPI GetProcessWorkingSetSize(
+  _In_  HANDLE  hProcess,
+  _Out_ PSIZE_T lpMinimumWorkingSetSize,
+  _Out_ PSIZE_T lpMaximumWorkingSetSize
+  );
+* ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì˜ ìµœì†Œì™€ ìµœëŒ€ working set sizeë¥¼ ê²€ìƒ‰
+* @author : ì†ë‚˜ì˜
+
+* @param hProcess ì‘ì—… ì§‘í•© í¬ê¸°ë¥¼ ê°€ì ¸ì˜¬ í”„ë¡œì„¸ìŠ¤ì˜ í•¸ë“¤. í•¸ë“¤ì—ëŠ” PROCESS_QUERY_INFORMATION ë˜ëŠ” PROCESS_QUERY_LIMITED_INFORMATION ì•¡ì„¸ìŠ¤ ê¶Œí•œ ì´ ìˆì–´ì•¼ í•¨.
+* @param lpMinimumWorkingSetSize  ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì˜ ìµœì†Œ ì‘ì—… ì§‘í•© í¬ê¸°ë¥¼ ë°”ì´íŠ¸ ë‹¨ìœ„ë¡œë°›ëŠ” ë³€ìˆ˜ì— ëŒ€í•œ í¬ì¸í„°.
+* @param lpMaximumWorkingSetSize ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì˜ ìµœëŒ€ ì‘ì—… ì„¸íŠ¸ í¬ê¸°ë¥¼ ë°”ì´íŠ¸ ë‹¨ìœ„ë¡œë°›ëŠ” ë³€ìˆ˜ì— ëŒ€í•œ í¬ì¸í„°.
+* @return ê²€ìƒ‰ ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€
+*/
+
+/**
+	processê°€ ìì£¼ ì°¸ì¡°í•˜ëŠ” ë°ì´í„°ë¥¼ ë¬¼ë¦¬ ë©”ëª¨ë¦¬ ì˜ì—­ì— ìƒì£¼ ì‹œì¼œì„œ 
+	page faultë‚˜ page swap ê³¼ì • ì—†ì´ ë°ì´í„° ì°¸ì¡° ê°€ëŠ¥í•˜ê²Œ í•¨.
+	process working setì—ëŠ” code pagesì™€ data pagesê°€ í¬í•¨ë¨.
+	setì—ì„œ ì œì™¸í•˜ëŠ” ê³¼ì • Trim
+*/
+BOOL test_GetProcessWorkingSetSize(){
+
+	#ifdef OQADBGPRINT
+	printf("test_GetProcessWorkingSetSize\n");
+	#endif
+
+	BOOL result;
+	HANDLE hProcess;
+	SIZE_T dwMin, dwMax;
+
+	char buf[BUFSIZ];
+	char msg[BUFSIZ] = "FAIL";
+
+	/** process ì‹ë³„ì ê°€ì ¸ì˜´ */
+	int pid = GetCurrentProcessId();
+
+	/**	PROCESS_QUERY_INFORMATION : access right(security)
+		FALSE : process do not inherit this handle	
+		pid : GetCurrentProcessId()		*/
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
+
+	/** OpenProcess() ì‹¤íŒ¨	*/
+	if (!hProcess) {
+		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
+		return 1;
+	}
+
+	/**	processì˜ working set sizeë¥¼ ê°€ì ¸ì˜´	*/
+	result = GetProcessWorkingSetSize(hProcess, &dwMin, &dwMax);
+
+	if (result != 0){
+		sprintf(msg, " GetProcessWorkingSetSize() : SUCCESS \n\n ProcessId : %d \n MinimumWorkingSetSize : %lu KB \n MaximumWorkingSetSize : %lu KB", pid, dwMin, dwMax);
+		strcpy(buf, "SUCCESS");
+
+	}else 
+		strcpy(buf, GetErrorMessage(" GetProcessWorkingSetSize() : FAIL \n\n Error Message :", GetLastError()));
+
+	wresult(__FILE__, __LINE__, "GetProcessWorkingSetSize", buf, "SUCCESS", msg);
+
+    CloseHandle(hProcess);
+
+	return result;
+}
+
+
+/**
+* BOOL WINAPI GetProcessWorkingSetSizeEx(
+  _In_  HANDLE  hProcess,
+  _Out_ PSIZE_T lpMinimumWorkingSetSize,
+  _Out_ PSIZE_T lpMaximumWorkingSetSize,
+  _Out_ PDWORD  Flags
+  );
+* ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì˜ ìµœì†Œ, ìµœëŒ€ working set sizeë¥¼ ê²€ìƒ‰
+* @author : ì†ë‚˜ì˜
+*
+* @param hProcess ì‘ì—… ì§‘í•© í¬ê¸°ë¥¼ ê°€ì ¸ì˜¬ í”„ë¡œì„¸ìŠ¤ì˜ í•¸ë“¤. í•¸ë“¤ì—ëŠ” PROCESS_QUERY_INFORMATION ë˜ëŠ” PROCESS_QUERY_LIMITED_INFORMATION ì•¡ì„¸ìŠ¤ ê¶Œí•œ ì´ ìˆì–´ì•¼ í•¨.
+* @param lpMinimumWorkingSetSize  ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì˜ ìµœì†Œ ì‘ì—… ì§‘í•© í¬ê¸°ë¥¼ ë°”ì´íŠ¸ ë‹¨ìœ„ë¡œë°›ëŠ” ë³€ìˆ˜ì— ëŒ€í•œ í¬ì¸í„°.
+* @param lpMaximumWorkingSetSize ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì˜ ìµœëŒ€ ì‘ì—… ì„¸íŠ¸ í¬ê¸°ë¥¼ ë°”ì´íŠ¸ ë‹¨ìœ„ë¡œë°›ëŠ” ë³€ìˆ˜ì— ëŒ€í•œ í¬ì¸í„°.
+* @param Flags ìµœì†Œ ë° ìµœëŒ€ ì‘ì—… ì„¸íŠ¸ í¬ê¸°ì˜ ì ìš©ì„ ì œì–´í•˜ëŠ” â€‹â€‹í”Œë˜ê·¸. 4ê°€ì§€.
+* @return ê²€ìƒ‰ ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€
+*/
+
+BOOL test_GetProcessWorkingSetSizeEx(){
+
+	#ifdef OQADBGPRINT
+	printf("test_GetProcessWorkingSetSizeEx\n");
+	#endif
+
+	BOOL result;
+	HANDLE hProcess;
+	SIZE_T dwMin, dwMax;
+	DWORD flags = QUOTA_LIMITS_HARDWS_MIN_DISABLE;
+
+	char buf[BUFSIZ];
+	char msg[BUFSIZ] = "FAIL";
+
+	/** process ì‹ë³„ì ê°€ì ¸ì˜´ */
+	int pid = GetCurrentProcessId();
+
+	/**	PROCESS_QUERY_INFORMATION : access right(security)
+		FALSE : process do not inherit this handle	
+		pid : GetCurrentProcessId()		*/
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
+
+	/** OpenProcess() ì‹¤íŒ¨	*/
+	if (!hProcess) {
+		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
+		return 1;
+	}
+
+	/**	processì˜ working set sizeë¥¼ ê°€ì ¸ì˜´	*/
+	result = GetProcessWorkingSetSizeEx(hProcess, &dwMin, &dwMax, &flags);
+
+	if (result != 0){
+		sprintf(msg, " GetProcessWorkingSetSizeEx() : SUCCESS \n\n ProcessId : %d \n MinimumWorkingSetSize : %lu KB \n MaximumWorkingSetSize : %lu KB", pid, dwMin, dwMax);
+		strcpy(buf, "SUCCESS");
+
+	}else {
+		strcpy(buf, GetErrorMessage(" GetProcessWorkingSetSizeEx() : FAIL \n\n Error Message :", GetLastError()));
+		return FALSE;
+	}
+	wresult(__FILE__, __LINE__, "GetProcessWorkingSetSizeEx", buf, "SUCCESS", msg);
+
+    CloseHandle(hProcess);
+
+	return result;
+}
+
+
+/**
+* BOOL WINAPI IsProcessInJob(
+  _In_     HANDLE ProcessHandle,
+  _In_opt_ HANDLE JobHandle,
+  _Out_    PBOOL  Result
+  );
+* í”„ë¡œì„¸ìŠ¤ê°€ ì§€ì •ëœ ì‘ì—…ì—ì„œ ì‹¤í–‰ ì¤‘ì¸ì§€ ì—¬ë¶€ë¥¼ ê²°ì •
+* @author : ì†ë‚˜ì˜
+*
+* @param ProcessHandle í…ŒìŠ¤íŠ¸ í•  í”„ë¡œì„¸ìŠ¤ì˜ í•¸ë“¤. í•¸ë“¤ì—ëŠ” PROCESS_QUERY_INFORMATION ë˜ëŠ” PROCESS_QUERY_LIMITED_INFORMATION ì•¡ì„¸ìŠ¤ ê¶Œí•œì´ ìˆì–´ì•¼ í•¨.
+* @param JobHandle ì‘ì—…ì— ëŒ€í•œ í•¸ë“¤. ì´ ë§¤ê°œ ë³€ìˆ˜ê°€ NULLì´ë©´ í•¨ìˆ˜ëŠ” í”„ë¡œì„¸ìŠ¤ê°€ ëª¨ë“  ì‘ì—…ì—ì„œ ì‹¤í–‰ ì¤‘ì¸ì§€ ì—¬ë¶€ë¥¼ í…ŒìŠ¤íŠ¸.
+* @param Result í”„ë¡œì„¸ìŠ¤ê°€ ì‘ì—…ì—ì„œ ì‹¤í–‰ì¤‘ì¸ ê²½ìš° TRUEë¥¼ ìˆ˜ì‹ í•˜ëŠ” ê°’ì„ ê°€ë¦¬í‚¤ëŠ” í¬ì¸í„°ì´ë©°, ê·¸ë ‡ì§€ ì•Šìœ¼ë©´ FALSE.
+* @return ì‹¤í–‰ì¤‘ì¸ì§€ ì—¬ë¶€ ê²°ì • ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€
+*/
+
+BOOL test_IsProcessInJob(){
+
+	#ifdef OQADBGPRINT
+	printf("test_IsProcessInJob\n");
+	#endif
+
+	BOOL result;
+	BOOL bInJob;
+	HANDLE hProcess;
+
+	char buf[BUFSIZ];
+	char msg[BUFSIZ] = "FAIL";
+	
+	/** process ì‹ë³„ì ê°€ì ¸ì˜´ */
+	int pid = GetCurrentProcessId();
+
+	/**	PROCESS_QUERY_INFORMATION : access right(security)
+		FALSE : process do not inherit this handle	
+		pid : GetCurrentProcessId()		*/
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION , FALSE, pid);
+
+	/** OpenProcess() ì‹¤íŒ¨	*/
+	if (!hProcess) {
+		strcpy(buf, GetErrorMessage(" OpenProcess() : FAIL \n\n Error Message :", GetLastError()));
+		return 1;
+	}
+
+	/** processê°€ ì§€ì •ëœ ì‘ì—…ì—ì„œ ì‹¤í–‰ ì¤‘ì¸ì§€ ì—¬ë¶€ ê²°ì •	*/
+    result = IsProcessInJob(hProcess, 0, &bInJob);
+
+	if(result != 0){
+		sprintf(msg, " IsProcessInJob() : SUCCESS");
+		strcpy(buf, "SUCCESS");
+
+	}else 
+		strcpy(buf, GetErrorMessage(" IsProcessInJob() : FAIL \n\n Error Message :", GetLastError()));
+
+	wresult(__FILE__, __LINE__, "IsProcessInJob", buf, "SUCCESS", msg);
+
+	return result;
+}
+
+
+/**
+* BOOL WINAPI EnumProcesses(
+  _Out_ DWORD *pProcessIds,
+  _In_  DWORD cb,
+  _Out_ DWORD *pBytesReturned
+  );
+* ì‹œìŠ¤í…œì˜ ê° í”„ë¡œì„¸ìŠ¤ ì˜¤ë¸Œì íŠ¸ì— ëŒ€í•œ í”„ë¡œì„¸ìŠ¤ IDë¥¼ ê²€ìƒ‰.
+* @author : ì†ë‚˜ì˜
+*
+* @param pProcessIds í”„ë¡œì„¸ìŠ¤ ì‹ë³„ì ëª©ë¡ì„ ìˆ˜ì‹ í•˜ëŠ” ë°°ì—´ì— ëŒ€í•œ í¬ì¸í„°.
+* @param cb pProcessIds ë°°ì—´ ì˜ í¬ê¸° ( ë°”ì´íŠ¸).
+* @param pBytesReturned pProcessIds ë°°ì—´ ì—ì„œ ë°˜í™˜ ëœ ë°”ì´íŠ¸ ìˆ˜.
+* @return ID ê²€ìƒ‰ ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€.
+*/
+
+BOOL test_K32EnumProcesses(){
+
+	#ifdef OQADBGPRINT
+	printf("test_K32EnumProcesses\n");
+	#endif
+
+	DWORD arProc[1024],cb;
+	BOOL result;
+	BOOL re_result = FALSE;
+
+	char buf[BUFSIZ];
+	char msg[BUFSIZ] = "FAIL";
+
+	// í”„ë¡œì„¸ìŠ¤ì˜ ëª©ë¡ì„ ë°°ì—´ì— êµ¬í•˜ê³  ê°œìˆ˜ë¥¼ ê³„ì‚°í•œë‹¤.
+	result = K32EnumProcesses(arProc,sizeof(arProc),&cb);
+	
+	if(result != 0){
+		re_result = TRUE;
+		sprintf(msg, " EnumProcesses() : SUCCESS");
+		strcpy(buf, "SUCCESS");
+	}else{
+		strcpy(msg, GetErrorMessage(" EnumProcesses() : FAIL \n\n Error Message :", GetLastError()));
+	}
+
+	wresult(__FILE__, __LINE__, "EnumProcesses", buf, "SUCCESS", msg);
+
+	return re_result;
+}
+
+/** 
+* BOOL WINAPI EnumProcessModules(
+  _In_  HANDLE  hProcess,
+  _Out_ HMODULE *lphModule,
+  _In_  DWORD   cb,
+  _Out_ LPDWORD lpcbNeeded
+  );
+* ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì˜ ê° ëª¨ë“ˆì— ëŒ€í•œ í•¸ë“¤ì„ ê²€ìƒ‰
+*
+* @param hProcess í”„ë¡œì„¸ìŠ¤ì— ëŒ€í•œ í•¸ë“¤.
+* @param lphModule ëª¨ë“ˆ í•¸ë“¤ ëª©ë¡ì„ë°›ëŠ” ë°°ì—´.
+* @param cb lphModule ë°°ì—´ ì˜ í¬ê¸° ( ë°”ì´íŠ¸).
+* @param lpcbNeeded lphModule ë°°ì—´ ì— ëª¨ë“  ëª¨ë“ˆ í•¸ë“¤ì„ ì €ì¥í•˜ëŠ” ë° í•„ìš”í•œ ë°”ì´íŠ¸ ìˆ˜.
+* @return í•¸ë“¤ ê²€ìƒ‰ ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€.
+*/
+
+BOOL test_K32EnumProcessModules(){
+
+	#ifdef OQADBGPRINT
+	printf("test_K32EnumProcessModules\n");
+	#endif
+
+	char buf[BUFSIZ];
+	char msg[BUFSIZ] = "FAIL";
+
+	DWORD arProc[1024];
+	DWORD cb;
+
+	HMODULE hModule;
+	HANDLE hProcess;
+	BOOL result;
+	BOOL re_result;
+
+	// í”„ë¡œì„¸ìŠ¤ì˜ ëª©ë¡ì„ ë°°ì—´ì— êµ¬í•˜ê³  ê°œìˆ˜ë¥¼ ê³„ì‚°í•œë‹¤.
+	EnumProcesses(arProc,sizeof(arProc),&cb);
+
+	int pid = GetCurrentProcessId();
+
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,FALSE, pid);
+
+	if(hProcess){
+
+		// ì²«ë²ˆì§¸ ëª¨ë“ˆ(=í”„ë¡œì„¸ìŠ¤ ê·¸ ìì²´)ì˜ ì´ë¦„ì„ êµ¬í•´ ì¶œë ¥í•œë‹¤.
+		result=K32EnumProcessModules(hProcess,&hModule,sizeof(hModule),&cb);
+
+		if(result != 0){
+			sprintf(msg, " EnumProcessModules() : SUCCESS");
+			strcpy(buf, "SUCCESS");
+			re_result = TRUE;
+		}else{
+			strcpy(msg, GetErrorMessage(" EnumProcessModules() : FAIL \n\n Error Message :", GetLastError()));
+		}
+	}else
+		strcpy(msg, GetErrorMessage(" í”„ë¡œì„¸ìŠ¤ë¥¼ opení•˜ì§€ ëª»í–ˆìŠµë‹ˆë‹¤. \n\n OpenProcess í•¨ìˆ˜ë¥¼ ë‹¤ì‹œ ì²´í¬í•˜ì‹­ì‹œì˜¤. \n\n Error Message :", GetLastError()));
+	wresult(__FILE__, __LINE__, "EnumProcessModules", buf, "SUCCESS", msg);
+
+	return re_result;
+}
+
+/**
+* BOOL WINAPI EnumProcessModulesEx(
+  _In_  HANDLE  hProcess,
+  _Out_ HMODULE *lphModule,
+  _In_  DWORD   cb,
+  _Out_ LPDWORD lpcbNeeded,
+  _In_  DWORD   dwFilterFlag
+  );
+* ì§€ì •ëœ í•„í„° ì¡°ê±´ì„ ì¶©ì¡±ì‹œí‚¤ëŠ” ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì˜ ê° ëª¨ë“ˆì— ëŒ€í•œ í•¸ë“¤ì„ ê²€ìƒ‰.
+* @author : ì†ë‚˜ì˜
+*
+* @param hProcess í”„ë¡œì„¸ìŠ¤ì— ëŒ€í•œ í•¸ë“¤.
+* @param lphModule ëª¨ë“ˆ í•¸ë“¤ ëª©ë¡ì„ë°›ëŠ” ë°°ì—´.
+* @param cb lphModule ë°°ì—´ ì˜ í¬ê¸° ( ë°”ì´íŠ¸).
+* @param lpcbNeeded lphModule ë°°ì—´ ì— ëª¨ë“  ëª¨ë“ˆ í•¸ë“¤ì„ ì €ì¥í•˜ëŠ” ë° í•„ìš”í•œ ë°”ì´íŠ¸ ìˆ˜.
+* @param dwFilterFlag í•„í„° ê¸°ì¤€. 4ê°€ì§€.
+* @return  ëª¨ë“ˆì— ëŒ€í•œ í•¸ë“¤ ê²€ìƒ‰ ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€.
+*/
+
+BOOL test_K32EnumProcessModulesEx(){
+
+	#ifdef OQADBGPRINT
+	printf("test_K32EnumProcessModulesEx\n");
+	#endif
+
+	char buf[BUFSIZ];
+	char msg[BUFSIZ] = "FAIL";
+
+	DWORD arProc[1024];
+	DWORD cb;
+
+	HMODULE hModule;
+	HANDLE hProcess;
+	BOOL result;
+	BOOL re_result;
+
+	// í”„ë¡œì„¸ìŠ¤ì˜ ëª©ë¡ì„ ë°°ì—´ì— êµ¬í•˜ê³  ê°œìˆ˜ë¥¼ ê³„ì‚°í•œë‹¤.
+	EnumProcesses(arProc,sizeof(arProc),&cb);
+
+	int pid = GetCurrentProcessId();
+
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,FALSE, pid);
+
+	if(hProcess){
+
+		// ì²«ë²ˆì§¸ ëª¨ë“ˆ(=í”„ë¡œì„¸ìŠ¤ ê·¸ ìì²´)ì˜ ì´ë¦„ì„ êµ¬í•´ ì¶œë ¥í•œë‹¤.
+		result=K32EnumProcessModulesEx(hProcess, &hModule, sizeof(hModule), &cb, LIST_MODULES_ALL);
+
+		if(result != 0){
+			re_result = TRUE;
+			sprintf(msg, " EnumProcessModulesEx() : SUCCESS");
+			strcpy(buf, "SUCCESS");
+		}else{
+			strcpy(msg, GetErrorMessage(" EnumProcessModulesEx() : FAIL \n\n Error Message :", GetLastError()));
+		}
+	}else
+		strcpy(msg, GetErrorMessage(" í”„ë¡œì„¸ìŠ¤ë¥¼ opení•˜ì§€ ëª»í–ˆìŠµë‹ˆë‹¤. \n\n OpenProcess í•¨ìˆ˜ë¥¼ ë‹¤ì‹œ ì²´í¬í•˜ì‹­ì‹œì˜¤. \n\n Error Message :", GetLastError()));
+	wresult(__FILE__, __LINE__, "EnumProcessModulesEx", buf, "SUCCESS", msg);
+
+	return re_result;
+}
+
+
+/**
+* BOOL WINAPI InitializeProcessForWsWatch(
+  _In_ HANDLE hProcess
+  );
+* ì§€ì •ëœ processì˜ working setì„ ëª¨ë‹ˆí„°ë§ ì‹œì‘(ì´ˆê¸°í™”).
+* @author : ì†ë‚˜ì˜
+*
+* @param hProcess í”„ë¡œì„¸ìŠ¤ì— ëŒ€í•œ í•¸ë“¤. í•¸ë“¤ì—ëŠ” PROCESS_QUERY_INFORMATION ì•¡ì„¸ìŠ¤ ê¶Œí•œì´ ìˆì–´ì•¼ í•¨.
+* @return ëª¨ë‹ˆí„°ë§ ì‹œì‘ ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€.
+*/
+
+BOOL test_K32InitializeProcessForWsWatch(){
+
+	#ifdef OQADBGPRINT
+	printf("test_K32InitializeProcessForWsWatch\n");
+	#endif
+
+	char msg[BUFSIZ] = "FAIL";
+
+	/** hFileì— ìƒì„±í•œ íŒŒì¼ */
+	HANDLE hFile = CreateFile(L"ì†ë‚˜ì˜\\test_K32InitializeProcessForWsWatch.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	
+	//HANDLE hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	//hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	hFile = CreateFile(L"ì†ë‚˜ì˜\\test_K32InitializeProcessForWsWatch.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	BOOL result = K32InitializeProcessForWsWatch(hFile);
+	
+	if(result != 0)
+		strcpy(msg, "InitializeProcessForWsWatch() : SUCCESS");	
+	else 
+		strcpy(msg, GetErrorMessage(" InitializeProcessForWsWatch() : FAIL \n\n Error Message :", GetLastError()));
+	
+	wresult(__FILE__, __LINE__, "InitializeProcessForWsWatch", msg, "InitializeProcessForWsWatch() : SUCCESS", msg);
+
+	//ì¶”ê°€ëœ í˜ì´ì§€ ê°€ì ¸ì˜¤ë ¤ë©´ GetWsChangesEx() function.
+	return result;
+}
+
+
+/**
+* BOOL WINAPI QueryProcessAffinityUpdateMode(
+  _In_      HANDLE ProcessHandle,
+  _Out_opt_ DWORD  lpdwFlags
+  );
+* íŠ¹ì • í”„ë¡œì„¸ìŠ¤ì˜ affinity ì—…ë°ì´íŠ¸ ëª¨ë“œë¥¼ ë¶ˆëŸ¬ì˜´.
+* @author : ì†ë‚˜ì˜
+*
+* @param ProcessHandle í”„ë¡œì„¸ìŠ¤ì— ëŒ€í•œ í•¸ë“¤. í•¸ë“¤ì—ëŠ” PROCESS_QUERY_INFORMATION ë˜ëŠ” PROCESS_QUERY_LIMITED_INFORMATION ì•¡ì„¸ìŠ¤ ê¶Œí•œì´ ìˆì–´ì•¼ í•¨.
+* @param lpdwFlags affinity ì—†ë°ì´íŠ¸ ëª¨ë“œ.2ê°€ì§€.
+* @return ì—…ë°ì´íŠ¸ ëª¨ë“œ ë¶ˆëŸ¬ì˜¤ê¸° ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€.
+*/
+
+/**
+	íŠ¹ì • í”„ë¡œì„¸ìŠ¤ì˜ update mode ê°€ì ¸ì˜´
+*/
+BOOL test_QueryProcessAffinityUpdateMode(){
+
+	#ifdef OQADBGPRINT
+	printf("test_QueryProcessAffinityUpdateMode\n");
+	#endif
+
+	char buf[BUFSIZ];
+	char msg[BUFSIZ] = "FAIL";
+	
+	DWORD Flags = PROCESS_AFFINITY_ENABLE_AUTO_UPDATE;
+
+	/** hFileì— ìƒì„±í•œ íŒŒì¼ */
+	HANDLE hFile = CreateFile(L"ì†ë‚˜ì˜\\test_QueryProcessAffinityUpdateMode.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	//HANDLE hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test2.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	//hFile = CreateFile(L"C:\\Users\\Tmax\\Desktop\\test2.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	hFile = CreateFile(L"ì†ë‚˜ì˜\\test_QueryProcessAffinityUpdateMode.txt", GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	/** ë‘ ë²ˆì§¸ íŒŒë¼ë¯¸í„° 0 : ì‹œìŠ¤í…œì— ì˜í•œ í”„ë¡œì„¸ìŠ¤ affinityì˜ ë™ì  ê°±ì‹  ë¶ˆê°€ 
+					    PROCESS_AFFINITY_ENABLE_AUTO_UPDATE : ì‹œìŠ¤í…œì— ì˜í•œ í”„ë¡œì„¸ìŠ¤ affinityì˜ ë™ì  ê°±ì‹  ê°€ëŠ¥	*/
+	BOOL result = QueryProcessAffinityUpdateMode(hFile, &Flags);
+
+	if(result != 0){
+		
+		sprintf(msg, "QueryProcessAffinityUpdateMode() : SUCCESS \n\n affinity update mode : %u", Flags);	
+		strcpy(buf, "SUCCESS");
+	}else 
+		strcpy(msg, GetErrorMessage(" QueryProcessAffinityUpdateMode() : FAIL \n\n Error Message :", GetLastError()));
+	
+	wresult(__FILE__, __LINE__, "QueryProcessAffinityUpdateMode", buf, "SUCCESS", msg);
+
+	return result;
+} 
+
+
+/**
+* BOOL WINAPI SetProcessAffinityUpdateMode(
+  _In_ HANDLE ProcessHandle,
+  _In_ DWORD  dwFlags
+  );
+* ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì˜ affinity ì—…ë°ì´íŠ¸ ëª¨ë“œ ì„¤ì •.
+* @author : ì†ë‚˜ì˜
+*
+* @param ProcessHandle í”„ë¡œì„¸ìŠ¤ì— ëŒ€í•œ í•¸ë“¤. ì´ í•¸ë“¤ì€ GetCurrentProcess í•¨ìˆ˜ì—ì„œ ë°˜í™˜í•´ì•¼ í•¨.
+* @param dwFlags affinity ì—…ë°ì´íŠ¸ ëª¨ë“œ. 2ê°€ì§€.
+* @return  ì—…ë°ì´íŠ¸ ëª¨ë“œ ì„¤ì • ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€.
+*/
+
+BOOL test_SetProcessAffinityUpdateMode(){
+
+	#ifdef OQADBGPRINT
+	printf("test_SetProcessAffinityUpdateMode \n");
+	#endif
+
+	BOOL result;
+	char buf[BUFSIZ];
+	char msg[BUFSIZ] = "FAIL";
+
+	// 0 : Disables dynamic update of the process affinity by the system.
+	// PROCESS_AFFINITY_ENABLE_AUTO_UPDATE : Enables dynamic update of the process affinity by the system.
+	// í”„ë¡œì„¸ìŠ¤ì˜ ìœ ì—°ì„±ì„ ì—…ë°ì´íŠ¸
+	// ì²« ë²ˆì§¸ íŒŒë¼ë¯¸í„° : GetCurrentProcessí•¨ìˆ˜ ë°˜í™˜í•´ì•¼ í•¨
+
+	result = SetProcessAffinityUpdateMode(GetCurrentProcess(), 0);
+	if(result != 0){
+		sprintf(msg, "SetProcessAffinityUpdateMode() : SUCCESS \n\ní”„ë¡œì„¸ìŠ¤ì˜ affinity ê°±ì‹  â–¶ value ê°’ : 0 \nâ†’ ì‹œìŠ¤í…œì— ì˜í•œ í”„ë¡œì„¸ìŠ¤ affinity ë™ì  ê°±ì‹  ë¶ˆê°€ë¡œ ì„¤ì • \n\n(PROCESS_AFFINITY_ENABLE_AUTO_UPDATEë¡œ ì„¤ì • ì‹œ \nì‹œìŠ¤í…œì˜ í”„ë¡œì„¸ìŠ¤ ì„ í˜¸ë„ë¥¼ ë™ì ìœ¼ë¡œ ì—…ë°ì´íŠ¸ ê°€ëŠ¥)");
+		strcpy(buf, "SUCCESS");
+	}else {
+		strcpy(buf, GetErrorMessage(" SetProcessAffinityUpdateMode() : FAIL \n\n Error Message :", GetLastError()));
+	}
+
+	wresult(__FILE__, __LINE__, "SetProcessAffinityUpdateMode", buf, "SUCCESS", msg);
+	return result;
+}
+
+/**
+* BOOL WINAPI SetProcessDEPPolicy(
+  _In_ DWORD dwFlags
+  );
+* 32 ë¹„íŠ¸ í”„ë¡œì„¸ìŠ¤ì— ëŒ€í•œ ë°ì´í„° ì‹¤í–‰ ë°©ì§€ (DEP) ë° DEP-ATL thunk emulation ì„¤ì •ì„ ë³€ê²½.
+* @author : ì†ë‚˜ì˜
+*
+* @param dwFlags 3ê°€ì§€.
+* @return ë³€ê²½ ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€.
+*/
+
+
+BOOL test_SetProcessDEPPolicy(){
+	
+	#ifdef OQADBGPRINT
+	printf("test_SetProcessDEPPolicy\n");
+	#endif
+
+	BOOL result = FALSE;
+	
+	char buf[BUFSIZ] = "FAIL";
+	char msg[BUFSIZ] = "FAIL";
+	
+	// DEP(Data Execution Prevention) : ë°ì´íƒ€ ì‹¤í–‰ ë°©ì§€
+	// SetProcessDEPPolicy í•¨ìˆ˜ëŠ” 32bit processë¥¼ ìœ„í•œ setting
+	// ë”°ë¼ì„œ, í˜„ windows í™˜ê²½(64bit)ì—ì„œëŠ” fail ëœ¨ëŠ” ê²ƒ0ì´ ì •ìƒ
+
+	// íŒŒë¼ë¯¸í„° ê°’ 0 
+	// DEP ì‹œìŠ¤í…œ ì •ì±…ì´ Optln ì´ê±°ë‚˜ OptOut, ë˜ëŠ” í•´ë‹¹ í”„ë¡œì„¸ì„œì— DEP ì‚¬ìš©í•  ë•Œ\
+	// ê°’ì„ 0ìœ¼ë¡œ ì£¼ë©´ â†’ DEPê°€ ë¹„í™œì„±í™” ì²˜ë¦¬ ë¨
+	
+	result = SetProcessDEPPolicy(0);
+	
+	if(result != FALSE)
+		strcpy(msg, "SetProcessDEPPolicy() : SUCCESS");	
+	else 
+		strcpy(msg, " SetProcessDEPPolicy() : FAIL \n\n \n(í•´ë‹¹ í•¨ìˆ˜ëŠ” 32 bit ì „ìš©ì…ë‹ˆë‹¤");
+		
+	wresult(__FILE__, __LINE__, "SetProcessDEPPolicy", msg, "SetProcessDEPPolicy() : SUCCESS", msg);
+
+	return result;
+}
+
+
+/**
+* BOOL WINAPI SetProcessPriorityBoost(
+  _In_ HANDLE hProcess,
+  _In_ BOOL   DisablePriorityBoost
+  );
+* ì‹œìŠ¤í…œì´ ì§€ì •ëœ í”„ë¡œì„¸ìŠ¤ì˜ ìŠ¤ë ˆë“œ ìš°ì„  ìˆœìœ„ë¥¼ ì¼ì‹œì ìœ¼ë¡œ ë†’ì´ëŠ” ê¸°ëŠ¥ì„ ë¹„í™œì„±í™”í•˜ê±°ë‚˜ í™œì„±í™”.
+* @author : ì†ë‚˜ì˜
+*
+* @param hProcess í”„ë¡œì„¸ìŠ¤ì— ëŒ€í•œ í•¸ë“¤. ì´ í•¸ë“¤ì—ëŠ” PROCESS_SET_INFORMATION ì•¡ì„¸ìŠ¤ ê¶Œí•œì´ ìˆì–´ì•¼ í•¨.
+* @param DisablePriorityBoost ì´ ë§¤ê°œ ë³€ìˆ˜ê°€ TRUEì´ë©´ ë™ì  ë¶€ìŠ¤íŒ…ì´ ë¹„í™œì„±í™”ë¨. ë§¤ê°œ ë³€ìˆ˜ê°€ FALSEì´ë©´ ë™ì  ë¶€ìŠ¤í„°ê°€ í™œì„±í™” ë¨.
+* @return í™œì„±í™” ë˜ëŠ” ë¹„í™œì„±í™” ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€.
+*/
+
+BOOL test_SetProcessPriorityBoost(){
+	
+	#ifdef OQADBGPRINT
+	printf("test_SetProcessPriorityBoost\n");
+	#endif
+
+	char buf[BUFSIZ];
+	char msg[BUFSIZ] = "FAIL";
+	int pid = GetCurrentProcessId();
+
+	BOOL re_result = FALSE;
+	BOOL result;
+	// This handle must have the PROCESS_SET_INFORMATION access right.
+	HANDLE hProcess = OpenProcess(PROCESS_SET_INFORMATION , FALSE, pid);
+
+	// To restore normal behavior, call SetProcessPriorityBoost with DisablePriorityBoost set to FALSE.
+	result = SetProcessPriorityBoost(hProcess, FALSE);
+
+	if(result != 0){
+		re_result = TRUE;
+		sprintf(msg, " SetProcessPriorityBoost() : SUCCESS");
+		strcpy(buf, "SUCCESS");
+	}else{
+		strcpy(msg, GetErrorMessage(" SetProcessPriorityBoost() : FAIL \n\n Error Message :", GetLastError()));
+	}
+
+	wresult(__FILE__, __LINE__, "SetProcessPriorityBoost", buf, "SUCCESS", msg);
+
+	return re_result;
+}
+
+
+/**
+* BOOL WINAPI SetProcessShutdownParameters(
+  _In_ DWORD dwLevel,
+  _In_ DWORD dwFlags
+  );
+* í˜„ì¬ í˜¸ì¶œì¤‘ì¸ í”„ë¡œì„¸ìŠ¤ì˜ ì¢…ë£Œ ë§¤ê°œ ë³€ìˆ˜ë¥¼ ì„¤ì •í•˜ë¼. ì´ í•¨ìˆ˜ëŠ” ì‹œìŠ¤í…œì˜ ë‹¤ë¥¸ í”„ë¡œì„¸ìŠ¤ì™€ ê´€ë ¨ëœ í”„ë¡œì„¸ìŠ¤ì˜ ì¢…ë£Œ ìˆœì„œë¥¼ ì…‹íŒ…í•¨.
+* @author : ì†ë‚˜ì˜
+*
+* @param ì‹œìŠ¤í…œì˜ ë‹¤ë¥¸ í”„ë¡œì„¸ìŠ¤ì™€ ê´€ë ¨ëœ í”„ë¡œì„¸ìŠ¤ì˜ ì¢…ë£Œ ìš°ì„  ìˆœìœ„. ëª¨ë“  í”„ë¡œì„¸ìŠ¤ëŠ” ì¢…ë£Œ ë ˆë²¨ 0x280ì—ì„œ ì‹œì‘.
+* @param SHUTDOWN_NORETRYì¼ ìˆ˜ ìˆìŒ.
+* @return ì¢…ë£Œ ìˆœì„œ ì…‹íŒ… ì„±ê³µ/ì‹¤íŒ¨ ì—¬ë¶€.
+*/
+
+BOOL test_SetProcessShutdownParameters(){
+
+	#ifdef OQADBGPRINT
+	printf("test_SetProcessShutdownParameters\n");
+	#endif
+
+	BOOL result;
+	char msg[BUFSIZ] = "FAIL";
+
+	// í˜„ì¬ í˜¸ì¶œì¤‘ì¸ í”„ë¡œì„¸ìŠ¤ì˜ ì¢…ë£Œ ë§¤ê°œ ë³€ìˆ˜ë¥¼ ì„¤ì •
+	// ì²« ë²ˆì§¸ íŒŒë¼ë¯¸í„° : í”„ë¡œì„¸ìŠ¤ ì¢…ë£Œ ìš°ì„  ìˆœìœ„. value ê°’ ë‹¤ì„¯ ê°€ì§€ ì¤‘ì— set.
+	// 000 ~ 0FF ì‹œìŠ¤í…œì€ ë§ˆì§€ë§‰ ì¢…ë£Œ ë²”ìœ„ë¥¼ ì˜ˆì•½í•¨	/ 100-1FF ì‘ìš© í”„ë¡œê·¸ë¨ì€ ë§ˆì§€ë§‰ ì¢…ë£Œ ë²”ìœ„ë¥¼ ì˜ˆì•½í•¨
+	// 200-2FF ì‘ìš© í”„ë¡œê·¸ë¨ì´ "ì¢…ë£Œ ë²”ìœ„"ì‚¬ì´ì— ì˜ˆì•½ë¨	/ 300-3FF ì‘ìš© í”„ë¡œê·¸ë¨ì´ ì²« ë²ˆì§¸ ì¢…ë£Œ ë²”ìœ„ë¥¼ ì˜ˆì•½í•¨
+	// 400-4FF ì‹œìŠ¤í…œì´ ì²« ë²ˆì§¸ ì¢…ë£Œ ë²”ìœ„ë¥¼ ì˜ˆì•½í•¨
+	// ë‘ ë²ˆì§¸ íŒŒë¼ë¯¸í„° : SHUTDOWN_NORETRY â†’ ì‹œìŠ¤í…œì€ ì‚¬ìš©ìì— ëŒ€í•œ ì¬ì‹œë„ ëŒ€í™” ìƒìë¥¼ í‘œì‹œí•˜ì§€ ì•Šê³  í”„ë¡œì„¸ìŠ¤ë¥¼ ì¢…ë£Œ
+	
+	result = SetProcessShutdownParameters(0x3ff, SHUTDOWN_NORETRY);
+	if(result != 0)
+		strcpy(msg, "SetProcessShutdownParameters() : SUCCESS");	
+	else 
+		strcpy(msg, GetErrorMessage(" SetProcessShutdownParameters() : FAIL \n\n Error Message :", GetLastError()));
+	
+	wresult(__FILE__, __LINE__, "SetProcessShutdownParameters", msg, "SetProcessShutdownParameters() : SUCCESS", msg);
+	return result;
+}

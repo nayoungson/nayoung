@@ -1,28 +1,27 @@
-﻿빌드 시작: 2017-11-13 오후 3:27:10
-     1>2 노드의 "C:\Users\NAYOUNG\documents\visual studio 2012\Projects\API_OS1nayoung_2\API_OS1nayoung_2\API_OS1nayoung_2.vcxproj" 프로젝트(Build 대상)입니다.
-     1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt "손나영\TestCriticalSection.cpp" "손나영\TestMemory.cpp"
-         TestCriticalSection.cpp
-         TestMemory.cpp
-     1>손나영\TestMemory.cpp(560): warning C4101: 'bytesRead' :참조되지 않은 지역 변수입니다.
-       Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\NAYOUNG\documents\visual studio 2012\Projects\API_OS1nayoung_2\Release\API_OS1nayoung_2.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\NAYOUNG\documents\visual studio 2012\Projects\API_OS1nayoung_2\Release\API_OS1nayoung_2.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\NAYOUNG\documents\visual studio 2012\Projects\API_OS1nayoung_2\Release\API_OS1nayoung_2.lib" /MACHINE:X86 /SAFESEH Release\MyUtil.obj
+﻿빌드 시작: 2018-01-26 오전 9:18:08
+     1>2 노드의 "C:\Users\NAYOUNG\Documents\Visual Studio 2012\Projects\API_OS1nayoung_2\API_OS1nayoung_2\API_OS1nayoung_2.vcxproj" 프로젝트(Build 대상)입니다.
+     1>Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\NAYOUNG\Documents\Visual Studio 2012\Projects\API_OS1nayoung_2\Release\API_OS1nayoung_2.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\NAYOUNG\Documents\Visual Studio 2012\Projects\API_OS1nayoung_2\Release\API_OS1nayoung_2.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\NAYOUNG\Documents\Visual Studio 2012\Projects\API_OS1nayoung_2\Release\API_OS1nayoung_2.lib" /MACHINE:X86 /SAFESEH Release\MakeButton.obj
+         Release\MergedWinMain.obj
+         Release\MyUtil.obj
          Release\OSQA.obj
-         Release\WinMain.obj
+         Release\Paging.obj
+         Release\TestConsole.obj
          Release\TestCriticalSection.obj
          Release\TestEventHG.obj
          Release\TestFunction.obj
          Release\TestFunctionPPT.obj
          Release\TestMemory.obj
+         Release\TestMetafile.obj
          Release\TestModule.obj
          Release\TestProcessF.obj
          Release\TestProcessor.obj
          Release\TestRegistry.obj
          코드를 생성하고 있습니다.
          코드를 생성했습니다.
-         API_OS1nayoung_2.vcxproj -> C:\Users\NAYOUNG\documents\visual studio 2012\Projects\API_OS1nayoung_2\Release\API_OS1nayoung_2.exe
-     1>"C:\Users\NAYOUNG\documents\visual studio 2012\Projects\API_OS1nayoung_2\API_OS1nayoung_2\API_OS1nayoung_2.vcxproj" 프로젝트를 빌드했습니다(Build 대상).
+         API_OS1nayoung_2.vcxproj -> C:\Users\NAYOUNG\Documents\Visual Studio 2012\Projects\API_OS1nayoung_2\Release\API_OS1nayoung_2.exe
+     1>"C:\Users\NAYOUNG\Documents\Visual Studio 2012\Projects\API_OS1nayoung_2\API_OS1nayoung_2\API_OS1nayoung_2.vcxproj" 프로젝트를 빌드했습니다(Build 대상).
 
 빌드했습니다.
 
-경과 시간: 00:00:02.79
+경과 시간: 00:00:02.61

@@ -24,15 +24,6 @@
     <ClCompile Include="손나영\TestEventHG.cpp">
       <Filter>소스 파일\손나영</Filter>
     </ClCompile>
-    <ClCompile Include="OSQA.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="MyUtil.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="WinMain.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="손나영\TestCriticalSection.cpp">
       <Filter>소스 파일\손나영</Filter>
     </ClCompile>
@@ -40,9 +31,6 @@
       <Filter>소스 파일\손나영</Filter>
     </ClCompile>
     <ClCompile Include="손나영\TestFunctionPPT.cpp">
-      <Filter>소스 파일\손나영</Filter>
-    </ClCompile>
-    <ClCompile Include="손나영\TestMemory.cpp">
       <Filter>소스 파일\손나영</Filter>
     </ClCompile>
     <ClCompile Include="손나영\TestModule.cpp">
@@ -55,6 +43,30 @@
       <Filter>소스 파일\손나영</Filter>
     </ClCompile>
     <ClCompile Include="손나영\TestRegistry.cpp">
+      <Filter>소스 파일\손나영</Filter>
+    </ClCompile>
+    <ClCompile Include="손나영\TestMetafile.cpp">
+      <Filter>소스 파일\손나영</Filter>
+    </ClCompile>
+    <ClCompile Include="손나영\TestMemory.cpp">
+      <Filter>소스 파일\손나영</Filter>
+    </ClCompile>
+    <ClCompile Include="MakeButton.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="MergedWinMain.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="MyUtil.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="OSQA.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Paging.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="손나영\TestConsole.cpp">
       <Filter>소스 파일\손나영</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,9 +89,6 @@
     <ClInclude Include="손나영\TestFunctionPPT.h">
       <Filter>헤더 파일\손나영</Filter>
     </ClInclude>
-    <ClInclude Include="손나영\TestMemory.h">
-      <Filter>헤더 파일\손나영</Filter>
-    </ClInclude>
     <ClInclude Include="손나영\TestModule.h">
       <Filter>헤더 파일\손나영</Filter>
     </ClInclude>
@@ -92,5 +101,29 @@
     <ClInclude Include="손나영\TestRegistry.h">
       <Filter>헤더 파일\손나영</Filter>
     </ClInclude>
+    <ClInclude Include="Paging.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MakeButton.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MergedWinMain.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="손나영\TestMetafile.h">
+      <Filter>헤더 파일\손나영</Filter>
+    </ClInclude>
+    <ClInclude Include="OS1HeaderList.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="손나영\TestMemory.h">
+      <Filter>헤더 파일\손나영</Filter>
+    </ClInclude>
+    <ClInclude Include="손나영\TestConsole.h">
+      <Filter>헤더 파일\손나영</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Text.txt" />
   </ItemGroup>
 </Project>
